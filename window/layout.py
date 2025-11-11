@@ -3,8 +3,6 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from random import randint
-
 import pyqtgraph as pg
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (
@@ -14,47 +12,36 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QVBoxLayout,
     QHBoxLayout,
-    QPushButton,
-    QSizePolicy,
-    QSpacerItem,
     QFileDialog,
     QMessageBox
 )
 
-
-
-#- Defines -----------------------------------------------------------------------------------------
-
-BACKGROUND_COLOR: str = "#101e15"
-APPLICATION_NAME: str = "Gesture Tracker v0.0.1"
-
-BUTTON_STYLE: str = """
-    QPushButton {
-        background-color: #112719;
-        border: 2px solid #0b1e14;
-        border-radius: 5px;
-        padding: 5% 10%;
-        color: #7d8b94;
-    }
-    QPushButton:pressed {
-        background-color: black;
-    }
-"""
+# from utils import connected_ports
+from .helper import (
+    new_color,
+    spaced_element
+)
+from .style import (
+    BACKGROUND_COLOR,
+    APPLICATION_NAME,
+    WINDOW_SIZE,
+    GRAPH_HEIGHT,
+    RAW_VALUE_BOX_STYLE,
+)
 
 
 #- Window Class ------------------------------------------------------------------------------------
 
-def new_color() -> ( int, int, int ):
-    return ( randint( 0, 255 ), randint( 60, 255 ), randint( 0, 200 ) )
-
 
 class LiveGraph( QWidget ):
+
+    from .helper import create_button
 
     def __init__( self ) -> None:
         super().__init__()
 
         self.setWindowTitle( APPLICATION_NAME )
-        self.resize( 1200, 800 )
+        self.resize( WINDOW_SIZE["width"], WINDOW_SIZE["height"] )
         self.setStyleSheet( f"background-color: {BACKGROUND_COLOR};" )
 
         self.layout = QVBoxLayout()
@@ -65,33 +52,19 @@ class LiveGraph( QWidget ):
 
         button_layout = QHBoxLayout()
 
-        self.RecordButton = QPushButton( "Record (Start)" )
-        self.RecordButton.clicked.connect( self.button_record )
-        self.RecordButton.setStyleSheet( BUTTON_STYLE )
-        button_layout.addWidget( self.RecordButton )
+        self.RecordButton = self.create_button("Record (Start)", self.button_record)
+        self.SaveButton = self.create_button("Save", self.button_save)
+        self.DataViewButton = self.create_button("View Toggle", self.button_toggle_recent)
+        self.FreezeButton = self.create_button("Freeze", self.button_freeze)
+        self.ClearButton = self.create_button("Clear", self.button_clear_data)
 
-        self.SaveButton = QPushButton( "Save" )
-        self.SaveButton.clicked.connect( self.button_save )
-        self.SaveButton.setStyleSheet( BUTTON_STYLE )
+        button_layout.addWidget( self.RecordButton )
         button_layout.addWidget( self.SaveButton )
 
-        button_layout.addItem(
-            QSpacerItem( 20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred )
-        )
+        button_layout.addItem( spaced_element() )
 
-        self.DataViewButton = QPushButton( "View Toggle" )
-        self.DataViewButton.clicked.connect( self.button_toggle_recent )
-        self.DataViewButton.setStyleSheet( BUTTON_STYLE )
         button_layout.addWidget( self.DataViewButton )
-
-        self.FreezeButton = QPushButton( "Freeze" )
-        self.FreezeButton.clicked.connect( self.button_freeze )
-        self.FreezeButton.setStyleSheet( BUTTON_STYLE )
         button_layout.addWidget( self.FreezeButton )
-
-        self.ClearButton = QPushButton( " Clear " )
-        self.ClearButton.clicked.connect( self.button_clear_data )
-        self.ClearButton.setStyleSheet( BUTTON_STYLE )
         button_layout.addWidget( self.ClearButton )
 
         self.layout.addLayout( button_layout )
@@ -102,7 +75,7 @@ class LiveGraph( QWidget ):
         self.plot_widget = pg.PlotWidget()
         self.plot_widget.setBackground( BACKGROUND_COLOR )
         self.layout.addWidget( self.plot_widget )
-        self.plot_widget.setFixedHeight( 250 )
+        self.plot_widget.setFixedHeight( GRAPH_HEIGHT )
 
         self.plot_widget.showGrid( x=True, y=True )
         self.plot_widget.setMouseEnabled( True, True )
@@ -115,10 +88,7 @@ class LiveGraph( QWidget ):
         # Legend
         self.legend_layout = QHBoxLayout()
         self.layout.addLayout( self.legend_layout )
-
-        self.legend_layout.addItem(
-            QSpacerItem( 20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred )
-        )
+        self.legend_layout.addItem( spaced_element() )
 
 
         #- Raw Values ----------------------------------------------------------
@@ -130,14 +100,13 @@ class LiveGraph( QWidget ):
         self.scroll_area_layout = QVBoxLayout( self.scroll_area_content )
 
         self.data_display = QTextEdit()
-        self.data_display.setStyleSheet( "background-color: #121212; color: #7d8b94;" )
+        self.data_display.setStyleSheet( RAW_VALUE_BOX_STYLE )
         self.data_display.setReadOnly( True )
 
         self.scroll_area_layout.addWidget( self.data_display )
         self.scroll_area.setWidget( self.scroll_area_content )
 
         self.layout.addWidget( self.scroll_area )
-
 
 
     def update_plot( self ) -> None:
