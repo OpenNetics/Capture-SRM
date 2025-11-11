@@ -16,7 +16,9 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QPushButton,
     QSizePolicy,
-    QSpacerItem
+    QSpacerItem,
+    QFileDialog,
+    QMessageBox
 )
 
 
@@ -38,6 +40,7 @@ BUTTON_STYLE: str = """
         background-color: black;
     }
 """
+
 
 #- Window Class ------------------------------------------------------------------------------------
 
@@ -62,15 +65,15 @@ class LiveGraph( QWidget ):
 
         button_layout = QHBoxLayout()
 
-        self.SaveButton = QPushButton( "Save" )
-        self.SaveButton.clicked.connect( self.button_save )
-        self.SaveButton.setStyleSheet( BUTTON_STYLE )
-        button_layout.addWidget( self.SaveButton )
-
         self.RecordButton = QPushButton( "Record (Start)" )
         self.RecordButton.clicked.connect( self.button_record )
         self.RecordButton.setStyleSheet( BUTTON_STYLE )
         button_layout.addWidget( self.RecordButton )
+
+        self.SaveButton = QPushButton( "Save" )
+        self.SaveButton.clicked.connect( self.button_save )
+        self.SaveButton.setStyleSheet( BUTTON_STYLE )
+        button_layout.addWidget( self.SaveButton )
 
         button_layout.addItem(
             QSpacerItem( 20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred )
@@ -218,7 +221,25 @@ class LiveGraph( QWidget ):
 
 
     def button_save( self ) -> None:
-        pass
+        # Open file dialog to select save location
+        options = QFileDialog.Options()
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save File",
+            "",
+            "Text Files (*.txt);;All Files (*)",
+            options=options
+        )
+
+        if file_path:
+            with open( file_path, 'w' ) as file:
+                file.write( self.data_display.toPlainText() )
+
+        msg_box = QMessageBox( self )
+        msg_box.setIcon( QMessageBox.NoIcon )
+        msg_box.setWindowTitle( "Success" )
+        msg_box.setText( "File saved successfully!" )
+        msg_box.exec_()
 
 
     def button_record( self ) -> None:
