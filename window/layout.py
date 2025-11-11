@@ -6,8 +6,7 @@
 from random import randint
 
 import pyqtgraph as pg
-from PySide6.QtCore import QTimer
-from PySide6.QtWidgets import QVBoxLayout, QWidget, QPushButton
+from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QSpacerItem
 
 
 #- Defines -----------------------------------------------------------------------------------------
@@ -15,11 +14,24 @@ from PySide6.QtWidgets import QVBoxLayout, QWidget, QPushButton
 BACKGROUND_COLOR: str = "#101e15"
 APPLICATION_NAME: str = "Gesture Tracker v0.0.1"
 
+BUTTON_STYLE: str = """
+    QPushButton {
+        background-color: #112719;
+        border: 2px solid #0b1e14;
+        border-radius: 5px;
+        padding: 5% 10%;
+        color: #7d8b94;
+    }
+    QPushButton:pressed {
+        background-color: black;
+    }
+"""
 
 #- Window Class ------------------------------------------------------------------------------------
 
-def print_message():
-    pass
+def new_color() -> ( int, int, int ):
+    return ( randint( 0, 255 ), randint( 60, 255 ), randint( 0, 200 ) )
+
 
 class LiveGraph( QWidget ):
 
@@ -33,11 +45,45 @@ class LiveGraph( QWidget ):
         self.layout = QVBoxLayout()
         self.setLayout( self.layout )
 
-        self.button = QPushButton( "Toggle All" )
-        self.button.clicked.connect( self.button_toggle_recent )
-        self.layout.addWidget( self.button )
 
-        # Initialise the plot
+        #- Buttons -------------------------------------------------------------
+
+        button_layout = QHBoxLayout()
+
+        self.SaveButton = QPushButton( "Save" )
+        self.SaveButton.clicked.connect( self.button_save )
+        self.SaveButton.setStyleSheet( BUTTON_STYLE )
+        button_layout.addWidget( self.SaveButton )
+
+        self.RecordButton = QPushButton( "Record (Start)" )
+        self.RecordButton.clicked.connect( self.button_record )
+        self.RecordButton.setStyleSheet( BUTTON_STYLE )
+        button_layout.addWidget( self.RecordButton )
+
+        button_layout.addItem(
+            QSpacerItem( 20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred )
+        )
+
+        self.DataViewButton = QPushButton( "View Toggle" )
+        self.DataViewButton.clicked.connect( self.button_toggle_recent )
+        self.DataViewButton.setStyleSheet( BUTTON_STYLE )
+        button_layout.addWidget( self.DataViewButton )
+
+        self.FreezeButton = QPushButton( "Freeze" )
+        self.FreezeButton.clicked.connect( self.button_freeze )
+        self.FreezeButton.setStyleSheet( BUTTON_STYLE )
+        button_layout.addWidget( self.FreezeButton )
+
+        self.ClearButton = QPushButton( " Clear " )
+        self.ClearButton.clicked.connect( self.button_clear_data )
+        self.ClearButton.setStyleSheet( BUTTON_STYLE )
+        button_layout.addWidget( self.ClearButton )
+
+        self.layout.addLayout(button_layout)
+
+
+        #- Graph Plot ----------------------------------------------------------
+
         self.plot_widget = pg.PlotWidget()
         self.plot_widget.setBackground( BACKGROUND_COLOR )
         self.layout.addWidget( self.plot_widget )
@@ -48,36 +94,26 @@ class LiveGraph( QWidget ):
         self.reading_source = []
         self.counter = [0]
         self.toggle_recent = 0
-
-        self.timer = QTimer()
-        self.timer.timeout.connect( self.update_plot )
-        self.timer.start(100)
-
-        # Set-up hover label
-        self.hover_label = pg.LabelItem()
-        self.plot_widget.addItem( self.hover_label )
+        self.freeze = False
 
 
-    def update_plot(self) -> None:
+
+    def update_plot( self ) -> None:
+        if self.freeze:
+            return
+
         self.plot_widget.clear()
 
         for line in self.reading_source:
             sliced_line = pg.PlotDataItem(
                 x = self.counter[self.toggle_recent:],
                 y = line["reading"][self.toggle_recent:],
-                pen = pg.mkPen( color=line["color"], width=2 )
+                pen = pg.mkPen( color=line["color"], width=2 ),
+                name = line["name"]
             )
 
             self.plot_widget.addItem( sliced_line )
-
-
-    def button_toggle_recent( self ) -> None:
-        self.toggle_recent = 0 - 10 - self.toggle_recent
-        self.update_plot()
-
-
-    def new_color( self ) -> ( int, int, int ):
-        return ( randint( 0, 255 ), randint( 60, 255 ), randint( 0, 200 ) )
+            self.legend.addItem( sliced_line, line["name"] )
 
 
     def add_data( self, values ) -> None:
@@ -92,7 +128,8 @@ class LiveGraph( QWidget ):
             if i >= len( self.reading_source ):
                 new_line: dict = {
                     "reading": [value] * len( self.counter ),
-                    "color": self.new_color(),
+                    "color": new_color(),
+                    "name": f"source{i}"
                 }
 
                 self.reading_source.append(new_line)
@@ -101,4 +138,34 @@ class LiveGraph( QWidget ):
                 self.reading_source[i]["reading"].append( value )
 
         self.update_plot()
+
+
+    def button_toggle_recent( self ) -> None:
+        view_button_options = [ "View Latest", "View All" ]
+        self.toggle_recent = 0 - 10 - self.toggle_recent
+        self.DataViewButton.setText( view_button_options[self.toggle_recent % 11] )
+        self.update_plot()
+
+
+    def button_clear_data( self ) -> None:
+        self.reading_source = []
+        self.counter = [0]
+        self.toggle_recent = 0
+        self.update_plot()
+
+
+    def button_freeze( self ) -> None:
+        self.freeze = not self.freeze
+        self.FreezeButton.setText("Unfreeze" if self.freeze else "Freeze")
+        self.update_plot()
+
+
+    def button_save( self ) -> None:
+        pass
+
+
+    def button_record( self ) -> None:
+        current_text = self.RecordButton.text()
+        new_text = "Record (Stop)" if current_text == "Record (Start)" else "Record (Start)"
+        self.RecordButton.setText(new_text)
 
