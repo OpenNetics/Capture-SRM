@@ -8,6 +8,7 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (
     QLabel,
     QWidget,
+    QDialog,
     QTextEdit,
     QComboBox,
     QScrollArea,
@@ -31,10 +32,10 @@ from .style import (
     RAW_VALUE_BOX_STYLE,
     COMBOBOX_STYLE
 )
+from .record_gesture import InputDialog
 
 
 #- Window Class ------------------------------------------------------------------------------------
-
 
 class LiveGraph( QWidget ):
 
@@ -49,6 +50,14 @@ class LiveGraph( QWidget ):
 
         self.layout = QVBoxLayout()
         self.setLayout( self.layout )
+
+
+        #- Variables -----------------------------------------------------------
+
+        self.reading_source = []
+        self.counter = [0]
+        self.toggle_recent = 0
+        self.freeze = False
 
 
         #- Buttons -------------------------------------------------------------
@@ -80,11 +89,6 @@ class LiveGraph( QWidget ):
 
         self.plot_widget.showGrid( x=True, y=True )
         self.plot_widget.setMouseEnabled( True, True )
-
-        self.reading_source = []
-        self.counter = [0]
-        self.toggle_recent = 0
-        self.freeze = False
 
         # Legend
         self.legend_layout = QHBoxLayout()
@@ -235,7 +239,11 @@ class LiveGraph( QWidget ):
     def button_record( self ) -> None:
         current_text = self.RecordButton.text()
         new_text = "Record (Stop)" if current_text == "Record (Start)" else "Record (Start)"
-        self.RecordButton.setText(new_text)
+        self.RecordButton.setText( new_text )
+
+        dialog = InputDialog( len(self.reading_source) )
+        if dialog.exec() == QDialog.Accepted:
+            gesture_name, repeats, selected_sensors = dialog.get_inputs()
 
 
     def button_refresh_connections( self ) -> None:
