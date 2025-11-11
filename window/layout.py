@@ -60,9 +60,7 @@ class LiveGraph( QWidget ):
 
         button_layout.addWidget( self.RecordButton )
         button_layout.addWidget( self.SaveButton )
-
         button_layout.addItem( spaced_element() )
-
         button_layout.addWidget( self.DataViewButton )
         button_layout.addWidget( self.FreezeButton )
         button_layout.addWidget( self.ClearButton )
@@ -176,9 +174,12 @@ class LiveGraph( QWidget ):
 
 
     def button_clear_data( self ) -> None:
-        self.reading_source = []
         self.counter = [0]
         self.toggle_recent = 0
+
+        for line in self.reading_source:
+            line["reading"] = [line["reading"][-1]]
+
         self.data_display.clear()
         self.update_plot()
 
