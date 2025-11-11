@@ -6,7 +6,9 @@
 from random import randint
 
 import pyqtgraph as pg
-from PySide6.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QSpacerItem
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QSpacerItem
+from PySide6.QtCore import QSize
+
 
 
 #- Defines -----------------------------------------------------------------------------------------
@@ -79,7 +81,7 @@ class LiveGraph( QWidget ):
         self.ClearButton.setStyleSheet( BUTTON_STYLE )
         button_layout.addWidget( self.ClearButton )
 
-        self.layout.addLayout(button_layout)
+        self.layout.addLayout( button_layout )
 
 
         #- Graph Plot ----------------------------------------------------------
@@ -95,6 +97,17 @@ class LiveGraph( QWidget ):
         self.counter = [0]
         self.toggle_recent = 0
         self.freeze = False
+
+        # Legend
+        self.legend_layout = QHBoxLayout()
+        self.layout.addLayout( self.legend_layout )
+
+        self.legend_layout.addItem(
+            QSpacerItem( 20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred )
+        )
+
+
+        #- Raw Values ----------------------------------------------------------
 
 
 
@@ -113,7 +126,6 @@ class LiveGraph( QWidget ):
             )
 
             self.plot_widget.addItem( sliced_line )
-            self.legend.addItem( sliced_line, line["name"] )
 
 
     def add_data( self, values ) -> None:
@@ -126,13 +138,30 @@ class LiveGraph( QWidget ):
         for i, value in enumerate(values):
 
             if i >= len( self.reading_source ):
+                colors: ( int, int, int ) = new_color()
+
                 new_line: dict = {
                     "reading": [value] * len( self.counter ),
-                    "color": new_color(),
+                    "color": colors,
                     "name": f"source{i}"
                 }
 
-                self.reading_source.append(new_line)
+                self.reading_source.append( new_line )
+
+                # Draw legend
+                square = QLabel()
+                square.setFixedSize( QSize(20, 20) )
+                square.setStyleSheet(
+                    f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
+                )
+
+                text_label = QLabel( f"source {i+1}" )
+
+                h_layout = QHBoxLayout()
+                h_layout.addWidget(square)
+                h_layout.addWidget(text_label)
+
+                self.legend_layout.addLayout( h_layout )
 
             else:
                 self.reading_source[i]["reading"].append( value )
