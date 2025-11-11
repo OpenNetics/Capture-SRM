@@ -6,8 +6,18 @@
 from random import randint
 
 import pyqtgraph as pg
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QSizePolicy, QSpacerItem
 from PySide6.QtCore import QSize
+from PySide6.QtWidgets import (
+    QLabel,
+    QWidget,
+    QTextEdit,
+    QScrollArea,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QSizePolicy,
+    QSpacerItem
+)
 
 
 
@@ -41,7 +51,7 @@ class LiveGraph( QWidget ):
         super().__init__()
 
         self.setWindowTitle( APPLICATION_NAME )
-        self.resize( 1200, 600 )
+        self.resize( 1200, 800 )
         self.setStyleSheet( f"background-color: {BACKGROUND_COLOR};" )
 
         self.layout = QVBoxLayout()
@@ -89,6 +99,7 @@ class LiveGraph( QWidget ):
         self.plot_widget = pg.PlotWidget()
         self.plot_widget.setBackground( BACKGROUND_COLOR )
         self.layout.addWidget( self.plot_widget )
+        self.plot_widget.setFixedHeight( 250 )
 
         self.plot_widget.showGrid( x=True, y=True )
         self.plot_widget.setMouseEnabled( True, True )
@@ -109,6 +120,21 @@ class LiveGraph( QWidget ):
 
         #- Raw Values ----------------------------------------------------------
 
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setWidgetResizable( True )
+
+        self.scroll_area_content = QWidget()
+        self.scroll_area_layout = QVBoxLayout( self.scroll_area_content )
+
+        self.data_display = QTextEdit()
+        self.data_display.setStyleSheet( "background-color: #121212; color: #7d8b94;" )
+        self.data_display.setReadOnly( True )
+
+        self.scroll_area_layout.addWidget( self.data_display )
+        self.scroll_area.setWidget( self.scroll_area_content )
+
+        self.layout.addWidget( self.scroll_area )
+
 
 
     def update_plot( self ) -> None:
@@ -122,7 +148,6 @@ class LiveGraph( QWidget ):
                 x = self.counter[self.toggle_recent:],
                 y = line["reading"][self.toggle_recent:],
                 pen = pg.mkPen( color=line["color"], width=2 ),
-                name = line["name"]
             )
 
             self.plot_widget.addItem( sliced_line )
@@ -131,6 +156,9 @@ class LiveGraph( QWidget ):
     def add_data( self, values ) -> None:
         if not isinstance(values, list):
             raise ValueError("Input must be an array of values.")
+
+        # add data to the raw data area
+        self.data_display.append( str(values) )
 
         self.counter.append( self.counter[-1] + 1 )
 
@@ -143,7 +171,6 @@ class LiveGraph( QWidget ):
                 new_line: dict = {
                     "reading": [value] * len( self.counter ),
                     "color": colors,
-                    "name": f"source{i}"
                 }
 
                 self.reading_source.append( new_line )
@@ -155,7 +182,7 @@ class LiveGraph( QWidget ):
                     f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
                 )
 
-                text_label = QLabel( f"source {i+1}" )
+                text_label = QLabel( f"index {i+1}" )
 
                 h_layout = QHBoxLayout()
                 h_layout.addWidget(square)
@@ -180,6 +207,7 @@ class LiveGraph( QWidget ):
         self.reading_source = []
         self.counter = [0]
         self.toggle_recent = 0
+        self.data_display.clear()
         self.update_plot()
 
 
