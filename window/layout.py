@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QVBoxLayout, QWidget, QPushButton
 
 #- Defines -----------------------------------------------------------------------------------------
 
-BACKGROUND_COLOUR: str = "#101e15"
+BACKGROUND_COLOR: str = "#101e15"
 APPLICATION_NAME: str = "Gesture Tracker v0.0.1"
 
 
@@ -27,26 +27,27 @@ class LiveGraph( QWidget ):
         super().__init__()
 
         self.setWindowTitle( APPLICATION_NAME )
-        self.setStyleSheet( f"background-color: {BACKGROUND_COLOUR};" )
+        self.resize( 1200, 600 )
+        self.setStyleSheet( f"background-color: {BACKGROUND_COLOR};" )
 
         self.layout = QVBoxLayout()
         self.setLayout( self.layout )
 
         self.button = QPushButton( "Toggle All" )
-        self.button.clicked.connect( print_message )
+        self.button.clicked.connect( self.button_toggle_recent )
         self.layout.addWidget( self.button )
 
         # Initialise the plot
         self.plot_widget = pg.PlotWidget()
-        self.plot_widget.setBackground( BACKGROUND_COLOUR )
+        self.plot_widget.setBackground( BACKGROUND_COLOR )
         self.layout.addWidget( self.plot_widget )
 
         self.plot_widget.showGrid( x=True, y=True )
         self.plot_widget.setMouseEnabled( True, True )
 
-        self.data_lines = []
-        self.x_data = [0]
-        self.y_data = []
+        self.reading_source = []
+        self.counter = [0]
+        self.toggle_recent = 0
 
         self.timer = QTimer()
         self.timer.timeout.connect( self.update_plot )
@@ -57,43 +58,47 @@ class LiveGraph( QWidget ):
         self.plot_widget.addItem( self.hover_label )
 
 
-    def update_plot( self ) -> None:
+    def update_plot(self) -> None:
         self.plot_widget.clear()
 
-        for line in self.data_lines:
-            self.plot_widget.addItem(line)
+        for line in self.reading_source:
+            sliced_line = pg.PlotDataItem(
+                x = self.counter[self.toggle_recent:],
+                y = line["reading"][self.toggle_recent:],
+                pen = pg.mkPen( color=line["color"], width=2 )
+            )
+
+            self.plot_widget.addItem( sliced_line )
+
+
+    def button_toggle_recent( self ) -> None:
+        self.toggle_recent = 0 - 10 - self.toggle_recent
+        self.update_plot()
 
 
     def new_color( self ) -> ( int, int, int ):
-        return ( randint(50, 250), randint(50, 250), randint(50, 250) )
+        return ( randint( 0, 255 ), randint( 60, 255 ), randint( 0, 200 ) )
 
 
     def add_data( self, values ) -> None:
         if not isinstance(values, list):
             raise ValueError("Input must be an array of values.")
 
-        self.x_data.append( self.x_data[-1] + 1 )
+        self.counter.append( self.counter[-1] + 1 )
 
         # Clear old data and add new lines
         for i, value in enumerate(values):
 
-            if i >= len(self.data_lines):
-                pen = pg.mkPen( color=self.new_color(), width=2 )
-                y_values = [value]*len(self.x_data)
+            if i >= len( self.reading_source ):
+                new_line: dict = {
+                    "reading": [value] * len( self.counter ),
+                    "color": self.new_color(),
+                }
 
-                new_line = pg.PlotDataItem(
-                    x=self.x_data,
-                    y=y_values,
-                    pen=pen,
-                    name=f"Value {i+1}"
-                )
-
-                self.y_data.append(y_values)
-                self.data_lines.append(new_line)
+                self.reading_source.append(new_line)
 
             else:
-                self.y_data[i].append(value)
-                self.data_lines[i].setData( x=self.x_data, y=self.y_data[i] )
+                self.reading_source[i]["reading"].append( value )
 
         self.update_plot()
 
