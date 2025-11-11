@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QWidget,
     QTextEdit,
+    QComboBox,
     QScrollArea,
     QVBoxLayout,
     QHBoxLayout,
@@ -16,17 +17,19 @@ from PySide6.QtWidgets import (
     QMessageBox
 )
 
-# from utils import connected_ports
+from utils import connected_ports, baud_rates
 from .helper import (
     new_color,
     spaced_element
 )
 from .style import (
     BACKGROUND_COLOR,
+    FONT_COLOR,
     APPLICATION_NAME,
     WINDOW_SIZE,
     GRAPH_HEIGHT,
     RAW_VALUE_BOX_STYLE,
+    COMBOBOX_STYLE
 )
 
 
@@ -54,7 +57,7 @@ class LiveGraph( QWidget ):
 
         self.RecordButton = self.create_button("Record (Start)", self.button_record)
         self.SaveButton = self.create_button("Save", self.button_save)
-        self.DataViewButton = self.create_button("View Toggle", self.button_toggle_recent)
+        self.DataViewButton = self.create_button("Zoom Latest", self.button_toggle_recent)
         self.FreezeButton = self.create_button("Freeze", self.button_freeze)
         self.ClearButton = self.create_button("Clear", self.button_clear_data)
 
@@ -86,6 +89,22 @@ class LiveGraph( QWidget ):
         # Legend
         self.legend_layout = QHBoxLayout()
         self.layout.addLayout( self.legend_layout )
+
+        self.connection_list = QComboBox()
+        self.connection_list.addItems( connected_ports() )
+        self.connection_list.setStyleSheet( COMBOBOX_STYLE )
+        self.connection_list.currentTextChanged.connect( self.print_selected_item )
+
+        ConnectionsRefreshButoon = self.create_button( "Refresh", self.button_refresh_connections )
+
+        self.baud_rate_list = QComboBox()
+        self.baud_rate_list.addItems( baud_rates() )
+        self.baud_rate_list.setStyleSheet( COMBOBOX_STYLE )
+        self.baud_rate_list.currentTextChanged.connect( self.print_selected_item )
+
+        self.legend_layout.addWidget( ConnectionsRefreshButoon )
+        self.legend_layout.addWidget( self.connection_list )
+        self.legend_layout.addWidget( self.baud_rate_list )
         self.legend_layout.addItem( spaced_element() )
 
 
@@ -152,7 +171,8 @@ class LiveGraph( QWidget ):
                     f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
                 )
 
-                text_label = QLabel( f"index {i+1}" )
+                text_label = QLabel( f"i{i+1}" )
+                text_label.setStyleSheet( f"color: {FONT_COLOR}" )
 
                 h_layout = QHBoxLayout()
                 h_layout.addWidget(square)
@@ -167,7 +187,7 @@ class LiveGraph( QWidget ):
 
 
     def button_toggle_recent( self ) -> None:
-        view_button_options = [ "View Latest", "View All" ]
+        view_button_options = [ "Zoom Latest", "View All" ]
         self.toggle_recent = 0 - 10 - self.toggle_recent
         self.DataViewButton.setText( view_button_options[self.toggle_recent % 11] )
         self.update_plot()
@@ -216,4 +236,13 @@ class LiveGraph( QWidget ):
         current_text = self.RecordButton.text()
         new_text = "Record (Stop)" if current_text == "Record (Start)" else "Record (Start)"
         self.RecordButton.setText(new_text)
+
+
+    def button_refresh_connections( self ) -> None:
+        self.connection_list.clear()
+        self.connection_list.addItems( connected_ports() )
+
+
+    def print_selected_item( self, text: str ) -> None:
+        print( f'Selected item: {text}' )
 
