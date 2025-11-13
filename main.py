@@ -1,33 +1,44 @@
 
 # main.py
 
+#- Imports -----------------------------------------------------------------------------------------
+
 import sys
+import time
+
+import numpy as np
 from PySide6.QtWidgets import QApplication
+from PySide6.QtCore import QThread, Signal
 from window import LiveGraph
+
+
+#- Declarations ------------------------------------------------------------------------------------
+
+class DataGenerator(QThread):
+    data_signal = Signal(list)
+
+    def run(self):
+        while True:
+            random_values = np.random.uniform(10, 15, 5)
+            array = np.round(random_values, 2).tolist()
+            self.data_signal.emit( array )
+            time.sleep(1)
+
 
 def main():
     app = QApplication( sys.argv )
     live_graph = LiveGraph()
     live_graph.show()
 
-    # Input loop
-    while True:
-        try:
-            value_input = input( "Enter numbers to plot (comma-separated or 'exit' to quit ): ")
-            if value_input.lower() == 'exit':
-                break
+    data_thread = DataGenerator()
+    data_thread.data_signal.connect( live_graph.add_data )
+    data_thread.start()
 
-            # convert input to a list of floats
-            values = list( map( float, value_input.split(',') ))
-            live_graph.add_data( values )
+    exit_code = app.exec()
+    data_thread.terminate()
 
-        except ValueError:
-            print( "Invalid input. Please enter numbers separated by commas." )
+    sys.exit(exit_code)
 
-        except Exception as e:
-            print( f"An error occurred: {e}" )
-
-    sys.exit( app.exec() )
 
 if __name__ == "__main__":
     main()
