@@ -79,10 +79,15 @@ class RecordDialog( QDialog ):
         self.layout.addLayout( button_layout )
 
 
-    def get_inputs( self ) -> ( str, int, List ):
+    def get_inputs( self ) -> ( str, int, List[int] ):
         gesture_name = self.gesture_name_input.text()
         repeats = int(self.repeats_input.text())
-        selected_sensors = [cb.text() for cb in self.sensor_checkboxes if cb.isChecked()]
+
+        selected_sensors = [
+            int(checkbox.text().split()[-1]) - 1
+            for checkbox in self.sensor_checkboxes
+            if checkbox.isChecked()
+        ]
 
         return gesture_name, repeats, selected_sensors
 

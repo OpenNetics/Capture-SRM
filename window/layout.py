@@ -74,7 +74,6 @@ class LiveGraph( QWidget ):
         self.counter = [0]
         self.toggle_recent = 0
         self.freeze = False
-        self.recording = False
 
         # Build UI Components
         self.init_buttons()
@@ -257,35 +256,56 @@ class LiveGraph( QWidget ):
 
 
     def button_record( self ) -> None:
+        self.records_stamps = []
         dialog = RecordDialog( len(self.reading_source) )
 
         if dialog.exec() != QDialog.Accepted:
             return
 
-        gesture_name, repeats, selected_sensors = dialog.get_inputs()
+        gesture_name, repeats, selected_sources = dialog.get_inputs()
 
-        if check_record_dialog_return( gesture_name, repeats, selected_sensors ):
+        if check_record_dialog_return( gesture_name, repeats, selected_sources ):
             return
+
+        inputs = RecordInputs( repeats, self.record_data )
+        if inputs.exec() != QDialog.Accepted:
+            self.record_data( RECORD_ACTION_TERMINATE )
+            return
+
+        analyse_data = []
+        for source in selected_sources:
+            source_data = []
+            for start, end in self.records_stamps:
+                source_data.append( self.reading_source[source]["reading"][start:end] )
+
+            analyse_data.append( source_data )
+
+        analyse( analyse_data )
 
 
     def record_data( self, action: int ) -> None:
         if action == RECORD_ACTION_START:
-            print( "Recording started." )
+            self.records_stamps.append( [len(self.counter)] )
             self.plot_widget.setBackground( "#121212" )
+            print( self.records_stamps )
 
         elif action == RECORD_ACTION_STOP:
-            print( "Recording stopped." )
+            self.records_stamps[-1].append( len(self.counter) )
             self.plot_widget.setBackground( BACKGROUND_COLOR )
+            print( self.records_stamps )
 
         elif action == RECORD_ACTION_DISCARD:
-            print( "Recording discarded." )
+            self.records_stamps.pop()
+            print( self.records_stamps )
 
         elif action == RECORD_ACTION_RESTART:
-            print( "Recording restarted." )
+            self.records_stamps[-1][0] = len(self.counter)
+            print( self.records_stamps )
 
         else:
-            #TODO delete stored data
+            self.records_stamps = []
             print( "Invalid action" )
+
 
     def button_refresh_connections( self ) -> None:
         self.connection_list.clear()
