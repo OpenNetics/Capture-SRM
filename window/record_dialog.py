@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List
+from typing import List, Union, Tuple
 
 from PySide6.QtWidgets import (
     QLabel,
@@ -18,6 +18,7 @@ from .style import (
     BACKGROUND_COLOR,
     FONT_COLOR,
 )
+from .helper import alert_box
 
 
 #- Window Class ------------------------------------------------------------------------------------
@@ -79,15 +80,31 @@ class RecordDialog( QDialog ):
         self.layout.addLayout( button_layout )
 
 
-    def get_inputs( self ) -> ( str, int, List[int] ):
+    def get_inputs(self) -> Union[bool, Tuple[str, int, List[int]]]:
         gesture_name = self.gesture_name_input.text()
-        repeats = int(self.repeats_input.text())
+        if gesture_name == "":
+            alert_box( self, "Error", "Missing gesture name." )
+            return False
 
-        selected_sensors = [
-            int(checkbox.text().split()[-1]) - 1
-            for checkbox in self.sensor_checkboxes
-            if checkbox.isChecked()
-        ]
+        try:
+            repeats = int(self.repeats_input.text())
+            if repeats < 1:
+                raise ValueError
+        except ValueError:
+            alert_box(self, "Error", "Invalid gesture repeat count.")
+            return False
+
+        try:
+            selected_sensors = [
+                int(checkbox.text().split()[-1]) - 1
+                for checkbox in self.sensor_checkboxes
+                if checkbox.isChecked()
+            ]
+            if len( selected_sensors ) < 1:
+                raise ValueError
+        except ValueError:
+            alert_box(self, "Error", "Select input indexes to record.")
+            return False
 
         return gesture_name, repeats, selected_sensors
 

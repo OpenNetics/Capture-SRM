@@ -6,6 +6,7 @@
 from random import randint
 
 from PySide6.QtWidgets import (
+    QMessageBox,
     QPushButton,
     QSpacerItem,
     QSizePolicy,
@@ -30,5 +31,14 @@ def create_button( self, text: str, callback: callable ) -> QPushButton:
     button = QPushButton( text )
     button.setStyleSheet( BUTTON_STYLE )
     button.clicked.connect( callback )
+
     return button
+
+
+def alert_box( window, status: str, message: str ) -> None:
+    msg_box = QMessageBox( window )
+    msg_box.setIcon( QMessageBox.NoIcon )
+    msg_box.setWindowTitle( status )
+    msg_box.setText( message )
+    msg_box.exec_()
 

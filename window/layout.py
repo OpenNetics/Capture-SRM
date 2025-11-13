@@ -40,9 +40,6 @@ from .style import (
     RECORD_ACTION_RESTART,
     RECORD_ACTION_TERMINATE
 )
-from .runtime_tests import (
-    check_record_dialog_return
-)
 
 from analyse import analyse
 from serial import (
@@ -262,10 +259,13 @@ class LiveGraph( QWidget ):
         if dialog.exec() != QDialog.Accepted:
             return
 
-        gesture_name, repeats, selected_sources = dialog.get_inputs()
+        values = dialog.get_inputs()
 
-        if check_record_dialog_return( gesture_name, repeats, selected_sources ):
+        if not values:
+            print( "fail" )
             return
+
+        gesture_name, repeats, selected_sources = values
 
         inputs = RecordInputs( repeats, self.record_data )
         if inputs.exec() != QDialog.Accepted:
