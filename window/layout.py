@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 )
 
 from .record_dialog import RecordDialog
+from .record_inputs import RecordInputs
 from .helper import (
     new_color,
     spaced_element
@@ -32,7 +33,12 @@ from .style import (
     WINDOW_SIZE,
     GRAPH_HEIGHT,
     RAW_VALUE_BOX_STYLE,
-    COMBOBOX_STYLE
+    COMBOBOX_STYLE,
+    RECORD_ACTION_STOP,
+    RECORD_ACTION_START,
+    RECORD_ACTION_DISCARD,
+    RECORD_ACTION_RESTART,
+    RECORD_ACTION_TERMINATE
 )
 from .runtime_tests import (
     check_record_dialog_return
@@ -262,10 +268,24 @@ class LiveGraph( QWidget ):
             return
 
 
+    def record_data( self, action: int ) -> None:
+        if action == RECORD_ACTION_START:
+            print( "Recording started." )
+            self.plot_widget.setBackground( "#121212" )
 
+        elif action == RECORD_ACTION_STOP:
+            print( "Recording stopped." )
+            self.plot_widget.setBackground( BACKGROUND_COLOR )
 
+        elif action == RECORD_ACTION_DISCARD:
+            print( "Recording discarded." )
 
+        elif action == RECORD_ACTION_RESTART:
+            print( "Recording restarted." )
 
+        else:
+            #TODO delete stored data
+            print( "Invalid action" )
 
     def button_refresh_connections( self ) -> None:
         self.connection_list.clear()
