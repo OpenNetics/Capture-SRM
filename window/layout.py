@@ -59,17 +59,21 @@ class LiveGraph( QWidget ):
         self.layout = QVBoxLayout()
         self.setLayout( self.layout )
 
-
-        #- Variables -----------------------------------------------------------
-
+        # Variables
         self.reading_source = []
         self.counter = [0]
         self.toggle_recent = 0
         self.freeze = False
+        self.recording = False
+
+        # Build UI Components
+        self.init_buttons()
+        self.init_graph_plot()
+        self.init_graph_footer()
+        self.init_raw_data()
 
 
-        #- Buttons -------------------------------------------------------------
-
+    def init_buttons( self ) -> None:
         button_layout = QHBoxLayout()
 
         self.RecordButton = self.create_button( "Record", self.button_record )
@@ -88,8 +92,7 @@ class LiveGraph( QWidget ):
         self.layout.addLayout( button_layout )
 
 
-        #- Graph Plot ----------------------------------------------------------
-
+    def init_graph_plot( self ) -> None:
         self.plot_widget = pg.PlotWidget()
         self.plot_widget.setBackground( BACKGROUND_COLOR )
         self.layout.addWidget( self.plot_widget )
@@ -98,10 +101,11 @@ class LiveGraph( QWidget ):
         self.plot_widget.showGrid( x=True, y=True )
         self.plot_widget.setMouseEnabled( True, True )
 
-        # Legend
+
+    def init_graph_footer( self ) -> None:
+        # Legends are added to this layout
         self.legend_layout = QHBoxLayout()
         self.layout.addLayout( self.legend_layout )
-
 
         # Port & Baud Rate Selector
         self.connection_list = QComboBox()
@@ -122,8 +126,7 @@ class LiveGraph( QWidget ):
         self.legend_layout.addItem( spaced_element() )
 
 
-        #- Raw Values ----------------------------------------------------------
-
+    def init_raw_data( self ) -> None:
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable( True )
 

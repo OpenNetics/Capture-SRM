@@ -14,8 +14,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout
 )
 
-# from .helper import spaced_element
-
 from .style import (
     BACKGROUND_COLOR,
     FONT_COLOR,
@@ -30,12 +28,21 @@ class RecordDialog( QDialog ):
 
     def __init__( self, total_inputs: int ) -> None:
         super().__init__()
+
         self.setWindowTitle( "Record Gestures" )
+        self.setFixedWidth( 250 )
         self.resize( 250, 200 )
         self.setStyleSheet( f"background-color: {BACKGROUND_COLOR};" )
 
         self.layout = QVBoxLayout(self)
+        self.setLayout( self.layout )
 
+        self.init_input_fields()
+        self.init_checkboxes( total_inputs )
+        self.init_buttons()
+
+
+    def init_input_fields( self ) -> None:
         # Gesture Name
         self.gesture_name_input = QLineEdit( self )
         self.gesture_name_input.setPlaceholderText( "Gesture Name" )
@@ -46,6 +53,8 @@ class RecordDialog( QDialog ):
         self.repeats_input.setPlaceholderText( "Repeats (integer )")
         self.layout.addWidget( self.repeats_input )
 
+
+    def init_checkboxes( self, total_inputs ) -> None:
         # Sensor Select Checkboxes
         text_label = QLabel( "Select Sensors" )
         text_label.setStyleSheet( f"color: {FONT_COLOR}" )
@@ -58,7 +67,7 @@ class RecordDialog( QDialog ):
             self.layout.addWidget( checkbox )
 
 
-        # Buttons
+    def init_buttons( self ) -> None:
         button_layout = QHBoxLayout()
 
         self.cancel_button = self.create_button( "Cancel", self.reject  )
@@ -76,5 +85,4 @@ class RecordDialog( QDialog ):
         selected_sensors = [cb.text() for cb in self.sensor_checkboxes if cb.isChecked()]
 
         return gesture_name, repeats, selected_sensors
-
 
