@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QMessageBox
 )
 
-from utils import connected_ports, baud_rates
+from .record_dialog import RecordDialog
 from .helper import (
     new_color,
     spaced_element
@@ -37,10 +37,14 @@ from .style import (
 from .runtime_tests import (
     check_record_dialog_return
 )
-from .record_dialog import RecordDialog
-from .record_inputs import RecordInputs
 
 from analyse import analyse
+from serial import (
+    select_port,
+    select_baud_rate,
+    baud_rates,
+    connected_ports
+)
 
 
 #- Window Class ------------------------------------------------------------------------------------
@@ -111,14 +115,14 @@ class LiveGraph( QWidget ):
         self.connection_list = QComboBox()
         self.connection_list.addItems( connected_ports() )
         self.connection_list.setStyleSheet( COMBOBOX_STYLE )
-        self.connection_list.currentTextChanged.connect( self.print_selected_item )
+        self.connection_list.currentTextChanged.connect( select_port )
 
         ConnectionsRefreshButoon = self.create_button( "Refresh", self.button_refresh_connections )
 
         self.baud_rate_list = QComboBox()
         self.baud_rate_list.addItems( baud_rates() )
         self.baud_rate_list.setStyleSheet( COMBOBOX_STYLE )
-        self.baud_rate_list.currentTextChanged.connect( self.print_selected_item )
+        self.baud_rate_list.currentTextChanged.connect( select_baud_rate )
 
         self.legend_layout.addWidget( ConnectionsRefreshButoon )
         self.legend_layout.addWidget( self.connection_list )
@@ -260,12 +264,10 @@ class LiveGraph( QWidget ):
 
 
 
+
+
+
     def button_refresh_connections( self ) -> None:
         self.connection_list.clear()
         self.connection_list.addItems( connected_ports() )
-
-
-    def print_selected_item( self, text: str ) -> None:
-        print( f'Selected item: {text}' )
-
 
