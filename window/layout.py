@@ -3,6 +3,8 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
+from typing import List
+
 import pyqtgraph as pg
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import (
@@ -32,7 +34,13 @@ from .style import (
     RAW_VALUE_BOX_STYLE,
     COMBOBOX_STYLE
 )
-from .record_gesture import InputDialog
+from .runtime_tests import (
+    check_record_dialog_return
+)
+from .record_dialog import RecordDialog
+from .record_inputs import RecordInputs
+
+from analyse import analyse
 
 
 #- Window Class ------------------------------------------------------------------------------------
@@ -64,11 +72,11 @@ class LiveGraph( QWidget ):
 
         button_layout = QHBoxLayout()
 
-        self.RecordButton = self.create_button("Record (Start)", self.button_record)
-        self.SaveButton = self.create_button("Save", self.button_save)
-        self.DataViewButton = self.create_button("Zoom Latest", self.button_toggle_recent)
-        self.FreezeButton = self.create_button("Freeze", self.button_freeze)
-        self.ClearButton = self.create_button("Clear", self.button_clear_data)
+        self.RecordButton = self.create_button( "Record", self.button_record )
+        self.SaveButton = self.create_button( "Save", self.button_save )
+        self.DataViewButton = self.create_button( "Zoom Latest", self.button_toggle_recent )
+        self.FreezeButton = self.create_button( "Freeze", self.button_freeze )
+        self.ClearButton = self.create_button( "Clear", self.button_clear_data )
 
         button_layout.addWidget( self.RecordButton )
         button_layout.addWidget( self.SaveButton )
@@ -94,6 +102,8 @@ class LiveGraph( QWidget ):
         self.legend_layout = QHBoxLayout()
         self.layout.addLayout( self.legend_layout )
 
+
+        # Port & Baud Rate Selector
         self.connection_list = QComboBox()
         self.connection_list.addItems( connected_ports() )
         self.connection_list.setStyleSheet( COMBOBOX_STYLE )
@@ -146,10 +156,7 @@ class LiveGraph( QWidget ):
             self.plot_widget.addItem( sliced_line )
 
 
-    def add_data( self, values ) -> None:
-        if not isinstance(values, list):
-            raise ValueError("Input must be an array of values.")
-
+    def add_data( self, values: List[float] ) -> None:
         # add data to the raw data area
         self.data_display.append( str(values) )
 
@@ -210,7 +217,7 @@ class LiveGraph( QWidget ):
 
     def button_freeze( self ) -> None:
         self.freeze = not self.freeze
-        self.FreezeButton.setText("Unfreeze" if self.freeze else "Freeze")
+        self.FreezeButton.setText( "Unfreeze" if self.freeze else "Freeze" )
         self.update_plot()
 
 
@@ -229,21 +236,25 @@ class LiveGraph( QWidget ):
             with open( file_path, 'w' ) as file:
                 file.write( self.data_display.toPlainText() )
 
-        msg_box = QMessageBox( self )
-        msg_box.setIcon( QMessageBox.NoIcon )
-        msg_box.setWindowTitle( "Success" )
-        msg_box.setText( "File saved successfully!" )
-        msg_box.exec_()
+            msg_box = QMessageBox( self )
+            msg_box.setIcon( QMessageBox.NoIcon )
+            msg_box.setWindowTitle( "Success" )
+            msg_box.setText( "File saved successfully!" )
+            msg_box.exec_()
 
 
     def button_record( self ) -> None:
-        current_text = self.RecordButton.text()
-        new_text = "Record (Stop)" if current_text == "Record (Start)" else "Record (Start)"
-        self.RecordButton.setText( new_text )
+        dialog = RecordDialog( len(self.reading_source) )
 
-        dialog = InputDialog( len(self.reading_source) )
-        if dialog.exec() == QDialog.Accepted:
-            gesture_name, repeats, selected_sensors = dialog.get_inputs()
+        if dialog.exec() != QDialog.Accepted:
+            return
+
+        gesture_name, repeats, selected_sensors = dialog.get_inputs()
+
+        if check_record_dialog_return( gesture_name, repeats, selected_sensors ):
+            return
+
+
 
 
     def button_refresh_connections( self ) -> None:
@@ -253,4 +264,5 @@ class LiveGraph( QWidget ):
 
     def print_selected_item( self, text: str ) -> None:
         print( f'Selected item: {text}' )
+
 

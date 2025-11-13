@@ -1,5 +1,5 @@
 
-# window/record_gesture.py
+# window/record_dialog.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
@@ -24,11 +24,11 @@ from .style import (
 
 #- Window Class ------------------------------------------------------------------------------------
 
-class InputDialog( QDialog ):
+class RecordDialog( QDialog ):
 
     from .helper import create_button
 
-    def __init__( self, total_inputs: int ):
+    def __init__( self, total_inputs: int ) -> None:
         super().__init__()
         self.setWindowTitle( "Record Gestures" )
         self.resize( 250, 200 )
@@ -72,7 +72,7 @@ class InputDialog( QDialog ):
 
     def get_inputs( self ) -> ( str, int, List ):
         gesture_name = self.gesture_name_input.text()
-        repeats = self.repeats_input.text()
+        repeats = int(self.repeats_input.text())
         selected_sensors = [cb.text() for cb in self.sensor_checkboxes if cb.isChecked()]
 
         return gesture_name, repeats, selected_sensors
