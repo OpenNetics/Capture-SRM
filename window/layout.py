@@ -6,7 +6,7 @@
 from typing import List
 
 import pyqtgraph as pg
-from PySide6.QtCore import QSize
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtWidgets import (
     QLabel,
     QWidget,
@@ -310,4 +310,24 @@ class LiveGraph( QWidget ):
     def button_refresh_connections( self ) -> None:
         self.connection_list.clear()
         self.connection_list.addItems( connected_ports() )
+
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_R:
+            self.RecordButton.click()
+
+        elif event.key() == Qt.Key_Space:
+            self.FreezeButton.click()
+
+        elif event.key() == Qt.Key_S:
+            self.SaveButton.click()
+
+        elif event.key() == Qt.Key_T:
+            self.DataViewButton.click()
+
+        elif event.key() == Qt.Key_Escape:
+            self.ClearButton.click()
+
+        else:
+            super().keyPressEvent(event)
 

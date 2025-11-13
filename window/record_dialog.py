@@ -5,6 +5,7 @@
 
 from typing import List, Union, Tuple
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QLabel,
     QDialog,
@@ -107,4 +108,13 @@ class RecordDialog( QDialog ):
             return False
 
         return gesture_name, repeats, selected_sensors
+
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Return:
+            self.continue_button.click()
+        elif event.key() == Qt.Key_Escape:
+            self.cancel_button.click()
+        else:
+            super().keyPressEvent(event)
 

@@ -3,6 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QLabel,
     QDialog,
@@ -97,4 +98,12 @@ class RecordInputs( QDialog ):
             self.text_label.setText( f"Recording: {self.recording_counter} of {self.total_recordings}" )
             self.call( RECORD_ACTION_START )
 
+
+    def keyPressEvent( self, event ):
+        if event.key() == Qt.Key_Return:
+            self.start_stop_button.click()
+        elif event.key() == Qt.Key_Escape:
+            self.cancel_button.click()
+        else:
+            super().keyPressEvent(event)
 
