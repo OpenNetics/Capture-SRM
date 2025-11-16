@@ -82,13 +82,13 @@ class LiveGraph( QWidget ):
     def init_buttons( self ) -> None:
         button_layout = QHBoxLayout()
 
-        self.RecordButton = self.create_button( "Record", self.button_record )
+        self.GestureButton = self.create_button( "Gesture", self.button_gesture )
         self.SaveButton = self.create_button( "Save", self.button_save )
         self.DataViewButton = self.create_button( "Zoom Latest", self.button_toggle_recent )
         self.FreezeButton = self.create_button( "Freeze", self.button_freeze )
         self.ClearButton = self.create_button( "Clear", self.button_clear_data )
 
-        button_layout.addWidget( self.RecordButton )
+        button_layout.addWidget( self.GestureButton )
         button_layout.addWidget( self.SaveButton )
         button_layout.addItem( spaced_element() )
         button_layout.addWidget( self.DataViewButton )
@@ -176,7 +176,7 @@ class LiveGraph( QWidget ):
 
             if i >= len( self.reading_source ):
                 colors: ( int, int, int ) = new_color()
-                text_label = EditLabel( f"i{i+1}")
+                text_label = EditLabel( f"source{i+1}")
 
                 new_line: dict = {
                     "reading": [value] * len( self.counter ),
@@ -251,9 +251,11 @@ class LiveGraph( QWidget ):
             msg_box.exec_()
 
 
-    def button_record( self ) -> None:
+    def button_gesture( self ) -> None:
         self.records_stamps = []
-        dialog = RecordDialog( [ source["title"].text() for source in self.reading_source ] )
+        source_names = [ source["title"].text() for source in self.reading_source ]
+
+        dialog = RecordDialog( source_names )
 
         if dialog.exec() != QDialog.Accepted:
             return
@@ -273,11 +275,14 @@ class LiveGraph( QWidget ):
 
         analyse_data = []
         for source in selected_sources:
-            source_data = []
+            source_info: dict = {
+                "name": source_names[source],
+                "data": []
+            }
             for start, end in self.records_stamps:
-                source_data.append( self.reading_source[source]["reading"][start:end] )
+                source_info["data"].append( self.reading_source[source]["reading"][start:end] )
 
-            analyse_data.append( source_data )
+            analyse_data.append( source_info )
 
         analyse( analyse_data )
 
@@ -312,8 +317,8 @@ class LiveGraph( QWidget ):
 
 
     def keyPressEvent(self, event):
-        if event.key() == Qt.Key_R:
-            self.RecordButton.click()
+        if event.key() == Qt.Key_G:
+            self.GestureButton.click()
 
         elif event.key() == Qt.Key_Space:
             self.FreezeButton.click()
