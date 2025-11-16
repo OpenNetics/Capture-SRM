@@ -24,11 +24,11 @@ from .record_dialog import RecordDialog
 from .record_inputs import RecordInputs
 from .helper import (
     new_color,
-    spaced_element
+    spaced_element,
+    EditLabel
 )
 from .style import (
     BACKGROUND_COLOR,
-    FONT_COLOR,
     APPLICATION_NAME,
     WINDOW_SIZE,
     GRAPH_HEIGHT,
@@ -176,10 +176,12 @@ class LiveGraph( QWidget ):
 
             if i >= len( self.reading_source ):
                 colors: ( int, int, int ) = new_color()
+                text_label = EditLabel( f"i{i+1}")
 
                 new_line: dict = {
                     "reading": [value] * len( self.counter ),
                     "color": colors,
+                    "title": text_label
                 }
 
                 self.reading_source.append( new_line )
@@ -191,12 +193,9 @@ class LiveGraph( QWidget ):
                     f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
                 )
 
-                text_label = QLabel( f"i{i+1}" )
-                text_label.setStyleSheet( f"color: {FONT_COLOR}" )
-
                 h_layout = QHBoxLayout()
-                h_layout.addWidget(square)
-                h_layout.addWidget(text_label)
+                h_layout.addWidget( square )
+                h_layout.addWidget( text_label )
 
                 self.legend_layout.addLayout( h_layout )
 
@@ -254,7 +253,7 @@ class LiveGraph( QWidget ):
 
     def button_record( self ) -> None:
         self.records_stamps = []
-        dialog = RecordDialog( len(self.reading_source) )
+        dialog = RecordDialog( [ source["title"].text() for source in self.reading_source ] )
 
         if dialog.exec() != QDialog.Accepted:
             return

@@ -6,6 +6,7 @@
 from random import randint
 
 from PySide6.QtWidgets import (
+    QLineEdit,
     QMessageBox,
     QPushButton,
     QSpacerItem,
@@ -41,4 +42,19 @@ def alert_box( window, status: str, message: str ) -> None:
     msg_box.setWindowTitle( status )
     msg_box.setText( message )
     msg_box.exec_()
+
+
+class EditLabel( QLineEdit ):
+
+    def __init__( self, label: str ) -> None:
+        super().__init__()
+        self.setStyleSheet( "max-width: 40px; padding: 2px;" )
+        self.textChanged.connect( self.adjustWidth )
+        self.setText( label )
+
+
+    def adjustWidth( self ) -> None:
+        metrics = self.fontMetrics()
+        text_width = metrics.horizontalAdvance( self.text() )
+        self.setFixedWidth( min(text_width + 10, 100) )
 
