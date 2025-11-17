@@ -1,5 +1,5 @@
 
-# window/record_dialog.py
+# window/gesture_dialog.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
@@ -9,8 +9,10 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QLabel,
     QDialog,
+    QWidget,
     QLineEdit,
     QCheckBox,
+    QTabWidget,
     QVBoxLayout,
     QHBoxLayout
 )
@@ -24,54 +26,67 @@ from .helper import alert_box
 
 #- Window Class ------------------------------------------------------------------------------------
 
-class RecordDialog( QDialog ):
+class GestureDialog( QDialog ):
 
     from .helper import create_button
 
     def __init__( self, input_names: List[str] ) -> None:
         super().__init__()
-        print( input_names )
 
         self.setWindowTitle( "Record Gestures" )
-        self.setFixedWidth( 250 )
-        self.resize( 250, 200 )
+        self.resize( 450, 200 )
         self.setStyleSheet( f"background-color: {BACKGROUND_COLOR};" )
 
-        self.layout = QVBoxLayout(self)
-        self.setLayout( self.layout )
+        self.layout = QVBoxLayout( self )
+        tab_widget = QTabWidget( self )
+        tab_widget.setStyleSheet( "QTabWidget::pane { border: none; }" )
 
-        self.init_input_fields()
-        self.init_checkboxes( input_names )
-        self.init_buttons()
+        # Record Tab
+        tab1 = QWidget()
+        tab_widget.addTab( tab1, "Record" )
+        self.tab1_layout = QVBoxLayout()
+        self.init_tab1_input_fields()
+        self.init_tab1_checkboxes( input_names )
+        self.init_tab1_buttons()
+        tab1.setLayout( self.tab1_layout )
 
+        # Update Tab
+        tab2 = QWidget()
+        tab_widget.addTab( tab2, "Update" )
+        self.tab2_layout = QVBoxLayout()
+        tab2.setLayout( self.tab2_layout )
 
-    def init_input_fields( self ) -> None:
+        self.layout.addWidget( tab_widget )
+
+    #- Tab 1 --------------------------------------------------------------------------------------
+
+    def init_tab1_input_fields( self ) -> None:
         # Gesture Name
         self.gesture_name_input = QLineEdit( self )
         self.gesture_name_input.setPlaceholderText( "Gesture Name" )
-        self.layout.addWidget( self.gesture_name_input )
+        self.tab1_layout.addWidget( self.gesture_name_input )
 
         # Repeats
         self.repeats_input = QLineEdit( self )
         self.repeats_input.setPlaceholderText( "Repeats (integer )")
         self.repeats_input.setText( "5" )
-        self.layout.addWidget( self.repeats_input )
+        self.tab1_layout.addWidget( self.repeats_input )
 
 
-    def init_checkboxes( self, input_names: List[str] ) -> None:
+    def init_tab1_checkboxes( self, input_names: List[str] ) -> None:
         # Sensor Select Checkboxes
         text_label = QLabel( "Select Sensors" )
         text_label.setStyleSheet( f"color: {FONT_COLOR}" )
-        self.layout.addWidget( text_label )
+        self.tab1_layout.addWidget( text_label )
 
         self.sensor_checkboxes = []
         for name in input_names:
             checkbox = QCheckBox( name, self )
             self.sensor_checkboxes.append( checkbox )
-            self.layout.addWidget( checkbox )
+            self.tab1_layout.addWidget( checkbox )
 
 
-    def init_buttons( self ) -> None:
+    def init_tab1_buttons( self ) -> None:
         button_layout = QHBoxLayout()
 
         self.cancel_button = self.create_button( "Cancel", self.reject  )
@@ -80,8 +95,11 @@ class RecordDialog( QDialog ):
         button_layout.addWidget( self.cancel_button )
         button_layout.addWidget( self.continue_button )
 
-        self.layout.addLayout( button_layout )
+        self.tab1_layout.addLayout( button_layout )
 
+    #- Tab 2 --------------------------------------------------------------------------------------
+
+    #- General ------------------------------------------------------------------------------------
 
     def get_inputs(self) -> Union[ bool, Tuple[str, int, List[int]] ]:
         gesture_name = self.gesture_name_input.text()

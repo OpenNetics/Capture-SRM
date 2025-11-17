@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (
     QMessageBox
 )
 
-from .record_dialog import RecordDialog
+from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs
 from .helper import (
     new_color,
@@ -78,6 +78,7 @@ class LiveGraph( QWidget ):
         self.init_graph_footer()
         self.init_raw_data()
 
+    #- Initialise Components ----------------------------------------------------------------------
 
     def init_buttons( self ) -> None:
         button_layout = QHBoxLayout()
@@ -148,6 +149,7 @@ class LiveGraph( QWidget ):
 
         self.layout.addWidget( self.scroll_area )
 
+    #- Sensor Data --------------------------------------------------------------------------------
 
     def update_plot( self ) -> None:
         if self.freeze:
@@ -204,6 +206,7 @@ class LiveGraph( QWidget ):
 
         self.update_plot()
 
+    #- Button Actions -----------------------------------------------------------------------------
 
     def button_toggle_recent( self ) -> None:
         view_button_options = [ "Zoom Latest", "View All" ]
@@ -255,7 +258,7 @@ class LiveGraph( QWidget ):
         self.records_stamps = []
         source_names = [ source["title"].text() for source in self.reading_source ]
 
-        dialog = RecordDialog( source_names )
+        dialog = GestureDialog( source_names )
 
         if dialog.exec() != QDialog.Accepted:
             return
