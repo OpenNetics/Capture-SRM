@@ -6,11 +6,13 @@
 from random import randint
 
 from PySide6.QtWidgets import (
+    QLabel,
     QLineEdit,
     QMessageBox,
     QPushButton,
     QSpacerItem,
     QSizePolicy,
+    QHBoxLayout,
 )
 
 from .style import BUTTON_STYLE
@@ -26,6 +28,11 @@ def spaced_element(layout) -> None:
     spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred)
     layout.addItem(spacer)
 
+
+def blank_line(layout: QHBoxLayout) -> None:
+    line = QLabel()
+    line.setFixedHeight(1)
+    layout.addWidget(line)
 
 
 def create_button(text: str, callback: callable) -> QPushButton:

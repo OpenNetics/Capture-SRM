@@ -14,16 +14,17 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QTabWidget,
     QVBoxLayout,
-    QHBoxLayout
+    QHBoxLayout,
 )
 
 from .helper import (
     alert_box,
+    blank_line,
     create_button,
 )
 from .style import (
     BACKGROUND_COLOR,
-    FONT_COLOR,
+    TEXT_HEAD
 )
 
 
@@ -75,11 +76,13 @@ class GestureDialog(QDialog):
 
 
     def init_tab1_checkboxes(self, input_names: List[str]) -> None:
-        # Sensor Select Checkboxes
+        blank_line(self.tab1_layout)
+
         text_label = QLabel("Select Sensors")
-        text_label.setStyleSheet(f"color: {FONT_COLOR}")
+        text_label.setStyleSheet(TEXT_HEAD)
         self.tab1_layout.addWidget(text_label)
 
+        # Sensor Select Checkboxes
         self.sensor_checkboxes = []
         for name in input_names:
             checkbox = QCheckBox(name, self)
@@ -88,6 +91,7 @@ class GestureDialog(QDialog):
 
 
     def init_tab1_buttons(self) -> None:
+        blank_line(self.tab1_layout)
         button_layout = QHBoxLayout()
 
         self.cancel_button = create_button("Cancel", self.reject )

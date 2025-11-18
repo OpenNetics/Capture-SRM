@@ -17,6 +17,9 @@ GRAPH_HEIGHT: int = 250
 
 RAW_VALUE_BOX_STYLE: str = f"background-color: #121212; color: {FONT_COLOR};"
 
+TEXT_BODY: str = f"color: {FONT_COLOR}"
+TEXT_HEAD: str = f"color: {FONT_COLOR}; font-size: 14px;"
+
 BUTTON_STYLE: str = """
     QPushButton {
         background-color: #112719;
