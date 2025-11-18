@@ -21,6 +21,7 @@ from .helper import (
     alert_box,
     blank_line,
     create_button,
+    labelled_text_widget,
 )
 from .style import (
     BACKGROUND_COLOR,
@@ -31,7 +32,6 @@ from .style import (
 #- Window Class ------------------------------------------------------------------------------------
 
 class GestureDialog(QDialog):
-
 
     def __init__(self, input_names: List[str]) -> None:
         super().__init__()
@@ -50,6 +50,7 @@ class GestureDialog(QDialog):
         self.tab1_layout = QVBoxLayout()
         self.init_tab1_input_fields()
         self.init_tab1_checkboxes(input_names)
+        self.init_tab1_model_params()
         self.init_tab1_buttons()
         tab1.setLayout(self.tab1_layout)
 
@@ -88,6 +89,18 @@ class GestureDialog(QDialog):
             checkbox = QCheckBox(name, self)
             self.sensor_checkboxes.append(checkbox)
             self.tab1_layout.addWidget(checkbox)
+
+
+    def init_tab1_model_params(self) -> None:
+        blank_line(self.tab1_layout)
+
+        text_label = QLabel("Model Parameters")
+        text_label.setStyleSheet(TEXT_HEAD)
+        self.tab1_layout.addWidget(text_label)
+
+        random_state_label = labelled_text_widget("Random State", "42", self.tab1_layout)
+        n_component_label = labelled_text_widget("n Component", "2", self.tab1_layout)
+        threshold_label = labelled_text_widget("Threshold", "-10", self.tab1_layout)
 
 
     def init_tab1_buttons(self) -> None:
