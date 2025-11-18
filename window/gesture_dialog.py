@@ -17,18 +17,20 @@ from PySide6.QtWidgets import (
     QHBoxLayout
 )
 
+from .helper import (
+    alert_box,
+    create_button,
+)
 from .style import (
     BACKGROUND_COLOR,
     FONT_COLOR,
 )
-from .helper import alert_box
 
 
 #- Window Class ------------------------------------------------------------------------------------
 
 class GestureDialog(QDialog):
 
-    from .helper import create_button
 
     def __init__(self, input_names: List[str]) -> None:
         super().__init__()
@@ -69,7 +71,6 @@ class GestureDialog(QDialog):
         # Repeats
         self.repeats_input = QLineEdit(self)
         self.repeats_input.setPlaceholderText("Repeats (integer)")
-        self.repeats_input.setText("5")
         self.tab1_layout.addWidget(self.repeats_input)
 
 
@@ -89,8 +90,8 @@ class GestureDialog(QDialog):
     def init_tab1_buttons(self) -> None:
         button_layout = QHBoxLayout()
 
-        self.cancel_button = self.create_button("Cancel", self.reject )
-        self.continue_button = self.create_button("Continue", self.accept)
+        self.cancel_button = create_button("Cancel", self.reject )
+        self.continue_button = create_button("Continue", self.accept)
 
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.continue_button)

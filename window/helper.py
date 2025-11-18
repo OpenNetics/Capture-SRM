@@ -22,13 +22,13 @@ def new_color() -> (int, int, int):
     return (randint(0, 255), randint(60, 255), randint(0, 200))
 
 
-def spaced_element() -> QSpacerItem:
-    return QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred)
+def spaced_element(layout) -> None:
+    spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred)
+    layout.addItem(spacer)
 
 
-#- Class Helper ------------------------------------------------------------------------------------
 
-def create_button(self, text: str, callback: callable) -> QPushButton:
+def create_button(text: str, callback: callable) -> QPushButton:
     button = QPushButton(text)
     button.setStyleSheet(BUTTON_STYLE)
     button.clicked.connect(callback)

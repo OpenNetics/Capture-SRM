@@ -23,9 +23,10 @@ from PySide6.QtWidgets import (
 from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs
 from .helper import (
+    EditLabel,
     new_color,
+    create_button,
     spaced_element,
-    EditLabel
 )
 from .style import (
     BACKGROUND_COLOR,
@@ -54,8 +55,6 @@ from serial import (
 
 class LiveGraph(QWidget):
 
-    from .helper import create_button
-
     def __init__(self) -> None:
         super().__init__()
 
@@ -83,15 +82,15 @@ class LiveGraph(QWidget):
     def init_buttons(self) -> None:
         button_layout = QHBoxLayout()
 
-        self.gesture_button = self.create_button("Gesture", self.button_gesture)
-        self.save_button = self.create_button("Save", self.button_save)
-        self.data_view_button = self.create_button("Zoom Latest", self.button_toggle_recent)
-        self.freeze_button = self.create_button("Freeze", self.button_freeze)
-        self.clear_button = self.create_button("Clear", self.button_clear_data)
+        self.gesture_button = create_button("Gesture", self.button_gesture)
+        self.save_button = create_button("Save", self.button_save)
+        self.data_view_button = create_button("Zoom Latest", self.button_toggle_recent)
+        self.freeze_button = create_button("Freeze", self.button_freeze)
+        self.clear_button = create_button("Clear", self.button_clear_data)
 
         button_layout.addWidget(self.gesture_button)
         button_layout.addWidget(self.save_button)
-        button_layout.addItem(spaced_element())
+        spaced_element(button_layout)
         button_layout.addWidget(self.data_view_button)
         button_layout.addWidget(self.freeze_button)
         button_layout.addWidget(self.clear_button)
@@ -120,7 +119,7 @@ class LiveGraph(QWidget):
         self.connection_list.setStyleSheet(COMBOBOX_STYLE)
         self.connection_list.currentTextChanged.connect(select_port)
 
-        connection_refresh_button = self.create_button("Refresh", self.button_refresh_connections)
+        connection_refresh_button = create_button("Refresh", self.button_refresh_connections)
 
         self.baud_rate_list = QComboBox()
         self.baud_rate_list.addItems(baud_rates())
@@ -130,7 +129,7 @@ class LiveGraph(QWidget):
         self.legend_layout.addWidget(connection_refresh_button)
         self.legend_layout.addWidget(self.connection_list)
         self.legend_layout.addWidget(self.baud_rate_list)
-        self.legend_layout.addItem(spaced_element())
+        spaced_element(self.legend_layout)
 
 
     def init_raw_data(self) -> None:
