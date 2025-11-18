@@ -3,8 +3,8 @@
 
 # from typing import List
 
-def analyse(data) -> None:
-    print(f"analyse called on data: {data}")
+def analyse(data, parameters) -> None:
+    print(f"analyse called on data: {data} with parameters: {parameters}")
     return
 
 

@@ -265,10 +265,9 @@ class LiveGraph(QWidget):
         values = dialog.get_inputs()
 
         if not values:
-            print("fail")
             return
 
-        gesture_name, repeats, selected_sources = values
+        gesture_name, repeats, selected_sources, model_param = values
 
         inputs = RecordInputs(repeats, self.record_data)
         if inputs.exec() != QDialog.Accepted:
@@ -286,31 +285,28 @@ class LiveGraph(QWidget):
 
             analyse_data.append(source_info)
 
-        analyse(analyse_data)
+        analyse(analyse_data, model_param)
 
 
     def record_data(self, action: int) -> None:
         if action == RECORD_ACTION_START:
             self.records_stamps.append([len(self.counter)])
             self.plot_widget.setBackground("#121212")
-            print(self.records_stamps)
 
         elif action == RECORD_ACTION_STOP:
             self.records_stamps[-1].append(len(self.counter))
             self.plot_widget.setBackground(BACKGROUND_COLOR)
-            print(self.records_stamps)
 
         elif action == RECORD_ACTION_DISCARD:
             self.records_stamps.pop()
-            print(self.records_stamps)
+            self.plot_widget.setBackground("#1f1212")
 
         elif action == RECORD_ACTION_RESTART:
             self.records_stamps[-1][0] = len(self.counter)
-            print(self.records_stamps)
 
         else:
             self.records_stamps = []
-            print("Invalid action")
+            self.plot_widget.setBackground(BACKGROUND_COLOR)
 
 
     def button_refresh_connections(self) -> None:

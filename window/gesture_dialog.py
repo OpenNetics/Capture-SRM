@@ -98,9 +98,9 @@ class GestureDialog(QDialog):
         text_label.setStyleSheet(TEXT_HEAD)
         self.tab1_layout.addWidget(text_label)
 
-        random_state_label = labelled_text_widget("Random State", "42", self.tab1_layout)
-        n_component_label = labelled_text_widget("n Component", "2", self.tab1_layout)
-        threshold_label = labelled_text_widget("Threshold", "-10", self.tab1_layout)
+        self.random_state_label = labelled_text_widget("Random State", "42", self.tab1_layout)
+        self.n_component_label = labelled_text_widget("n Component", "2", self.tab1_layout)
+        self.threshold_label = labelled_text_widget("Threshold", "-10", self.tab1_layout)
 
 
     def init_tab1_buttons(self) -> None:
@@ -119,10 +119,10 @@ class GestureDialog(QDialog):
 
     #- General ------------------------------------------------------------------------------------
 
-    def get_inputs(self) -> Union[ bool, Tuple[str, int, List[int]] ]:
+    def get_inputs(self) -> Union[ bool, Tuple[str, int, List[int], List[float]] ]:
         gesture_name = self.gesture_name_input.text()
         if gesture_name == "":
-            alert_box(self, "Error", "Missing gesture name.")
+            alert_box(self, "Error", "Gesture Name: Missing title.")
             return False
 
         try:
@@ -130,7 +130,7 @@ class GestureDialog(QDialog):
             if repeats < 1:
                 raise ValueError
         except ValueError:
-            alert_box(self, "Error", "Invalid gesture repeat count.")
+            alert_box(self, "Error", "Repeat Count: Enter valid integer.")
             return False
 
         try:
@@ -143,10 +143,28 @@ class GestureDialog(QDialog):
             if len(selected_sensors) < 1:
                 raise ValueError
         except ValueError:
-            alert_box(self, "Error", "Select input indexes to record.")
+            alert_box(self, "Error", "Sources: Select sources to record.")
             return False
 
-        return gesture_name, repeats, selected_sensors
+        try:
+            random_state = float( self.random_state_label.text() )
+        except ValueError:
+            alert_box(self, "Error", "Random State: Enter valid integer value.")
+            return False
+
+        try:
+            threshold = float( self.threshold_label.text() )
+        except ValueError:
+            alert_box(self, "Error", "Threshold: Enter valid integer value.")
+            return False
+
+        try:
+            n_component = float( self.n_component_label.text() )
+        except ValueError:
+            alert_box(self, "Error", "n Component: Enter valid integer value.")
+            return False
+
+        return gesture_name, repeats, selected_sensors, [random_state, n_component, threshold]
 
 
     def keyPressEvent(self, event):
