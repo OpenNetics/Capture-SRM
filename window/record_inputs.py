@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout
 )
 
-# from .helper import spaced_element
+from .helper import create_button
 from .style import (
     BACKGROUND_COLOR,
     FONT_COLOR,
@@ -26,8 +26,6 @@ from .style import (
 #- Window Class ------------------------------------------------------------------------------------
 
 class RecordInputs(QDialog):
-
-    from .helper import create_button
 
     def __init__(self, total_recordings, record_function) -> None:
         super().__init__()
@@ -50,8 +48,8 @@ class RecordInputs(QDialog):
         # Buttons
         button_layout = QHBoxLayout()
 
-        self.cancel_button = self.create_button("Cancel", self.button_cancel)
-        self.start_stop_button = self.create_button("Start", self.button_start_stop)
+        self.cancel_button = create_button("Cancel", self.button_cancel)
+        self.start_stop_button = create_button("Start", self.button_start_stop)
 
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.start_stop_button)
