@@ -285,7 +285,7 @@ class LiveGraph(QWidget):
 
             analyse_data.append(source_info)
 
-        analyse(analyse_data, model_param)
+        analyse(gesture_name, analyse_data, model_param)
 
 
     def record_data(self, action: int) -> None:
