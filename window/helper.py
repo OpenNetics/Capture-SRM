@@ -3,8 +3,6 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from random import randint
-
 from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
@@ -24,6 +22,7 @@ from .style import (
 #- Lib ---------------------------------------------------------------------------------------------
 
 def new_color() -> (int, int, int):
+    from random import randint
     return (randint(0, 255), randint(60, 255), randint(0, 200))
 
 
@@ -38,7 +37,9 @@ def blank_line(layout: QHBoxLayout) -> None:
     layout.addWidget(line)
 
 
-def labelled_text_widget(title: str, value: str, parent_layout: QHBoxLayout) -> QLineEdit:
+def labelled_text_widget(
+    title: str, value: str, placeholder: str, parent_layout: QHBoxLayout
+) -> QLineEdit:
     layout = QHBoxLayout()
 
     text_label = QLabel(title)
@@ -47,6 +48,7 @@ def labelled_text_widget(title: str, value: str, parent_layout: QHBoxLayout) -> 
     layout.addWidget(text_label)
 
     text_input = QLineEdit()
+    text_input.setPlaceholderText(placeholder)
     text_input.setText(value)
     text_input.setStyleSheet(TEXT_BODY)
     layout.addWidget(text_input)
@@ -63,8 +65,9 @@ def create_button(text: str, callback: callable) -> QPushButton:
     return button
 
 
-def alert_box(window, status: str, message: str) -> None:
-    msg_box = QMessageBox(window)
+def alert_box(status: str, message: str) -> None:
+    print(f"[{status}] {message}")
+    msg_box = QMessageBox()
     msg_box.setIcon(QMessageBox.NoIcon)
     msg_box.setWindowTitle(status)
     msg_box.setText(message)
