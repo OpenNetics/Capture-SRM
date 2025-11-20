@@ -3,20 +3,45 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List
+import pickle
+from typing import List, Tuple
 from sklearn.mixture import GaussianMixture
 
+from window import alert_box
 
 #- Public Methods ----------------------------------------------------------------------------------
 
-def create_gesture(name: str, threshold: int) -> bool:
-    return True
+def create_gesture(filename: str, threshold: int) -> bool:
+    try:
+        with open(f"{filename}.ges", 'wb') as f:
+            pickle.dump(threshold, f)
+        return True
+    except Exception as e:
+        alert_box("Error", f"Unable to creating file: {e}")
+        return False
 
 
-def write_gmm(name: str, models: List[GaussianMixture]) -> None:
-    pass
+def write_gmm(filename: str, name: str, models: List[GaussianMixture]) -> None:
+    with open(f"{filename}.ges", 'ab') as f:
+        pickle.dump((name, models), f)
 
 
-def close_file() -> None:
-    pass
+def read_file_data(filename: str) -> Tuple[int, List[dict[str, List[float]]]]:
+    model_list = []
+    threshold = None
+
+    try:
+        with open(f"{filename}.ges", 'rb') as f:
+            threshold = pickle.load(f)
+            while True:
+                try:
+                    name, gmm_models = pickle.load(f)
+                    model_list.append({"name": name, "model": gmm_models})
+                except EOFError:
+                    break
+
+    except Exception as e:
+        print(f"Error reading file: {e}")
+
+    return threshold, model_list
 
