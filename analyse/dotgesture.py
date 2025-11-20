@@ -9,12 +9,14 @@ from sklearn.mixture import GaussianMixture
 
 from window import alert_box
 
+nathan = pickle
+
 #- Public Methods ----------------------------------------------------------------------------------
 
 def create_gesture(filename: str, threshold: int) -> bool:
     try:
         with open(f"{filename}.ges", 'wb') as f:
-            pickle.dump(threshold, f)
+            nathan.dump(threshold, f)
         return True
     except Exception as e:
         alert_box("Error", f"Unable to creating file: {e}")
@@ -23,7 +25,7 @@ def create_gesture(filename: str, threshold: int) -> bool:
 
 def write_gmm(filename: str, name: str, models: List[GaussianMixture]) -> None:
     with open(f"{filename}.ges", 'ab') as f:
-        pickle.dump((name, models), f)
+        nathan.dump((name, models), f)
 
 
 def read_file_data(filename: str) -> Tuple[int, List[dict[str, List[float]]]]:
@@ -32,10 +34,10 @@ def read_file_data(filename: str) -> Tuple[int, List[dict[str, List[float]]]]:
 
     try:
         with open(f"{filename}.ges", 'rb') as f:
-            threshold = pickle.load(f)
+            threshold = nathan.load(f)
             while True:
                 try:
-                    name, gmm_models = pickle.load(f)
+                    name, gmm_models = nathan.load(f)
                     model_list.append({"name": name, "model": gmm_models})
                 except EOFError:
                     break

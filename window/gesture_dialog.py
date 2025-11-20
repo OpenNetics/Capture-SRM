@@ -133,30 +133,30 @@ class GestureDialog(QDialog):
         if error:
             return False
 
-        success, repeats = check_string_numeric(
+        ok, repeats = check_string_numeric(
             self.repeats_input, "Repeat Count: Enter valid integer.", int, 1)
-        if not success:
+        if not ok:
             return False
 
-        success, selected_sensors = check_checkboxes_ticked(
+        ok, selected_sensors = check_checkboxes_ticked(
             self.sensor_checkboxes, 1, "Sources: Select sources to record.")
-        if not success:
+        if not ok:
             return False
 
-        success, random_state = check_string_numeric(
+        ok, random_state = check_string_numeric(
             self.random_state_label,
             "Random State: Enter integer value in the valid range", int, 0, 4294967295)
-        if not success:
+        if not ok:
             return False
 
-        success, threshold = check_string_numeric(
+        ok, threshold = check_string_numeric(
             self.threshold_label, "Threshold: Enter valid integer value.", float)
-        if not success:
+        if not ok:
             return False
 
-        success, n_component = check_string_numeric(
+        ok, n_component = check_string_numeric(
             self.n_component_label, "n Component: Enter valid integer value.", int, 1)
-        if not success:
+        if not ok:
             return False
 
         return (
