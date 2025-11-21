@@ -11,8 +11,8 @@ from PySide6.QtWidgets import (
     QHBoxLayout
 )
 
-from .helper import create_button
-from .style import (
+from utils.ui import create_button
+from utils.style import (
     BACKGROUND_COLOR,
     FONT_COLOR,
     RECORD_ACTION_STOP,

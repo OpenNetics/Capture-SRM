@@ -7,7 +7,7 @@ import pickle
 from typing import List, Tuple
 from sklearn.mixture import GaussianMixture
 
-from window import alert_box
+from utils.ui import alert_box
 
 nathan = pickle
 

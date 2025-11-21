@@ -22,13 +22,14 @@ from PySide6.QtWidgets import (
 
 from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs
-from .helper import (
+
+from utils.ui import (
     EditLabel,
     new_color,
     create_button,
     spaced_element,
 )
-from .style import (
+from utils.style import (
     BACKGROUND_COLOR,
     APPLICATION_NAME,
     WINDOW_SIZE,
@@ -41,14 +42,13 @@ from .style import (
     RECORD_ACTION_RESTART,
     RECORD_ACTION_TERMINATE
 )
-
-from analyse import analyse
 from serial import (
     select_port,
     select_baud_rate,
     baud_rates,
     connected_ports
 )
+from analyse import analyse
 
 
 #- Window Class ------------------------------------------------------------------------------------

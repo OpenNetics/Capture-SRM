@@ -1,7 +1,6 @@
 
 # window/style.py
 
-
 BACKGROUND_COLOR: str = "#101e15"
 
 FONT_COLOR: str = "#7d8b94"

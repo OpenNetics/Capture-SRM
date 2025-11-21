@@ -17,12 +17,12 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
 )
 
-from .helper import (
+from utils.ui import (
     blank_line,
     create_button,
     labelled_text_widget,
 )
-from .style import (
+from utils.style import (
     BACKGROUND_COLOR,
     TEXT_HEAD
 )

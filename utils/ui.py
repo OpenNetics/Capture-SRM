@@ -1,7 +1,9 @@
 
-# window/helper.py
+# utils/ui.py
 
 #- Imports -----------------------------------------------------------------------------------------
+
+from typing import Tuple
 
 from PySide6.QtWidgets import (
     QLabel,
@@ -21,12 +23,12 @@ from .style import (
 
 #- Lib ---------------------------------------------------------------------------------------------
 
-def new_color() -> (int, int, int):
+def new_color() -> Tuple[int, int, int]:
     from random import randint
     return (randint(0, 255), randint(60, 255), randint(0, 200))
 
 
-def spaced_element(layout) -> None:
+def spaced_element(layout: QHBoxLayout) -> None:
     spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred)
     layout.addItem(spacer)
 

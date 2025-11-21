@@ -1,10 +1,16 @@
 
 # window/checks.py
 
-from typing import List, Tuple, Union
-from PySide6.QtWidgets import QLineEdit, QCheckBox
-from .helper import alert_box
+#- Imports -----------------------------------------------------------------------------------------
 
+from typing import List, Tuple, Union
+
+from PySide6.QtWidgets import QLineEdit, QCheckBox
+
+from utils.ui import alert_box
+
+
+#- Public Methods ----------------------------------------------------------------------------------
 
 def check_empty_string(string: str, error: str) -> bool:
     if string == "":
