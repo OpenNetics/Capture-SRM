@@ -12,7 +12,6 @@ from sklearn.mixture import GaussianMixture
 from .dotgesture import (
     create_gesture,
     write_gmm,
-    close_file,
 )
 
 
@@ -43,7 +42,6 @@ def _single_thread_analyse(name: str, readings: List[dict], parameters: List[flo
         model = _create_model(reading["data"], parameters[0], parameters[1])
         write_gmm(reading["name"], model)
 
-    close_file()
 
 
 #- Public Methods ----------------------------------------------------------------------------------

@@ -22,7 +22,7 @@ def check_string_numeric(
     max_value: float = None
 ) -> Tuple[bool, Union[int, float, None]]:
     try:
-        value: numeric_type = numeric_type(string.text())
+        value = numeric_type(string.text())
 
         if min_value is not None and value < min_value:
             raise ValueError
@@ -41,7 +41,7 @@ def check_checkboxes_ticked(
     checkboxes: QCheckBox,
     length: int,
     error: str,
-) -> Tuple[bool, List[int]]:
+) -> Tuple[bool, Union[None, List[int]]]:
     try:
         selected_boxes = [
             index

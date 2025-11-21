@@ -3,6 +3,7 @@
 
 **/.DS_Store
 **/todo
+**/*.ges
 
 .pyenv/
 __pycache__/

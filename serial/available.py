@@ -17,6 +17,6 @@ def baud_rates() -> List[str]:
 
 
 def connected_ports() -> List[str]:
-    Result: List = [ "/dev/cu.usbmodem54E20", "/dev/cu.usbmodem54E21", "/dev/cu.usbmodem54E22" ]
+    Result = [ "/dev/cu.usbmodem54E20", "/dev/cu.usbmodem54E21", "/dev/cu.usbmodem54E22" ]
     return Result
 
