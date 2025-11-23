@@ -1,5 +1,5 @@
 
-# window/layout.py
+# window/window.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ from analyse import analyse
 
 #- Window Class ------------------------------------------------------------------------------------
 
-class LiveGraph(QWidget):
+class GestureTracker(QWidget):
 
     def __init__(self) -> None:
         super().__init__()

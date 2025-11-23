@@ -3,4 +3,4 @@
 
 __version__: str = "0.0.1"
 
-from .layout import LiveGraph
+from .window import GestureTracker

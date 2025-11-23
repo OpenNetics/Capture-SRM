@@ -9,7 +9,8 @@ import time
 import numpy as np
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QThread, Signal
-from window import LiveGraph
+
+from window import GestureTracker
 
 
 #- Declarations ------------------------------------------------------------------------------------
@@ -21,17 +22,17 @@ class DataGenerator(QThread):
         while True:
             random_values = np.random.uniform(10, 15, 5)
             array = np.round(random_values, 2).tolist()
-            self.data_signal.emit( array )
+            self.data_signal.emit(array)
             time.sleep(1)
 
 
 def main():
     app = QApplication( sys.argv )
-    live_graph = LiveGraph()
-    live_graph.show()
+    window = GestureTracker()
+    window.show()
 
     data_thread = DataGenerator()
-    data_thread.data_signal.connect( live_graph.add_data )
+    data_thread.data_signal.connect(window.add_data)
     data_thread.start()
 
     exit_code = app.exec()
