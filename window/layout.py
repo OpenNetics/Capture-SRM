@@ -3,10 +3,11 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List
+from typing import List, Tuple
 
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
     QLabel,
     QWidget,
@@ -22,6 +23,7 @@ from PySide6.QtWidgets import (
 
 from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs
+from .graphline import GraphLine
 
 from utils.ui import (
     EditLabel,
@@ -41,6 +43,10 @@ from utils.style import (
     RECORD_ACTION_DISCARD,
     RECORD_ACTION_RESTART,
     RECORD_ACTION_TERMINATE
+)
+from utils.typedefs import (
+    SensorData,
+    int2d_t
 )
 from serial import (
     select_port,
@@ -62,14 +68,14 @@ class LiveGraph(QWidget):
         self.resize(WINDOW_SIZE["width"], WINDOW_SIZE["height"])
         self.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
 
-        self.layout = QVBoxLayout()
+        self.layout: QVBoxLayout = QVBoxLayout()
         self.setLayout(self.layout)
 
         # Variables
-        self.reading_source = []
-        self.counter = [0]
-        self.toggle_recent = 0
-        self.freeze = False
+        self.graphlines: List[GraphLine] = []
+        self.counter: List[float] = [0]
+        self.toggle_recent: int = 0
+        self.freeze: bool = False
 
         # Build UI Components
         self.init_buttons()
@@ -156,11 +162,11 @@ class LiveGraph(QWidget):
 
         self.plot_widget.clear()
 
-        for line in self.reading_source:
+        for line in self.graphlines:
             sliced_line = pg.PlotDataItem(
                 x = self.counter[self.toggle_recent:],
-                y = line["reading"][self.toggle_recent:],
-                pen = pg.mkPen(color=line["color"], width=2),
+                y = line.Reading(self.toggle_recent),
+                pen = pg.mkPen(color=line.Color(), width=2),
             )
 
             self.plot_widget.addItem(sliced_line)
@@ -174,18 +180,17 @@ class LiveGraph(QWidget):
 
         # Clear old data and add new lines
         for i, value in enumerate(values):
-
-            if i >= len(self.reading_source):
-                colors: (int, int, int) = new_color()
+            if i >= len(self.graphlines):
+                colors: Tuple[int, int, int] = new_color()
                 text_label = EditLabel(f"source{i+1}")
 
-                new_line: dict = {
-                    "reading": [value] * len(self.counter),
-                    "color": colors,
-                    "title": text_label
-                }
+                new_line: GraphLine = GraphLine(
+                    reading=[value] * len(self.counter),
+                    color=colors,
+                    title=text_label
+                )
 
-                self.reading_source.append(new_line)
+                self.graphlines.append(new_line)
 
                 # Draw legend
                 square = QLabel()
@@ -201,7 +206,8 @@ class LiveGraph(QWidget):
                 self.legend_layout.addLayout(h_layout)
 
             else:
-                self.reading_source[i]["reading"].append(value)
+                graphline: GraphLine = self.graphlines[i]
+                graphline.AddReading(value)
 
         self.update_plot()
 
@@ -218,8 +224,8 @@ class LiveGraph(QWidget):
         self.counter = [0]
         self.toggle_recent = 0
 
-        for line in self.reading_source:
-            line["reading"] = [line["reading"][-1]]
+        for line in self.graphlines:
+            line.ResetReading()
 
         self.data_display.clear()
         self.update_plot()
@@ -254,38 +260,40 @@ class LiveGraph(QWidget):
 
 
     def button_gesture(self) -> None:
-        self.records_stamps = []
-        source_names = [ source["title"].text() for source in self.reading_source ]
+        self.records_stamps: int2d_t = [] # start blank recording session
+        source_names: List[str] = [ source.Title().text() for source in self.graphlines ]
 
         dialog = GestureDialog(source_names)
 
         if dialog.exec() != QDialog.Accepted:
             return
 
-        values = dialog.get_inputs()
+        dialog_inputs = dialog.get_inputs()
+        if not dialog_inputs: return
 
-        if not values:
-            return
-
-        gesture_name, repeats, selected_sources, model_param = values
-
-        inputs = RecordInputs(repeats, self.record_data)
+        inputs = RecordInputs(dialog_inputs.repeats, self.record_data)
         if inputs.exec() != QDialog.Accepted:
             self.record_data(RECORD_ACTION_TERMINATE)
             return
+        
+        print("[DEBUG] 1", self.records_stamps)
 
-        analyse_data = []
-        for source in selected_sources:
-            source_info: dict = {
-                "name": source_names[source],
-                "data": []
-            }
+        analyse_data: List[SensorData] = []
+        for source in dialog_inputs.sensors:
+            source_info: SensorData = SensorData(
+                sensor=source_names[source],
+                values=[]
+            )
+
             for start, end in self.records_stamps:
-                source_info["data"].append(self.reading_source[source]["reading"][start:end])
+                source_info.AddValues(
+                    self.counter[start:end],
+                    self.graphlines[source].Reading(start, end)
+                )
 
             analyse_data.append(source_info)
 
-        analyse(gesture_name, analyse_data, model_param)
+        analyse(dialog_inputs.name, analyse_data, dialog_inputs.parameters)
 
 
     def record_data(self, action: int) -> None:
@@ -314,7 +322,7 @@ class LiveGraph(QWidget):
         self.connection_list.addItems(connected_ports())
 
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key_G:
             self.gesture_button.click()
 

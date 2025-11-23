@@ -7,7 +7,7 @@ FONT_COLOR: str = "#7d8b94"
 
 APPLICATION_NAME: str = "Gesture Tracker v0.0.1"
 
-WINDOW_SIZE: dict = {
+WINDOW_SIZE: dict[str,int] = {
     "width": 1200,
     "height": 800
 }

@@ -3,9 +3,10 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Union, Tuple
+from typing import List, Optional
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
     QLabel,
     QDialog,
@@ -31,6 +32,7 @@ from .checks import (
     check_string_numeric,
     check_checkboxes_ticked
 )
+from utils.typedefs import GestureInput
 
 
 #- Window Class ------------------------------------------------------------------------------------
@@ -88,7 +90,7 @@ class GestureDialog(QDialog):
         self.tab1_layout.addWidget(text_label)
 
         # Sensor Select Checkboxes
-        self.sensor_checkboxes = []
+        self.sensor_checkboxes: List[QCheckBox] = []
         for name in input_names:
             checkbox = QCheckBox(name, self)
             self.sensor_checkboxes.append(checkbox)
@@ -128,44 +130,51 @@ class GestureDialog(QDialog):
 
     #- General ------------------------------------------------------------------------------------
 
-    def get_inputs(self) -> Union[bool, Tuple[str, int, List[int], List[float]]]:
-        error = check_empty_string( self.gesture_name_input.text(), "Gesture Name: Missing title.")
-        if error:
-            return False
+    def get_inputs(self) -> Optional[GestureInput]:
+        result = GestureInput()
 
-        ok, repeats = check_string_numeric(
-            self.repeats_input, "Repeat Count: Enter valid integer.", int, 1)
-        if not ok:
-            return False
+        error = check_empty_string(self.gesture_name_input.text(), "Gesture Name: Missing title.")
+        if error: return
+        result.name = self.gesture_name_input.text()
 
-        ok, selected_sensors = check_checkboxes_ticked(
-            self.sensor_checkboxes, 1, "Sources: Select sources to record.")
-        if not ok:
-            return False
-
-        ok, random_state = check_string_numeric(
-            self.random_state_label,
-            "Random State: Enter integer value in the valid range", int, 0, 4294967295)
-        if not ok:
-            return False
-
-        ok, threshold = check_string_numeric(
-            self.threshold_label, "Threshold: Enter valid integer value.", float)
-        if not ok:
-            return False
-
-        ok, n_component = check_string_numeric(
-            self.n_component_label, "n Component: Enter valid integer value.", int, 1)
-        if not ok:
-            return False
-
-        return (
-            self.gesture_name_input.text(), repeats, selected_sensors,
-            [random_state, n_component, threshold]
+        repeats = check_string_numeric(
+            self.repeats_input,
+            "Repeat Count: Enter valid integer.", int, 1
         )
+        if not repeats: return
+        result.repeats = repeats
+
+        selected_sensors = check_checkboxes_ticked(
+            self.sensor_checkboxes,
+            1, "Sources: Select sources to record."
+        )
+        if not selected_sensors: return
+        result.sensors = selected_sensors
+
+        random_state = check_string_numeric(
+            self.random_state_label,
+            "Random State: Enter integer value in the valid range", int, 0, 4294967295
+        )
+        if not random_state: return
+
+        threshold = check_string_numeric(
+            self.threshold_label,
+            "Threshold: Enter valid integer value.", float
+        )
+        if not threshold: return
+
+        n_component = check_string_numeric(
+            self.n_component_label,
+            "n Component: Enter valid integer value.", int, 1
+        )
+        if not n_component: return
+
+        result.parameters = (random_state, n_component, threshold)
+
+        return result
 
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key_Return:
             self.continue_button.click()
         elif event.key() == Qt.Key_Escape:

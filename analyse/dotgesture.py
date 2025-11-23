@@ -1,10 +1,10 @@
-
 # analyse/dotgesture.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
 import pickle
-from typing import List, Tuple
+from typing import Optional, Dict, List, Tuple, Any, cast
+
 from sklearn.mixture import GaussianMixture
 
 from utils.ui import alert_box
@@ -14,7 +14,7 @@ nathan = pickle
 
 #- Public Methods ----------------------------------------------------------------------------------
 
-def create_gesture(filename: str, threshold: int) -> bool:
+def create_gesture(filename: str, threshold: float) -> bool:
     try:
         with open(f"{filename}.ges", 'wb') as f:
             nathan.dump(threshold, f)
@@ -29,16 +29,25 @@ def write_gmm(filename: str, name: str, models: List[GaussianMixture]) -> None:
         nathan.dump((name, models), f)
 
 
-def read_gesture(filename: str) -> Tuple[int, dict[str, List[GaussianMixture]]]:
-    models_dict = {}
-    threshold = None
+def read_gesture(filename: str) -> Tuple[Optional[int], Dict[str, List[GaussianMixture]]]:
+    models_dict: Dict[str, List[GaussianMixture]] = {}
+    threshold: Optional[int] = None
     try:
         with open(f"{filename}.ges", 'rb') as f:
-            threshold = nathan.load(f)
+            # nathan.load returns Any; validate/cast to int
+            loaded = nathan.load(f)
+            if isinstance(loaded, int):
+                threshold = loaded
+            else:
+                raise TypeError(f"Expected int threshold, got {type(loaded).__name__}")
+
             while True:
                 try:
-                    name, gmm_models = nathan.load(f)
-                    models_dict[name] = gmm_models
+                    name, gmm_models = nathan.load(f)  # type: Any
+                    if not isinstance(name, str) or not isinstance(gmm_models, list):
+                        raise TypeError("Malformed gesture entry")
+
+                    models_dict[name] = cast(List[GaussianMixture], gmm_models)
 
                 except EOFError:
                     break

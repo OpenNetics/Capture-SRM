@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Tuple, Union
+from typing import List, Optional, TypeVar, Type
 
 from PySide6.QtWidgets import QLineEdit, QCheckBox
 
@@ -20,13 +20,14 @@ def check_empty_string(string: str, error: str) -> bool:
     return False
 
 
+Numeric = TypeVar('Numeric', int, float)
 def check_string_numeric(
     string: QLineEdit,
     error: str,
-    numeric_type: type,
-    min_value: float = None,
-    max_value: float = None
-) -> Tuple[bool, Union[int, float, None]]:
+    numeric_type: Type[Numeric],
+    min_value: Optional[float] = None,
+    max_value: Optional[float] = None
+) -> Optional[Numeric]:
     try:
         value = numeric_type(string.text())
 
@@ -36,30 +37,28 @@ def check_string_numeric(
         if max_value is not None and value > max_value:
             raise ValueError
 
-        return True, value
+        return value
 
     except ValueError:
         alert_box("Error", error)
-        return False, None
+        return None
 
 
 def check_checkboxes_ticked(
-    checkboxes: QCheckBox,
+    checkboxes: List[QCheckBox],
     length: int,
     error: str,
-) -> Tuple[bool, Union[None, List[int]]]:
+) -> Optional[List[int]]:
     try:
         selected_boxes = [
-            index
-            for index, checkbox in enumerate(checkboxes)
-            if checkbox.isChecked()
+            index for index, checkbox in enumerate(checkboxes) if checkbox.isChecked()
         ]
 
         if len(selected_boxes) < length:
             raise ValueError
 
-        return True, selected_boxes
+        return selected_boxes
 
     except ValueError:
         alert_box("Error", error)
-        return False, None
+        return None

@@ -3,16 +3,18 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Tuple
+from typing import Tuple, Any
 
 from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
+    QBoxLayout,
+    QHBoxLayout,
+    QVBoxLayout,
     QMessageBox,
     QPushButton,
     QSpacerItem,
     QSizePolicy,
-    QHBoxLayout,
 )
 
 from .style import (
@@ -33,14 +35,14 @@ def spaced_element(layout: QHBoxLayout) -> None:
     layout.addItem(spacer)
 
 
-def blank_line(layout: QHBoxLayout) -> None:
+def blank_line(layout: QVBoxLayout) -> None:
     line = QLabel()
     line.setFixedHeight(1)
     layout.addWidget(line)
 
 
 def labelled_text_widget(
-    title: str, value: str, placeholder: str, parent_layout: QHBoxLayout
+    title: str, value: str, placeholder: str, parent_layout: QBoxLayout
 ) -> QLineEdit:
     layout = QHBoxLayout()
 
@@ -59,7 +61,7 @@ def labelled_text_widget(
     return text_input
 
 
-def create_button(text: str, callback: callable) -> QPushButton:
+def create_button(text: str, callback: Any) -> QPushButton:
     button = QPushButton(text)
     button.setStyleSheet(BUTTON_STYLE)
     button.clicked.connect(callback)

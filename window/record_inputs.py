@@ -3,7 +3,10 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
+from typing import Callable
+
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
     QLabel,
     QDialog,
@@ -27,7 +30,7 @@ from utils.style import (
 
 class RecordInputs(QDialog):
 
-    def __init__(self, total_recordings, record_function) -> None:
+    def __init__(self, total_recordings: int, record_function: Callable[[int], None]) -> None:
         super().__init__()
         self.setWindowTitle("Record Gestures")
         self.setFixedSize(250, 150)
@@ -97,7 +100,7 @@ class RecordInputs(QDialog):
             self.call(RECORD_ACTION_START)
 
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key_Return:
             self.start_stop_button.click()
         elif event.key() == Qt.Key_Escape:
