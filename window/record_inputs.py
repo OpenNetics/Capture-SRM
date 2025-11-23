@@ -33,7 +33,7 @@ class RecordInputs(QDialog):
     def __init__(self, total_recordings: int, record_function: Callable[[int], None]) -> None:
         super().__init__()
         self.setWindowTitle("Record Gestures")
-        self.setFixedSize(250, 150)
+        self.setFixedSize(300, 150)
         self.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
 
         self.layout = QVBoxLayout(self)
@@ -79,31 +79,38 @@ class RecordInputs(QDialog):
 
 
     def button_start_stop(self) -> None:
-        if self.start_stop_button.text() == "Continue":
+        if (self.start_stop_button.text() == "Continue"
+            and self.recording_counter == self.total_recordings):
             self.accept()
 
         elif self.recording:
             self.recording = False
-            self.cancel_button.setText("Discard")
-            self.start_stop_button.setText(
-                "Start" if self.recording_counter < self.total_recordings else "Continue"
-            )
-            self.text_label.setText(f"Recorded: {self.recording_counter} of {self.total_recordings}")
-            self.recording_counter += 1
+            self.cancel_button.setText("Discard Previous")
+
+            if self.recording_counter < self.total_recordings:
+                self.start_stop_button.setText("Start")
+                self.recording_counter += 1
+                self.text_label.setText(
+                    f"Record: {self.recording_counter} of {self.total_recordings}")
+            else:
+                self.start_stop_button.setText("Continue")
+                self.text_label.setText(f"Recorded {self.total_recordings} readings")
+
             self.call(RECORD_ACTION_STOP)
 
         else:
             self.recording = True
             self.cancel_button.setText("Restart")
             self.start_stop_button.setText("Stop")
-            self.text_label.setText(f"Recording: {self.recording_counter} of {self.total_recordings}")
+            self.text_label.setText(
+                f"Recording: {self.recording_counter} of {self.total_recordings}")
             self.call(RECORD_ACTION_START)
 
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
-        if event.key() == Qt.Key_Return:
+        if event.key() in [Qt.Key_Return, Qt.Key_Enter, Qt.Key_Space, Qt.Key_S]:
             self.start_stop_button.click()
-        elif event.key() == Qt.Key_Escape:
+        elif event.key() in [Qt.Key_Escape, Qt.Key_C]:
             self.cancel_button.click()
         else:
             super().keyPressEvent(event)
