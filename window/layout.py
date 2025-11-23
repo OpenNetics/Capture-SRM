@@ -275,15 +275,10 @@ class LiveGraph(QWidget):
         if inputs.exec() != QDialog.Accepted:
             self.record_data(RECORD_ACTION_TERMINATE)
             return
-        
-        print("[DEBUG] 1", self.records_stamps)
 
         analyse_data: List[SensorData] = []
         for source in dialog_inputs.sensors:
-            source_info: SensorData = SensorData(
-                sensor=source_names[source],
-                values=[]
-            )
+            source_info: SensorData = SensorData(source_names[source])
 
             for start, end in self.records_stamps:
                 source_info.AddValues(

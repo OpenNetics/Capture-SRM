@@ -1,9 +1,8 @@
-
 # window/gesture_dialog.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
@@ -131,47 +130,48 @@ class GestureDialog(QDialog):
     #- General ------------------------------------------------------------------------------------
 
     def get_inputs(self) -> Optional[GestureInput]:
-        result = GestureInput()
-
+        # validate fields first
         error = check_empty_string(self.gesture_name_input.text(), "Gesture Name: Missing title.")
-        if error: return
-        result.name = self.gesture_name_input.text()
+        if error:
+            return None
+        name = self.gesture_name_input.text()
 
         repeats = check_string_numeric(
             self.repeats_input,
             "Repeat Count: Enter valid integer.", int, 1
         )
-        if not repeats: return
-        result.repeats = repeats
+        if not repeats: return None
 
         selected_sensors = check_checkboxes_ticked(
             self.sensor_checkboxes,
             1, "Sources: Select sources to record."
         )
-        if not selected_sensors: return
-        result.sensors = selected_sensors
+        if not selected_sensors: return None
 
         random_state = check_string_numeric(
             self.random_state_label,
             "Random State: Enter integer value in the valid range", int, 0, 4294967295
         )
-        if not random_state: return
+        if random_state is None: return None
 
         threshold = check_string_numeric(
             self.threshold_label,
             "Threshold: Enter valid integer value.", float
         )
-        if not threshold: return
+        if threshold is None: return None
 
         n_component = check_string_numeric(
             self.n_component_label,
             "n Component: Enter valid integer value.", int, 1
         )
-        if not n_component: return
+        if not n_component:return None
 
-        result.parameters = (random_state, n_component, threshold)
-
-        return result
+        return GestureInput(
+            name=name,
+            repeats=repeats,
+            sensors=tuple(selected_sensors), # convert sensors list -> tuple for immutability
+            parameters=(random_state, n_component, threshold)
+        )
 
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
