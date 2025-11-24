@@ -239,13 +239,9 @@ class GestureTracker(QWidget):
 
     def button_save(self) -> None:
         # Open file dialog to select save location
-        options = QFileDialog.Options()
         file_path, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save File",
-            "",
-            "Text Files (*.txt);;All Files (*)",
-            options=options
+            self, "Save File", "lol", "Text Files (*.txt);;All Files (*)",
+            options=QFileDialog.Options()
         )
 
         if file_path:

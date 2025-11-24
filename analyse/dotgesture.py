@@ -3,7 +3,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 import pickle
-from typing import Optional, Dict, List, Tuple, Any, cast
+from typing import Optional, Dict, List, Tuple, cast
 
 from sklearn.mixture import GaussianMixture
 

@@ -2,7 +2,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
@@ -13,8 +13,10 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QCheckBox,
     QTabWidget,
+    QFileDialog,
     QVBoxLayout,
     QHBoxLayout,
+    QSizePolicy,
 )
 
 from utils.ui import (
@@ -71,14 +73,32 @@ class GestureDialog(QDialog):
 
     def init_tab1_input_fields(self) -> None:
         # Gesture Name
+        file_name_layout = QHBoxLayout()
+
         self.gesture_name_input = QLineEdit(self)
         self.gesture_name_input.setPlaceholderText("Gesture Name")
-        self.tab1_layout.addWidget(self.gesture_name_input)
+        self.gesture_name_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        file_name_layout.addWidget(self.gesture_name_input, 1)
+
+        browse_button = create_button("Browse", self.init_tab1_input_filepath)
+        browse_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        file_name_layout.addWidget(browse_button, 0)
+
+        self.tab1_layout.addLayout(file_name_layout)
 
         # Repeats
         self.repeats_input = QLineEdit(self)
         self.repeats_input.setPlaceholderText("Repeats (integer)")
         self.tab1_layout.addWidget(self.repeats_input)
+
+
+    def init_tab1_input_filepath(self) -> None:
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Save File", "", "Gesture Files (*.ges);;All Files (*)",
+            options=QFileDialog.Options()
+        )
+        if file_path:
+            self.gesture_name_input.setText(file_path)
 
 
     def init_tab1_checkboxes(self, input_names: List[str]) -> None:
@@ -164,7 +184,7 @@ class GestureDialog(QDialog):
             self.n_component_label,
             "n Component: Enter valid integer value.", int, 1
         )
-        if not n_component:return None
+        if not n_component: return None
 
         return GestureInput(
             name=name,
