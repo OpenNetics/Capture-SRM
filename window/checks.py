@@ -44,6 +44,15 @@ def check_string_numeric(
         return None
 
 
+# Ensure all source names are unique
+def check_sources_name(sources: List[str]) -> bool:
+    result: bool = len(sources) == len(set(sources))
+    if not result:
+        alert_box("Error", "Make sure all sources have unique names")
+
+    return result
+
+
 def check_checkboxes_ticked(
     checkboxes: List[QCheckBox],
     length: int,

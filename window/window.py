@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
 from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs
 from .graphline import GraphLine
+from .checks import check_sources_name
 
 from utils.ui import (
     EditLabel,
@@ -256,8 +257,11 @@ class GestureTracker(QWidget):
 
 
     def button_gesture(self) -> None:
-        self.records_stamps: int2d_t = [] # start blank recording session
         source_names: List[str] = [ source.Title().text() for source in self.graphlines ]
+        if not check_sources_name(source_names):
+            return
+
+        self.records_stamps: int2d_t = [] # start blank recording session
 
         dialog = GestureDialog(source_names)
 
