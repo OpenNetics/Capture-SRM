@@ -19,9 +19,10 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from utils.style import TEXT_HEAD
+from utils.style import TAB1, TEXT_HEAD
 from utils.typedefs import GestureInput
 from utils.ui import (
+    spacedv,
     blank_line,
     create_button,
     labelled_text_widget,
@@ -76,7 +77,7 @@ class Tab1:
 
     def init_input_filepath(self) -> None:
         file_path, _ = QFileDialog.getSaveFileName(
-            self.parent, "Save File", "", "Gesture Files (*.ges);;All Files (*)",
+            self.parent, "Save Gesture", "", "Gesture Files (*.ges);;All Files (*)",
             options=QFileDialog.Options()
         )
         if file_path:
@@ -117,10 +118,11 @@ class Tab1:
 
     def init_buttons(self) -> None:
         blank_line(self.layout)
+        spacedv(self.layout)
         button_layout = QHBoxLayout()
 
         self.cancel_button = create_button("Cancel", self.parent.reject)
-        self.continue_button = create_button("Continue", self.parent.submit, 1) # calling from tab 1
+        self.continue_button = create_button("Continue", self.parent.submit, TAB1) # calling from tab 1
 
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.continue_button)

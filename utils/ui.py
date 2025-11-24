@@ -3,6 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
+import sys
 from typing import Tuple, Any, Callable
 
 from PySide6.QtWidgets import (
@@ -30,14 +31,19 @@ def new_color() -> Tuple[int, int, int]:
     return (randint(0, 255), randint(60, 255), randint(0, 200))
 
 
-def spaced_element(layout: QHBoxLayout) -> None:
+def spacedh(layout: QHBoxLayout) -> None:
     spacer = QSpacerItem(20, 20, QSizePolicy.Expanding, QSizePolicy.Preferred)
+    layout.addItem(spacer)
+
+
+def spacedv(layout: QVBoxLayout) -> None:
+    spacer = QSpacerItem(20, 20, QSizePolicy.Preferred, QSizePolicy.Expanding)
     layout.addItem(spacer)
 
 
 def blank_line(layout: QVBoxLayout) -> None:
     line = QLabel()
-    line.setFixedHeight(1)
+    line.setFixedHeight(2)
     layout.addWidget(line)
 
 
@@ -73,9 +79,9 @@ def create_button(
 
 
 def alert_box(status: str, message: str) -> None:
-    print(f"[{status}] {message}")
+    print(f"[{status}] {message}", file=sys.stderr)
+
     msg_box = QMessageBox()
-    msg_box.setIcon(QMessageBox.NoIcon)
     msg_box.setWindowTitle(status)
     msg_box.setText(message)
     msg_box.exec_()

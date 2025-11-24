@@ -30,7 +30,7 @@ from utils.ui import (
     EditLabel,
     new_color,
     create_button,
-    spaced_element,
+    spacedh,
 )
 from utils.style import (
     BACKGROUND_COLOR,
@@ -97,7 +97,7 @@ class GestureTracker(QWidget):
 
         button_layout.addWidget(self.gesture_button)
         button_layout.addWidget(self.save_button)
-        spaced_element(button_layout)
+        spacedh(button_layout)
         button_layout.addWidget(self.data_view_button)
         button_layout.addWidget(self.freeze_button)
         button_layout.addWidget(self.clear_button)
@@ -136,7 +136,7 @@ class GestureTracker(QWidget):
         self.legend_layout.addWidget(connection_refresh_button)
         self.legend_layout.addWidget(self.connection_list)
         self.legend_layout.addWidget(self.baud_rate_list)
-        spaced_element(self.legend_layout)
+        spacedh(self.legend_layout)
 
 
     def init_raw_data(self) -> None:

@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from utils.style import BACKGROUND_COLOR
+from utils.style import BACKGROUND_COLOR, TAB1, TAB2
 from utils.typedefs import GestureInput, GestureUpdater
 from .gesture_dialog_tab1 import Tab1
 from .gesture_dialog_tab2 import Tab2
@@ -46,18 +46,17 @@ class GestureDialog(QDialog):
 
         self.layout.addWidget(tab_widget)
 
-    #- General ------------------------------------------------------------------------------------
 
     def get_inputs(self) -> Optional[Tuple[int, Union[GestureInput, GestureUpdater]]]:
-        if self.final_tab == 1:
-            result = self.tab1.get_inputs()
+        if self.final_tab == TAB1:
+            result: Optional[GestureInput] = self.tab1.get_inputs()
             if result is not None:
-                return (1, result)
+                return (TAB1, result)
 
-        elif self.final_tab == 2:
-            result = self.tab2.get_inputs()
+        elif self.final_tab == TAB2:
+            result: Optional[GestureUpdater] = self.tab2.get_inputs()
             if result is not None:
-                return (2, result)
+                return (TAB2, result)
 
         return None
 
