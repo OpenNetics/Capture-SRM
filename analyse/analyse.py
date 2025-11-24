@@ -7,6 +7,7 @@ from typing import List, Tuple
 from threading import Thread
 
 import numpy as np
+from numpy.typing import NDArray
 from sklearn.mixture import GaussianMixture
 
 from utils.typedefs import SensorData, float3d_t
@@ -16,9 +17,9 @@ from .dotgesture import create_gesture, write_gmm
 #- Private Methods ---------------------------------------------------------------------------------
 
 def _create_model(data: float3d_t, random_state: int, n_component: int ) -> List[GaussianMixture]:
-    train_traces = [np.array(t) for t in data if len(t) > 0]
+    train_traces: List[NDArray[np.float64]] = [np.array(t) for t in data if len(t) > 0]
 
-    gmm_models = []
+    gmm_models: List[GaussianMixture] = []
     for trace in train_traces:
         gmm = GaussianMixture(n_components=n_component, random_state=random_state)
         gmm.fit(trace)
@@ -35,9 +36,8 @@ def _single_thread_analyse(
         return
 
     for reading in readings:
-        model = _create_model(reading.values, parameters[0], parameters[1])
+        model: List[GaussianMixture] = _create_model(reading.values, parameters[0], parameters[1])
         write_gmm(name, reading.sensor, model)
-
 
 
 #- Public Methods ----------------------------------------------------------------------------------

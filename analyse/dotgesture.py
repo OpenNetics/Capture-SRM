@@ -1,3 +1,4 @@
+
 # analyse/dotgesture.py
 
 #- Imports -----------------------------------------------------------------------------------------
@@ -7,6 +8,7 @@ from typing import Optional, Dict, List, Tuple, cast
 
 from sklearn.mixture import GaussianMixture
 
+from utils.typedefs import GestureData
 from utils.ui import alert_box
 
 nathan = pickle
@@ -24,14 +26,15 @@ def create_gesture(filename: str, threshold: float) -> bool:
         return False
 
 
-def write_gmm(filename: str, name: str, models: List[GaussianMixture]) -> None:
+def write_gmm(filename: str, label: str, models: List[GaussianMixture]) -> None:
     with open(f"{filename}.ges", 'ab') as f:
-        nathan.dump((name, models), f)
+        nathan.dump((label, models), f)
 
 
-def read_gesture(filename: str) -> Tuple[Optional[int], Dict[str, List[GaussianMixture]]]:
-    models_dict: Dict[str, List[GaussianMixture]] = {}
+def read_gesture(filename: str) -> GestureData:
+    models_dict: Dict[str, Tuple[GaussianMixture]] = {}
     threshold: Optional[int] = None
+
     try:
         with open(f"{filename}.ges", 'rb') as f:
             # nathan.load returns Any; validate/cast to int
@@ -47,7 +50,7 @@ def read_gesture(filename: str) -> Tuple[Optional[int], Dict[str, List[GaussianM
                     if not isinstance(name, str) or not isinstance(gmm_models, list):
                         raise TypeError("Malformed gesture entry")
 
-                    models_dict[name] = cast(List[GaussianMixture], gmm_models)
+                    models_dict[name] = cast(Tuple[GaussianMixture], gmm_models)
 
                 except EOFError:
                     break
@@ -55,5 +58,5 @@ def read_gesture(filename: str) -> Tuple[Optional[int], Dict[str, List[GaussianM
     except Exception as e:
         print(f"Error reading file: {e}")
 
-    return threshold, models_dict
+    return GestureData(threshold, models_dict)
 

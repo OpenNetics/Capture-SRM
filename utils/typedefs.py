@@ -3,8 +3,9 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
+from sklearn.mixture import GaussianMixture
 
 #- Type Definitions --------------------------------------------------------------------------------
 
@@ -29,4 +30,10 @@ class GestureInput:
     repeats: int
     sensors: Tuple[int, ...]
     parameters: Tuple[int, int, float]
+
+
+@dataclass(frozen=True)
+class GestureData:
+    threshold: Optional[int]
+    models: dict[str, Tuple[GaussianMixture]]
 

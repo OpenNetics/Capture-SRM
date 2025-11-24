@@ -28,12 +28,13 @@ from utils.style import (
     BACKGROUND_COLOR,
     TEXT_HEAD
 )
+from utils.typedefs import GestureInput, GestureData
 from .checks import (
     check_empty_string,
     check_string_numeric,
     check_checkboxes_ticked
 )
-from utils.typedefs import GestureInput
+from analyse import read_gesture
 
 
 #- Window Class ------------------------------------------------------------------------------------
@@ -50,6 +51,7 @@ class GestureDialog(QDialog):
         self.layout = QVBoxLayout(self)
         tab_widget = QTabWidget(self)
         tab_widget.setStyleSheet("QTabWidget::pane { border: none; }")
+        self.input_names: List[str] = input_names
 
         # Record Tab
         tab1 = QWidget()
@@ -195,7 +197,7 @@ class GestureDialog(QDialog):
 
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
-        if event.key() == Qt.Key_Return:
+        if event.key() in [Qt.Key_Return, Qt.Key_Enter]:
             self.continue_button.click()
         elif event.key() == Qt.Key_Escape:
             self.cancel_button.click()
