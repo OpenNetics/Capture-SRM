@@ -18,13 +18,14 @@ from utils.ui import create_button
 from utils.style import (
     BACKGROUND_COLOR,
     FONT_COLOR,
+)
+from utils.typedefs import (
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,
     RECORD_ACTION_RESTART,
     RECORD_ACTION_TERMINATE
 )
-
 
 #- Window Class ------------------------------------------------------------------------------------
 

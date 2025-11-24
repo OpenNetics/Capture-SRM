@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Optional
+from typing import Callable, List, Optional
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
@@ -19,8 +19,8 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from utils.style import TAB1, TEXT_HEAD
-from utils.typedefs import GestureInput
+from utils.style import TEXT_HEAD
+from utils.typedefs import GestureInput, TAB1
 from utils.ui import (
     spacedv,
     blank_line,
@@ -38,8 +38,16 @@ from .checks import (
 
 class Tab1:
 
-    def __init__(self, parent: QDialog, parent_layout: QWidget, input_names: List[str]) -> None:
+    def __init__(
+            self,
+            parent: QDialog,
+            parent_layout: QWidget,
+            input_names: List[str],
+            submit: Callable[[int], None]
+        ) -> None:
+
         self.parent = parent
+        self.submit: Callable[[int], None] = submit
         self.input_names: List[str] = input_names
 
         self.layout = QVBoxLayout()
@@ -52,6 +60,7 @@ class Tab1:
         self.init_model_params()
         self.init_buttons()
 
+    #- Init Modules --------------------------------------------------------------------------------
 
     def init_input_fields(self) -> None:
         # Gesture Name
@@ -122,16 +131,20 @@ class Tab1:
         button_layout = QHBoxLayout()
 
         self.cancel_button = create_button("Cancel", self.parent.reject)
-        self.continue_button = create_button("Continue", self.parent.submit, TAB1) # calling from tab 1
+        self.continue_button = create_button("Continue", self.finish)
 
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.continue_button)
 
         self.layout.addLayout(button_layout)
 
+    #- Getters and Actions -------------------------------------------------------------------------
 
     def get_inputs(self) -> Optional[GestureInput]:
-        # validate fields first
+        return self.values if hasattr(self, 'values') else None
+
+
+    def finish(self) -> None:
         error = check_empty_string(self.gesture_file.text(), "Gesture Name: Missing title.")
         if error:
             return None
@@ -167,13 +180,16 @@ class Tab1:
         )
         if not n_component: return None
 
-        return GestureInput(
+        self.values = GestureInput(
             name=name,
             repeats=repeats,
             sensors=tuple(selected_sensors), # convert sensors list -> tuple for immutability
             parameters=(random_state, n_component, threshold)
         )
 
+        self.submit(TAB1)
+
+    #- Key Events ----------------------------------------------------------------------------------
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() in [Qt.Key_Return, Qt.Key_Enter]:
@@ -182,5 +198,4 @@ class Tab1:
             self.cancel_button.click()
         else:
             super().keyPressEvent(event)
-
 

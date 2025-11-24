@@ -12,10 +12,13 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from utils.style import BACKGROUND_COLOR, TAB1, TAB2
-from utils.typedefs import GestureInput, GestureUpdater
+from utils.style import BACKGROUND_COLOR
 from .gesture_dialog_tab1 import Tab1
 from .gesture_dialog_tab2 import Tab2
+from utils.typedefs import(
+    GestureInput, GestureUpdater,
+    TAB1, TAB2,
+)
 
 #- Window Class ------------------------------------------------------------------------------------
 
@@ -37,12 +40,12 @@ class GestureDialog(QDialog):
         # Record Tab
         t1 = QWidget()
         tab_widget.addTab(t1, "Record")
-        self.tab1 = Tab1(self, t1, input_names)
+        self.tab1 = Tab1(self, t1, input_names, self.submit)
 
         # Update Tab
         t2 = QWidget()
         tab_widget.addTab(t2, "Update")
-        self.tab2 = Tab2(self, t2, input_names)
+        self.tab2 = Tab2(self, t2, input_names, self.submit)
 
         self.layout.addWidget(tab_widget)
 
@@ -64,3 +67,4 @@ class GestureDialog(QDialog):
     def submit(self, tab: int) -> None:
         self.final_tab = tab
         self.accept()
+

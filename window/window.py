@@ -39,15 +39,17 @@ from utils.style import (
     GRAPH_HEIGHT,
     RAW_VALUE_BOX_STYLE,
     COMBOBOX_STYLE,
+)
+from utils.typedefs import (
+    SensorData,
+    int2d_t,
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,
     RECORD_ACTION_RESTART,
-    RECORD_ACTION_TERMINATE
-)
-from utils.typedefs import (
-    SensorData,
-    int2d_t
+    RECORD_ACTION_TERMINATE,
+    TAB1,
+    TAB2,
 )
 from serial import (
     select_port,
@@ -268,8 +270,10 @@ class GestureTracker(QWidget):
         if dialog.exec() != QDialog.Accepted:
             return
 
-        dialog_inputs = dialog.get_inputs()
-        if not dialog_inputs: return
+        dialog_return = dialog.get_inputs()
+        if not dialog_return: return
+
+        tab, dialog_inputs = dialog_return
 
         inputs = RecordInputs(dialog_inputs.repeats, self.record_data)
         if inputs.exec() != QDialog.Accepted:
@@ -288,7 +292,8 @@ class GestureTracker(QWidget):
 
             analyse_data.append(source_info)
 
-        analyse(dialog_inputs.name, analyse_data, dialog_inputs.parameters)
+        if tab == TAB1:
+            analyse(dialog_inputs.name, analyse_data, dialog_inputs.parameters)
 
 
     def record_data(self, action: int) -> None:

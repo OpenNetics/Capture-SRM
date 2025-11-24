@@ -8,6 +8,18 @@ from typing import List, Tuple, Optional
 from sklearn.mixture import GaussianMixture
 
 
+#- Constants ---------------------------------------------------------------------------------------
+
+RECORD_ACTION_STOP: int = 0
+RECORD_ACTION_START: int = 1
+RECORD_ACTION_DISCARD: int = 2
+RECORD_ACTION_RESTART: int = 3
+RECORD_ACTION_TERMINATE: int = 4
+
+TAB1: int = 1
+TAB2: int = 2
+
+
 #- Type Definitions --------------------------------------------------------------------------------
 
 float2d_t = List[List[float]]
