@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Tuple, Any
+from typing import Tuple, Any, Callable
 
 from PySide6.QtWidgets import (
     QLabel,
@@ -61,11 +61,14 @@ def labelled_text_widget(
     return text_input
 
 
-def create_button(text: str, callback: Any) -> QPushButton:
+def create_button(
+        text: str, callback: Callable[..., None], *cb_args: Any, **cb_kwargs: Any
+    ) -> QPushButton:
+
     button = QPushButton(text)
     button.setStyleSheet(BUTTON_STYLE)
-    button.clicked.connect(callback)
 
+    button.clicked.connect(lambda checked=False: callback(*cb_args, **cb_kwargs))
     return button
 
 

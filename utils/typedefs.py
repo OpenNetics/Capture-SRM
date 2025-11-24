@@ -7,6 +7,7 @@ from typing import List, Tuple, Optional
 
 from sklearn.mixture import GaussianMixture
 
+
 #- Type Definitions --------------------------------------------------------------------------------
 
 float2d_t = List[List[float]]
@@ -36,4 +37,11 @@ class GestureInput:
 class GestureData:
     threshold: Optional[int]
     models: dict[str, Tuple[GaussianMixture]]
+
+
+@dataclass(frozen=True)
+class GestureUpdater:
+    file: str
+    data: GestureData
+    old_data: GestureInput
 
