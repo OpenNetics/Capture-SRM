@@ -31,18 +31,18 @@ def write_gmm(filename: str, label: str, models: List[GaussianMixture]) -> None:
         nathan.dump((label, models), f)
 
 
-def read_gesture(filename: str) -> GestureData:
+def read_gesture(filename: str) -> Optional[GestureData]:
     models_dict: Dict[str, Tuple[GaussianMixture]] = {}
-    threshold: Optional[int] = None
+    threshold: Optional[float] = None
 
     try:
-        with open(f"{filename}.ges", 'rb') as f:
+        with open(filename, 'rb') as f:
             # nathan.load returns Any; validate/cast to int
             loaded = nathan.load(f)
-            if isinstance(loaded, int):
+            if isinstance(loaded, float):
                 threshold = loaded
             else:
-                raise TypeError(f"Expected int threshold, got {type(loaded).__name__}")
+                raise TypeError(f"Expected float threshold, got {type(loaded).__name__}")
 
             while True:
                 try:
@@ -55,8 +55,9 @@ def read_gesture(filename: str) -> GestureData:
                 except EOFError:
                     break
 
-    except Exception as e:
-        print(f"Error reading file: {e}")
+    except Exception as error:
+        alert_box("Error", f"{error}")
+        return None
 
     return GestureData(threshold, models_dict)
 

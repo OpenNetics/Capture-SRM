@@ -35,7 +35,7 @@ class GestureInput:
 
 @dataclass(frozen=True)
 class GestureData:
-    threshold: Optional[int]
+    threshold: Optional[float]
     models: dict[str, Tuple[GaussianMixture]]
 
 
