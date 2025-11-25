@@ -69,7 +69,9 @@ class Tab1:
         self.gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         file_name_layout.addWidget(self.gesture_file, 1)
 
-        browse_button = create_button("Browse", self.init_input_filepath)
+        browse_button = create_button(
+            "Browse", "Path to save gesture file to.", self.init_input_filepath)
+
         browse_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         file_name_layout.addWidget(browse_button, 0)
 
@@ -77,6 +79,7 @@ class Tab1:
 
         # Repeats
         self.repeats_input = QLineEdit(self.parent)
+        self.repeats_input.setToolTip("Number of times to repeat the gesture recording.")
         self.repeats_input.setPlaceholderText("Repeats (integer)")
         self.layout.addWidget(self.repeats_input)
 
@@ -127,8 +130,8 @@ class Tab1:
         spacedv(self.layout)
         button_layout = QHBoxLayout()
 
-        self.cancel_button = create_button("Cancel", self.parent.reject)
-        self.continue_button = create_button("Continue", self.finish)
+        self.cancel_button = create_button("Cancel", "[esc]" ,self.parent.reject)
+        self.continue_button = create_button("Continue", "[return]", self.finish)
 
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.continue_button)

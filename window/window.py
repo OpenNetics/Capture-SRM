@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Tuple
+from typing import Any, List, Tuple
 
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
@@ -78,11 +78,16 @@ class GestureTracker(QWidget):
     def init_buttons(self) -> None:
         button_layout = QHBoxLayout()
 
-        self.gesture_button = create_button("Gesture", self.button_gesture)
-        self.save_button = create_button("Save", self.button_save)
-        self.data_view_button = create_button("Zoom Latest", self.button_toggle_recent)
-        self.freeze_button = create_button("Freeze", self.button_freeze)
-        self.clear_button = create_button("Clear", self.button_clear_data)
+        self.gesture_button = create_button(
+            "Gesture", "Play with gesture files [g]", self.button_gesture)
+        self.save_button = create_button(
+            "Save", "Save read data in text file [s]", self.button_save)
+        self.data_view_button = create_button(
+            "Zoom Latest", "Plot only latest 10 readings [t]", self.button_toggle_recent)
+        self.freeze_button = create_button(
+            "Freeze", "Toggle freezing live plot [space]", self.button_freeze)
+        self.clear_button = create_button(
+            "Clear", "Clear all read data [esc]", self.button_clear_data)
 
         button_layout.addWidget(self.gesture_button)
         button_layout.addWidget(self.save_button)
@@ -111,14 +116,18 @@ class GestureTracker(QWidget):
 
         # Port & Baud Rate Selector
         self.connection_list = QComboBox()
-        self.connection_list.addItems(connected_ports())
+        self.connection_list.addItems(["<SELECT>"] + connected_ports())
+        self.connection_list.setToolTip("Select Connection Port")
         self.connection_list.setStyleSheet(COMBOBOX_STYLE)
         self.connection_list.currentTextChanged.connect(select_port)
 
-        connection_refresh_button = create_button("Refresh", self.button_refresh_connections)
+        connection_refresh_button = create_button(
+            "Refresh", "Reflesh port list", self.button_refresh_connections)
 
         self.baud_rate_list = QComboBox()
         self.baud_rate_list.addItems(baud_rates())
+        self.baud_rate_list.setToolTip("Select Baud Rate")
+        self.baud_rate_list.setCurrentText("115200")
         self.baud_rate_list.setStyleSheet(COMBOBOX_STYLE)
         self.baud_rate_list.currentTextChanged.connect(select_baud_rate)
 
@@ -162,14 +171,17 @@ class GestureTracker(QWidget):
             self.plot_widget.addItem(sliced_line)
 
 
-    def add_data(self, values: List[float]) -> None:
+    def add_data(self, values: List[Any]) -> None:
         # add data to the raw data area
         self.data_display.append(str(values))
-
         self.counter.append(self.counter[-1] + 1)
 
         # Clear old data and add new lines
         for i, value in enumerate(values):
+            # only plot data if values are numeric
+            if not (isinstance(value, float) or isinstance(value, int)):
+                continue
+
             if i >= len(self.graphlines):
                 colors: Tuple[int, int, int] = new_color()
                 text_label = EditLabel(f"source{i+1}")
@@ -205,8 +217,11 @@ class GestureTracker(QWidget):
 
     def button_toggle_recent(self) -> None:
         view_button_options = [ "Zoom Latest", "View All" ]
+        view_button_tips = ["Plot only latest 10 readings [t]", "Plot all readings [t]"]
+
         self.toggle_recent = 0 - 10 - self.toggle_recent
         self.data_view_button.setText(view_button_options[self.toggle_recent % 11])
+        self.data_view_button.setToolTip(view_button_tips[self.toggle_recent % 11])
         self.update_plot()
 
 

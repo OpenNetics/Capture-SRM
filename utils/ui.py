@@ -68,11 +68,12 @@ def labelled_text_widget(
 
 
 def create_button(
-        text: str, callback: Callable[..., None], *cb_args: Any, **cb_kwargs: Any
+        text: str, hover: str, callback: Callable[..., None], *cb_args: Any, **cb_kwargs: Any
     ) -> QPushButton:
 
     button = QPushButton(text)
     button.setStyleSheet(BUTTON_STYLE)
+    button.setToolTip(hover)
 
     button.clicked.connect(lambda checked=False: callback(*cb_args, **cb_kwargs))
     return button

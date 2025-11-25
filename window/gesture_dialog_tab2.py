@@ -66,16 +66,17 @@ class Tab2:
 
         self.gesture_file = QLineEdit(self.parent)
         self.gesture_file.setPlaceholderText("Gesture Path")
+        self.gesture_file.setToolTip("File to further update.")
         self.gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         file_name_layout.addWidget(self.gesture_file, 1)
 
-        browse_button = create_button("Browse", self.init_input_filepath)
+        browse_button = create_button("Browse", "File to further update.", self.init_input_filepath)
         browse_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         file_name_layout.addWidget(browse_button, 0)
 
         self.layout.addLayout(file_name_layout)
 
-        load_data = create_button("Load File Data", self.init_source_list)
+        load_data = create_button("Load File Data", "",self.init_source_list)
         self.layout.addWidget(load_data)
 
 
@@ -94,8 +95,8 @@ class Tab2:
         spacedv(self.layout)
         button_layout = QHBoxLayout()
 
-        self.cancel_button = create_button("Cancel", self.parent.reject)
-        self.continue_button = create_button("Continue", self.finish)
+        self.cancel_button = create_button("Cancel", "[esc]", self.parent.reject)
+        self.continue_button = create_button("Continue", "[return]", self.finish)
 
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.continue_button)

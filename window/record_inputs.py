@@ -50,8 +50,8 @@ class RecordInputs(QDialog):
         # Buttons
         button_layout = QHBoxLayout()
 
-        self.cancel_button = create_button("Cancel", self.button_cancel)
-        self.start_stop_button = create_button("Start", self.button_start_stop)
+        self.cancel_button = create_button("Cancel","[esc]" ,self.button_cancel)
+        self.start_stop_button = create_button("Start", "[return]", self.button_start_stop)
 
         button_layout.addWidget(self.cancel_button)
         button_layout.addWidget(self.start_stop_button)
