@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Union, Tuple
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
@@ -20,8 +20,8 @@ from utils.style import (
 )
 from utils.typedefs import(
     TAB2,
-    GestureUpdater,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
+    GestureData, GestureInput, GestureUpdater, ModelParameters
 )
 from utils.ui import (
     spacedv, blank_line,
@@ -29,6 +29,11 @@ from utils.ui import (
 )
 from analyse import read_gesture
 
+from .checks import (
+    check_empty_string,
+    check_string_numeric,
+    check_checkboxes_ticked
+)
 
 #- Tab Class ---------------------------------------------------------------------------------------
 
@@ -149,8 +154,10 @@ class Tab2:
         self.dynamic_data_usage()
 
 
+    # Use the read data to autofill model parameters. Allow editing them for future training.
+    def dynamic_data_usage(self) -> None:
         blank_line(self.body_layout)
-        label = QLabel("Model Parameters:")
+        label = QLabel("New Training Model Parameters:")
         label.setStyleSheet(TEXT_HEAD)
         self.body_layout.addWidget(label)
 
@@ -165,10 +172,18 @@ class Tab2:
         show_saved_values(LABEL_N_COMPONENT, self.gesture_data.parameters.n_component)
         show_saved_values(LABEL_THRESHOLD, self.gesture_data.parameters.threshold)
 
+        repeats_widget = labelled_text_widget("Repeats", "", "Positive Integer", self.body_layout)
+        repeats_widget.setToolTip("Number of times to repeat the gesture recording.")
+        self.entered_parameters["repeats"] = (repeats_widget)
+
         spacedv(self.body_layout)
 
-
     #- Getters and Actions -------------------------------------------------------------------------
+
+    # Return tuple of source matches
+    def source_matches(self) -> Optional[Tuple[int, ...]]:
+        return None
+
 
     # Return assembled GestureUpdater values if finish() previously validated them.
     def get_inputs(self) -> Optional[GestureUpdater]:
@@ -177,7 +192,47 @@ class Tab2:
 
     # Validate inputs, assemble GestureUpdater dataclass and submit tab result.
     def finish(self) -> None:
-        self.values: GestureUpdater
+        name = self.gesture_file.text()
+        error = check_empty_string(name, "Gesture Name: Missing title.")
+        if error:
+            return None
+
+        random_state = check_string_numeric(
+            self.entered_parameters[LABEL_RANDOM_STATE],
+            "Random State: Enter integer value in the valid range", int, 0, 4294967295
+        )
+        if random_state is None: return None
+
+        threshold = check_string_numeric(
+            self.entered_parameters[LABEL_THRESHOLD],
+            "Threshold: Enter valid integer value.", float
+        )
+        if threshold is None: return None
+
+        n_component = check_string_numeric(
+            self.entered_parameters[LABEL_N_COMPONENT],
+            "n Component: Enter valid integer value.", int, 1
+        )
+        if not n_component: return None
+
+        repeats = check_string_numeric(
+            self.entered_parameters["repeats"],
+            "Repeats: Enter valid integer value.", int, 1
+        )
+        if not repeats: return None
+
+        source_matches: Optional[Tuple[int,...]] = self.source_matches()
+        if source_matches is None: return None
+
+        self.values = GestureUpdater(
+            file=GestureInput(
+                name=name,
+                repeats=repeats,
+                sensors=source_matches,
+                parameters=ModelParameters(random_state, n_component, threshold)
+            ),
+            data=self.gesture_data.models
+        )
 
         self.submit(TAB2)
 
