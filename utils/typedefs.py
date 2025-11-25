@@ -20,7 +20,7 @@ TAB1: int = 1
 TAB2: int = 2
 
 LABEL_RANDOM_STATE: str = "Random State"
-LABEL_N_COMPONENTS: str = "n Components"
+LABEL_N_COMPONENT: str = "n Components"
 LABEL_THRESHOLD: str = "Threshold"
 
 
@@ -46,7 +46,7 @@ class SensorData:
 @dataclass(frozen=True)
 class ModelParameters:
     random_state: int
-    n_components: int
+    n_component: int
     threshold: float
 
 
@@ -69,7 +69,6 @@ class GestureData:
 # Structure used when updating an existing gesture file (filename, new data and original inputs).
 @dataclass(frozen=True)
 class GestureUpdater:
-    file: str
-    data: GestureData
-    old_data: GestureInput
+    file: GestureInput
+    data: dict[str, List[GaussianMixture]]
 

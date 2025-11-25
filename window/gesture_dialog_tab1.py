@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
 from utils.style import TEXT_HEAD
 from utils.typedefs import (
     TAB1,
-    LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
+    LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
     GestureInput, ModelParameters,
 )
 from utils.ui import (
@@ -125,7 +125,7 @@ class Tab1:
             LABEL_RANDOM_STATE, "42", "integer in the range [0, 4294967295]", self.layout)
 
         self.n_component_label = labelled_text_widget(
-            LABEL_N_COMPONENTS, "2", "positive integer", self.layout)
+            LABEL_N_COMPONENT, "2", "positive integer", self.layout)
 
         self.threshold_label = labelled_text_widget(
             LABEL_THRESHOLD, "-10", "", self.layout)
@@ -154,10 +154,10 @@ class Tab1:
 
     # Validate inputs, assemble GestureInput dataclass and submit tab result.
     def finish(self) -> None:
-        error = check_empty_string(self.gesture_file.text(), "Gesture Name: Missing title.")
+        name = self.gesture_file.text()
+        error = check_empty_string(name, "Gesture Name: Missing title.")
         if error:
             return None
-        name = self.gesture_file.text()
 
         repeats = check_string_numeric(
             self.repeats_input,

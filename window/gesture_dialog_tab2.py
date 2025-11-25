@@ -1,5 +1,5 @@
 
-# window/gesture_dialog.py
+# window/gesture_dialog_tab2.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
@@ -20,8 +20,8 @@ from utils.style import (
 )
 from utils.typedefs import(
     TAB2,
-    LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
     GestureUpdater,
+    LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
 )
 from utils.ui import (
     spacedv, blank_line,
@@ -79,7 +79,7 @@ class Tab2:
 
         self.layout.addLayout(file_name_layout)
 
-        load_data = create_button("Load File Data", "",self.init_source_list)
+        load_data = create_button("Load File Data", "", self.dynamic_source_list)
         self.layout.addWidget(load_data)
 
 
@@ -108,11 +108,12 @@ class Tab2:
 
         self.layout.addLayout(button_layout)
 
+    #- Dynamically Generated Modules ---------------------------------------------------------------
 
     # Read file data and add dynamic widgets to body layout, with data from gesture file.
-    def init_source_list(self) -> None:
-        gesture_data = read_gesture(self.gesture_file.text())
-        if gesture_data is None: return
+    def dynamic_source_list(self) -> None:
+        self.gesture_data: Optional[GestureData] = read_gesture(self.gesture_file.text())
+        if self.gesture_data is None: return
 
         # clear previous body layout
         while self.body_layout.count():
@@ -129,7 +130,7 @@ class Tab2:
 
         self.drop_boxes: List[QComboBox] = []
 
-        for model in gesture_data.models.keys():
+        for model in self.gesture_data.models.keys():
             label_holder: QHBoxLayout = QHBoxLayout()
 
             text_label = QLabel(model)
@@ -145,6 +146,9 @@ class Tab2:
 
             self.body_layout.addLayout(label_holder)
 
+        self.dynamic_data_usage()
+
+
         blank_line(self.body_layout)
         label = QLabel("Model Parameters:")
         label.setStyleSheet(TEXT_HEAD)
@@ -157,9 +161,9 @@ class Tab2:
             text_widget = labelled_text_widget(label, text_label, text_label, self.body_layout)
             self.entered_parameters[label] = (text_widget)
 
-        show_saved_values(LABEL_RANDOM_STATE, gesture_data.parameters.random_state)
-        show_saved_values(LABEL_N_COMPONENTS, gesture_data.parameters.n_components)
-        show_saved_values(LABEL_THRESHOLD, gesture_data.parameters.threshold)
+        show_saved_values(LABEL_RANDOM_STATE, self.gesture_data.parameters.random_state)
+        show_saved_values(LABEL_N_COMPONENT, self.gesture_data.parameters.n_component)
+        show_saved_values(LABEL_THRESHOLD, self.gesture_data.parameters.threshold)
 
         spacedv(self.body_layout)
 

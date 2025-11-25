@@ -34,7 +34,7 @@ def _single_thread_analyse(name: str, readings: List[SensorData], mp: ModelParam
         return
 
     for r in readings:
-        model: List[GaussianMixture] = _create_model(r.values, mp.random_state, mp.n_components)
+        model: List[GaussianMixture] = _create_model(r.values, mp.random_state, mp.n_component)
         write_gmm(name, r.sensor, model)
 
     print(f"Gesture '{name}' analysis complete.")
