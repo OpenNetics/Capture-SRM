@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 from sklearn.mixture import GaussianMixture
 
-from utils.typedefs import SensorData, float3d_t
+from utils.typedefs import SensorData, float3d_t, ModelParameters
 from .dotgesture import create_gesture, write_gmm
 
 
@@ -28,23 +28,21 @@ def _create_model(data: float3d_t, random_state: int, n_component: int ) -> List
     return gmm_models
 
 
-def _single_thread_analyse(
-    name: str, readings: List[SensorData], parameters: Tuple[int, int, float]
-) -> None:
-    if not create_gesture(name, parameters[2]):
+def _single_thread_analyse(name: str, readings: List[SensorData], mp: ModelParameters) -> None:
+    if not create_gesture(name, mp):
         # failed to create gesture file
         return
 
-    for reading in readings:
-        model: List[GaussianMixture] = _create_model(reading.values, parameters[0], parameters[1])
-        write_gmm(name, reading.sensor, model)
+    for r in readings:
+        model: List[GaussianMixture] = _create_model(r.values, mp.random_state, mp.n_components)
+        write_gmm(name, r.sensor, model)
+
+    print(f"Gesture '{name}' analysis complete.")
 
 
 #- Public Methods ----------------------------------------------------------------------------------
 
-def analyse(
-    name: str, readings: List[SensorData], parameters: Tuple[int, int, float]
-) -> None:
-    single_thread = Thread(target=_single_thread_analyse, args=(name, readings, parameters,))
+def analyse(name: str, readings: List[SensorData], mp: ModelParameters) -> None:
+    single_thread = Thread(target=_single_thread_analyse, args=(name, readings, mp,))
     single_thread.start()
 

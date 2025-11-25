@@ -20,6 +20,7 @@ from utils.style import (
 )
 from utils.typedefs import(
     TAB2,
+    LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
     GestureUpdater,
 )
 from utils.ui import (
@@ -138,11 +139,20 @@ class Tab2:
             self.body_layout.addLayout(label_holder)
 
         blank_line(self.body_layout)
-        threshold_label = str(gesture_data.threshold) if (
-            gesture_data.threshold is not None ) else "None Saved"
+        label = QLabel("Model Parameters:")
+        label.setStyleSheet(TEXT_HEAD)
+        self.body_layout.addWidget(label)
 
-        self.threshold_label = labelled_text_widget(
-            "Threshold", threshold_label, threshold_label, self.body_layout)
+        self.entered_parameters: dict[str,QLineEdit] = {}
+        blank_line(self.body_layout)
+        def show_saved_values(label: str, value: Union[int, float, None]) -> None:
+            text_label = str(value) if value is not None else "None Saved"
+            text_widget = labelled_text_widget(label, text_label, text_label, self.body_layout)
+            self.entered_parameters[label] = (text_widget)
+
+        show_saved_values(LABEL_RANDOM_STATE, gesture_data.parameters.random_state)
+        show_saved_values(LABEL_N_COMPONENTS, gesture_data.parameters.n_components)
+        show_saved_values(LABEL_THRESHOLD, gesture_data.parameters.threshold)
 
         spacedv(self.body_layout)
 

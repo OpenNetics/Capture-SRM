@@ -3,7 +3,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass, field
-from typing import List, Tuple, Optional
+from typing import List, Tuple
 
 from sklearn.mixture import GaussianMixture
 
@@ -18,6 +18,10 @@ RECORD_ACTION_TERMINATE: int = 4
 
 TAB1: int = 1
 TAB2: int = 2
+
+LABEL_RANDOM_STATE: str = "Random State"
+LABEL_N_COMPONENTS: str = "n Components"
+LABEL_THRESHOLD: str = "Threshold"
 
 
 #- Type Definitions --------------------------------------------------------------------------------
@@ -38,17 +42,24 @@ class SensorData:
 
 
 @dataclass(frozen=True)
+class ModelParameters:
+    random_state: int
+    n_components: int
+    threshold: float
+
+
+@dataclass(frozen=True)
 class GestureInput:
     name: str
     repeats: int
     sensors: Tuple[int, ...]
-    parameters: Tuple[int, int, float]
+    parameters: ModelParameters
 
 
 @dataclass(frozen=True)
 class GestureData:
-    threshold: Optional[float]
-    models: dict[str, Tuple[GaussianMixture]]
+    parameters: ModelParameters
+    models: dict[str, List[GaussianMixture]]
 
 
 @dataclass(frozen=True)

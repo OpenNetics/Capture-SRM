@@ -20,7 +20,7 @@ class DataGenerator(QThread):
 
     def run(self):
         while True:
-            random_values = np.random.uniform(10, 15, 5)
+            random_values = np.random.uniform(10, 15, 6)
             array = np.round(random_values, 2).tolist()
             self.data_signal.emit(array)
             time.sleep(1)

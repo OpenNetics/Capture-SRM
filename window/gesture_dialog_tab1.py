@@ -15,7 +15,11 @@ from PySide6.QtWidgets import (
 )
 
 from utils.style import TEXT_HEAD
-from utils.typedefs import GestureInput, TAB1
+from utils.typedefs import (
+    TAB1,
+    LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
+    GestureInput, ModelParameters,
+)
 from utils.ui import (
     spacedv, blank_line,
     create_button, labelled_text_widget,
@@ -109,13 +113,13 @@ class Tab1:
         self.layout.addWidget(text_label)
 
         self.random_state_label = labelled_text_widget(
-            "Random State", "42", "integer in the range [0, 4294967295]", self.layout)
+            LABEL_RANDOM_STATE, "42", "integer in the range [0, 4294967295]", self.layout)
 
         self.n_component_label = labelled_text_widget(
-            "n Component", "2", "positive integer", self.layout)
+            LABEL_N_COMPONENTS, "2", "positive integer", self.layout)
 
         self.threshold_label = labelled_text_widget(
-            "Threshold", "-10", "", self.layout)
+            LABEL_THRESHOLD, "-10", "", self.layout)
 
 
     def init_buttons(self) -> None:
@@ -177,7 +181,7 @@ class Tab1:
             name=name,
             repeats=repeats,
             sensors=tuple(selected_sensors), # convert sensors list -> tuple for immutability
-            parameters=(random_state, n_component, threshold)
+            parameters=ModelParameters(random_state, n_component, threshold)
         )
 
         self.submit(TAB1)
