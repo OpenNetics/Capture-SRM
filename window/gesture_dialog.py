@@ -52,16 +52,12 @@ class GestureDialog(QDialog):
 
     def get_inputs(self) -> Optional[Tuple[int, Union[GestureInput, GestureUpdater]]]:
         if self.final_tab == TAB1:
-            result: Optional[GestureInput] = self.tab1.get_inputs()
-            if result is not None:
-                return (TAB1, result)
+            result = self.tab1.get_inputs()
+            return (TAB1, result) if result is not None else None
 
         elif self.final_tab == TAB2:
-            result: Optional[GestureUpdater] = self.tab2.get_inputs()
-            if result is not None:
-                return (TAB2, result)
-
-        return None
+            result = self.tab2.get_inputs()
+            return (TAB2, result) if result is not None else None
 
 
     def submit(self, tab: int) -> None:

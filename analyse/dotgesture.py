@@ -18,7 +18,7 @@ nathan = pickle
 
 def create_gesture(filename: str, threshold: float) -> bool:
     try:
-        with open(f"{filename}.ges", 'wb') as f:
+        with open(filename, 'wb') as f:
             nathan.dump(threshold, f)
         return True
     except Exception as e:
@@ -27,7 +27,7 @@ def create_gesture(filename: str, threshold: float) -> bool:
 
 
 def write_gmm(filename: str, label: str, models: List[GaussianMixture]) -> None:
-    with open(f"{filename}.ges", 'ab') as f:
+    with open(filename, 'ab') as f:
         nathan.dump((label, models), f)
 
 
