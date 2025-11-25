@@ -31,6 +31,7 @@ float3d_t = List[List[List[float]]]
 int2d_t = List[List[int]]
 
 
+# Dataclass holding sensor name and appended time/reading pairs for analysis.
 @dataclass
 class SensorData:
     sensor: str
@@ -41,6 +42,7 @@ class SensorData:
         self.values.append(read_values)
 
 
+# Immutable container for model configuration and inputs used when creating gestures.
 @dataclass(frozen=True)
 class ModelParameters:
     random_state: int
@@ -48,6 +50,7 @@ class ModelParameters:
     threshold: float
 
 
+# Immutable input bundle used when recording a new gesture (name, repeats, sensors, params).
 @dataclass(frozen=True)
 class GestureInput:
     name: str
@@ -56,12 +59,14 @@ class GestureInput:
     parameters: ModelParameters
 
 
+# Structure representing saved gesture data: parameters plus per-model GaussianMixture lists.
 @dataclass(frozen=True)
 class GestureData:
     parameters: ModelParameters
     models: dict[str, List[GaussianMixture]]
 
 
+# Structure used when updating an existing gesture file (filename, new data and original inputs).
 @dataclass(frozen=True)
 class GestureUpdater:
     file: str

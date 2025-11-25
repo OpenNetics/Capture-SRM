@@ -12,6 +12,7 @@ from utils.ui import alert_box
 
 #- Public Methods ----------------------------------------------------------------------------------
 
+# Show an alert if a required string is empty; returns True when error occurred.
 def check_empty_string(string: str, error: str) -> bool:
     if string == "":
         alert_box("Error", error)
@@ -20,6 +21,7 @@ def check_empty_string(string: str, error: str) -> bool:
     return False
 
 
+# Generic numeric validator for QLineEdit that enforces optional min/max bounds.
 Numeric = TypeVar('Numeric', int, float)
 def check_string_numeric(
     string: QLineEdit,
@@ -44,7 +46,7 @@ def check_string_numeric(
         return None
 
 
-# Ensure all source names are unique
+# Ensure that the provided list of source names are unique; pop up an alert on failure.
 def check_sources_name(sources: List[str]) -> bool:
     result: bool = len(sources) == len(set(sources))
     if not result:
@@ -53,6 +55,7 @@ def check_sources_name(sources: List[str]) -> bool:
     return result
 
 
+# Ensure a minimum number of checkboxes are ticked and return their indexes or None on error.
 def check_checkboxes_ticked(
     checkboxes: List[QCheckBox],
     length: int,

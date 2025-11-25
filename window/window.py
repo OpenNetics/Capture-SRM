@@ -49,8 +49,10 @@ from .checks import check_sources_name
 
 #- Window Class ------------------------------------------------------------------------------------
 
+# GestureTracker: main application widget that manages UI, plotting and gesture workflows.
 class GestureTracker(QWidget):
 
+    # Initialise the main window, state variables and build UI components.
     def __init__(self) -> None:
         super().__init__()
 
@@ -75,6 +77,7 @@ class GestureTracker(QWidget):
 
     #- Initialise Components ----------------------------------------------------------------------
 
+    # Build the top button row and attach callbacks.
     def init_buttons(self) -> None:
         button_layout = QHBoxLayout()
 
@@ -99,6 +102,7 @@ class GestureTracker(QWidget):
         self.layout.addLayout(button_layout)
 
 
+    # Create and configure the plot widget used for realtime graphs.
     def init_graph_plot(self) -> None:
         self.plot_widget = pg.PlotWidget()
         self.plot_widget.setBackground(BACKGROUND_COLOR)
@@ -109,6 +113,7 @@ class GestureTracker(QWidget):
         self.plot_widget.setMouseEnabled(True, True)
 
 
+    # Create footer area containing legends and connection/baud selectors.
     def init_graph_footer(self) -> None:
         # Legends are added to this layout
         self.legend_layout = QHBoxLayout()
@@ -137,6 +142,7 @@ class GestureTracker(QWidget):
         spacedh(self.legend_layout)
 
 
+    # Create the scrollable raw data text area for incoming sensor values.
     def init_raw_data(self) -> None:
         self.scroll_area = QScrollArea()
         self.scroll_area.setWidgetResizable(True)
@@ -155,6 +161,7 @@ class GestureTracker(QWidget):
 
     #- Sensor Data --------------------------------------------------------------------------------
 
+    # Update the plot from graphlines unless the UI is frozen.
     def update_plot(self) -> None:
         if self.freeze:
             return
@@ -171,6 +178,7 @@ class GestureTracker(QWidget):
             self.plot_widget.addItem(sliced_line)
 
 
+    # Append new sensor values to internal buffers and create graph lines as needed.
     def add_data(self, values: List[Any]) -> None:
         # add data to the raw data area
         self.data_display.append(str(values))
@@ -215,6 +223,7 @@ class GestureTracker(QWidget):
 
     #- Button Actions -----------------------------------------------------------------------------
 
+    # Toggle between showing latest windowed values and full history.
     def button_toggle_recent(self) -> None:
         view_button_options = [ "Zoom Latest", "View All" ]
         view_button_tips = ["Plot only latest 10 readings [t]", "Plot all readings [t]"]
@@ -225,6 +234,7 @@ class GestureTracker(QWidget):
         self.update_plot()
 
 
+    # Clear all recorded data and reset view state.
     def button_clear_data(self) -> None:
         self.counter = [0]
         self.toggle_recent = 0
@@ -236,12 +246,14 @@ class GestureTracker(QWidget):
         self.update_plot()
 
 
+    # Toggle freezing of live plotting (pause/resume visuals).
     def button_freeze(self) -> None:
         self.freeze = not self.freeze
         self.freeze_button.setText("Unfreeze" if self.freeze else "Freeze")
         self.update_plot()
 
 
+    # Open a file dialog and save the raw text of incoming data to disk.
     def button_save(self) -> None:
         # Open file dialog to select save location
         file_path, _ = QFileDialog.getSaveFileName(
@@ -260,6 +272,7 @@ class GestureTracker(QWidget):
             msg_box.exec_()
 
 
+    # Launch gesture dialog, handle recording flow and hand over data to analyser.
     def button_gesture(self) -> None:
         source_names: List[str] = [ source.Title().text() for source in self.graphlines ]
         if not check_sources_name(source_names):
@@ -298,6 +311,7 @@ class GestureTracker(QWidget):
             analyse(dialog_inputs.name, analyse_data, dialog_inputs.parameters)
 
 
+    # Record control callback implementing start/stop/discard/restart semantics.
     def record_data(self, action: int) -> None:
         if action == RECORD_ACTION_START:
             self.records_stamps.append([len(self.counter)])
@@ -319,11 +333,13 @@ class GestureTracker(QWidget):
             self.plot_widget.setBackground(BACKGROUND_COLOR)
 
 
+    # Refresh the list of available serial connection ports in the combobox.
     def button_refresh_connections(self) -> None:
         self.connection_list.clear()
         self.connection_list.addItems(connected_ports())
 
 
+    # Map keyboard events to the corresponding toolbar button actions.
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key_G:
             self.gesture_button.click()

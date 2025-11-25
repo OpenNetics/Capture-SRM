@@ -21,8 +21,10 @@ from .gesture_dialog_tab2 import Tab2
 
 #- Window Class ------------------------------------------------------------------------------------
 
+# Modal dialog to choose between recording a new gesture or updating an existing one.
 class GestureDialog(QDialog):
 
+    # Build dialog tabs and store inputs; submit() will accept the dialog with chosen tab.
     def __init__(self, input_names: List[str]) -> None:
         super().__init__()
 
@@ -49,6 +51,7 @@ class GestureDialog(QDialog):
         self.layout.addWidget(tab_widget)
 
 
+    # Return inputs from the selected tab, or None if no valid inputs were produced.
     def get_inputs(self) -> Optional[Tuple[int, Union[GestureInput, GestureUpdater]]]:
         if self.final_tab == TAB1:
             result = self.tab1.get_inputs()
@@ -59,6 +62,7 @@ class GestureDialog(QDialog):
             return (TAB2, result) if result is not None else None
 
 
+    # Record which tab produced the inputs and accept the dialog to close it.
     def submit(self, tab: int) -> None:
         self.final_tab = tab
         self.accept()

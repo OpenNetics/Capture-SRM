@@ -33,8 +33,10 @@ from .checks import (
 
 #- Tab Class ---------------------------------------------------------------------------------------
 
+# Tab responsible for collecting inputs needed to record a new gesture.
 class Tab1:
 
+    # Initialise fields, checkboxes, model parameter inputs and action buttons.
     def __init__(
             self,
             parent: QDialog,
@@ -59,6 +61,7 @@ class Tab1:
 
     #- Init Modules --------------------------------------------------------------------------------
 
+    # Create line edits for gesture name and repeats with a browse/save helper.
     def init_input_fields(self) -> None:
         # Gesture Name
         file_name_layout = QHBoxLayout()
@@ -84,6 +87,7 @@ class Tab1:
         self.layout.addWidget(self.repeats_input)
 
 
+    # Open file dialog to choose target save path for the gesture file.
     def init_input_filepath(self) -> None:
         file_path, _ = QFileDialog.getSaveFileName(
             self.parent, "Save Gesture", "", "Gesture Files (*.ges);;All Files (*)",
@@ -93,6 +97,7 @@ class Tab1:
             self.gesture_file.setText(file_path)
 
 
+    # Build sensor selection checkboxes for available input names.
     def init_checkboxes(self) -> None:
         blank_line(self.layout)
 
@@ -108,6 +113,7 @@ class Tab1:
             self.layout.addWidget(checkbox)
 
 
+    # Add widgets to configure model parameters (random state, n components, threshold).
     def init_model_params(self) -> None:
         blank_line(self.layout)
 
@@ -125,6 +131,7 @@ class Tab1:
             LABEL_THRESHOLD, "-10", "", self.layout)
 
 
+    # Create Cancel / Continue buttons and wire them to actions.
     def init_buttons(self) -> None:
         blank_line(self.layout)
         spacedv(self.layout)
@@ -140,10 +147,12 @@ class Tab1:
 
     #- Getters and Actions -------------------------------------------------------------------------
 
+    # Return assembled GestureInput values if finish() previously validated them.
     def get_inputs(self) -> Optional[GestureInput]:
         return self.values if hasattr(self, 'values') else None
 
 
+    # Validate inputs, assemble GestureInput dataclass and submit tab result.
     def finish(self) -> None:
         error = check_empty_string(self.gesture_file.text(), "Gesture Name: Missing title.")
         if error:
@@ -191,6 +200,7 @@ class Tab1:
 
     #- Key Events ----------------------------------------------------------------------------------
 
+    # Map keyboard events to dialog interactions (enter/escape).
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() in [Qt.Key_Return, Qt.Key_Enter]:
             self.continue_button.click()

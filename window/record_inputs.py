@@ -27,8 +27,10 @@ from utils.typedefs import (
 
 #- Window Class ------------------------------------------------------------------------------------
 
+# Dialog used to control recording sessions (start/stop/discard/restart).
 class RecordInputs(QDialog):
 
+    # Initialise dialog UI and recording state, pass callbacks to record controller.
     def __init__(self, total_recordings: int, record_function: Callable[[int], None]) -> None:
         super().__init__()
         self.setWindowTitle("Record Gestures")
@@ -59,6 +61,7 @@ class RecordInputs(QDialog):
         self.layout.addLayout(button_layout)
 
 
+    # Handle cancel button actions: discard, restart or terminate the whole session.
     def button_cancel(self) -> None:
         button_title = self.cancel_button.text()
 
@@ -77,6 +80,7 @@ class RecordInputs(QDialog):
             self.reject()
 
 
+    # Toggle recording start/stop and advance or finalize the recording session.
     def button_start_stop(self) -> None:
         if (self.start_stop_button.text() == "Continue"
             and self.recording_counter == self.total_recordings):
@@ -106,6 +110,7 @@ class RecordInputs(QDialog):
             self.call(RECORD_ACTION_START)
 
 
+    # Map keyboard keys to dialog actions for convenience.
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() in [Qt.Key_Return, Qt.Key_Enter, Qt.Key_Space, Qt.Key_S]:
             self.start_stop_button.click()

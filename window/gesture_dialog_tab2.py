@@ -32,8 +32,10 @@ from analyse import read_gesture
 
 #- Tab Class ---------------------------------------------------------------------------------------
 
+# Tab responsible for collecting inputs needed to update existing gesture.
 class Tab2:
 
+    # Initialise fields, sensor list, model parameter inputs and action buttons.
     def __init__(
             self,
             parent: QDialog,
@@ -60,6 +62,7 @@ class Tab2:
 
     #- Init Modules --------------------------------------------------------------------------------
 
+    # Add widgets to find select gesture files. Add load button to call function to load file data.
     def init_filename(self) -> None:
         # Gesture Name
         file_name_layout = QHBoxLayout()
@@ -80,6 +83,7 @@ class Tab2:
         self.layout.addWidget(load_data)
 
 
+    # Browse button action: open file dialog to choose target gesture file.
     def init_input_filepath(self) -> None:
         file_path, _ = QFileDialog.getOpenFileName(
             self.parent, "Open Gesture File", "", "Gesture Files (*.ges);;All Files (*)",
@@ -90,6 +94,7 @@ class Tab2:
         self.gesture_file.setText(file_path)
 
 
+    # Create Cancel / Continue buttons and wire them to actions.
     def init_buttons(self) -> None:
         blank_line(self.layout)
         spacedv(self.layout)
@@ -104,6 +109,7 @@ class Tab2:
         self.layout.addLayout(button_layout)
 
 
+    # Read file data and add dynamic widgets to body layout, with data from gesture file.
     def init_source_list(self) -> None:
         gesture_data = read_gesture(self.gesture_file.text())
         if gesture_data is None: return
@@ -160,10 +166,12 @@ class Tab2:
 
     #- Getters and Actions -------------------------------------------------------------------------
 
+    # Return assembled GestureUpdater values if finish() previously validated them.
     def get_inputs(self) -> Optional[GestureUpdater]:
         return self.values if hasattr(self, 'values') else None
 
 
+    # Validate inputs, assemble GestureUpdater dataclass and submit tab result.
     def finish(self) -> None:
         self.values: GestureUpdater
 
@@ -171,6 +179,7 @@ class Tab2:
 
     #- Key Events ----------------------------------------------------------------------------------
 
+    # Map keyboard events to dialog interactions (enter/escape).
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() in [Qt.Key_Return, Qt.Key_Enter]:
             self.continue_button.click()
