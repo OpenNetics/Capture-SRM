@@ -3,34 +3,29 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Union
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
-    QLabel,
-    QDialog,
-    QWidget,
-    QLayout,
-    QLineEdit,
-    QComboBox,
-    QFileDialog,
-    QVBoxLayout,
-    QHBoxLayout,
+    QDialog, QWidget,
+    QComboBox, QFileDialog, QLabel, QLineEdit,
+    QLayout, QVBoxLayout, QHBoxLayout,
     QSizePolicy,
 )
 
-from utils.ui import (
-    spacedv,
-    blank_line,
-    create_button,
-    labelled_text_widget,
-)
 from utils.style import (
     TEXT_HEAD, TEXT_BODY,
     COMBOBOX_STYLE,
 )
-from utils.typedefs import GestureUpdater, TAB2
+from utils.typedefs import(
+    TAB2,
+    GestureUpdater,
+)
+from utils.ui import (
+    spacedv, blank_line,
+    create_button, labelled_text_widget,
+)
 from analyse import read_gesture
 
 
@@ -135,7 +130,7 @@ class Tab2:
             label_holder.addWidget(text_label)
 
             input_name_list = QComboBox()
-            input_name_list.addItems(self.input_names)
+            input_name_list.addItems(["<UNCHANGED>"] + self.input_names)
             input_name_list.setStyleSheet(COMBOBOX_STYLE)
             self.drop_boxes.append(input_name_list)
             label_holder.addWidget(input_name_list)

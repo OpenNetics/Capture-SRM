@@ -9,36 +9,21 @@ import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
-    QLabel,
-    QWidget,
-    QDialog,
-    QTextEdit,
-    QComboBox,
-    QScrollArea,
-    QVBoxLayout,
-    QHBoxLayout,
-    QFileDialog,
-    QMessageBox
+    QDialog, QWidget,
+    QComboBox, QFileDialog, QLabel, QMessageBox, QTextEdit,
+    QHBoxLayout, QVBoxLayout, QScrollArea,
 )
-
-from .gesture_dialog import GestureDialog
-from .record_inputs import RecordInputs
-from .graphline import GraphLine
-from .checks import check_sources_name
 
 from utils.ui import (
-    EditLabel,
-    new_color,
-    create_button,
     spacedh,
+    EditLabel, create_button,
+    new_color,
 )
 from utils.style import (
-    BACKGROUND_COLOR,
     APPLICATION_NAME,
-    WINDOW_SIZE,
-    GRAPH_HEIGHT,
-    RAW_VALUE_BOX_STYLE,
-    COMBOBOX_STYLE,
+    BACKGROUND_COLOR,
+    WINDOW_SIZE, GRAPH_HEIGHT,
+    RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE,
 )
 from utils.typedefs import (
     SensorData,
@@ -48,16 +33,18 @@ from utils.typedefs import (
     RECORD_ACTION_DISCARD,
     RECORD_ACTION_RESTART,
     RECORD_ACTION_TERMINATE,
-    TAB1,
-    TAB2,
+    TAB1, TAB2,
 )
 from serial import (
-    select_port,
-    select_baud_rate,
-    baud_rates,
-    connected_ports
+    select_port, select_baud_rate,
+    baud_rates, connected_ports
 )
 from analyse import analyse
+
+from .gesture_dialog import GestureDialog
+from .record_inputs import RecordInputs
+from .graphline import GraphLine
+from .checks import check_sources_name
 
 
 #- Window Class ------------------------------------------------------------------------------------

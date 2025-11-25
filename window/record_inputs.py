@@ -8,16 +8,14 @@ from typing import Callable
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
-    QLabel,
     QDialog,
-    QVBoxLayout,
-    QHBoxLayout
+    QLabel,
+    QHBoxLayout, QVBoxLayout,
 )
 
 from utils.ui import create_button
 from utils.style import (
-    BACKGROUND_COLOR,
-    FONT_COLOR,
+    BACKGROUND_COLOR, FONT_COLOR,
 )
 from utils.typedefs import (
     RECORD_ACTION_STOP,

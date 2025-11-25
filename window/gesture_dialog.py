@@ -6,19 +6,18 @@
 from typing import List, Optional, Union, Tuple
 
 from PySide6.QtWidgets import (
-    QDialog,
-    QWidget,
-    QTabWidget,
+    QDialog, QWidget, QTabWidget,
     QVBoxLayout,
 )
 
 from utils.style import BACKGROUND_COLOR
-from .gesture_dialog_tab1 import Tab1
-from .gesture_dialog_tab2 import Tab2
 from utils.typedefs import(
     GestureInput, GestureUpdater,
     TAB1, TAB2,
 )
+from .gesture_dialog_tab1 import Tab1
+from .gesture_dialog_tab2 import Tab2
+
 
 #- Window Class ------------------------------------------------------------------------------------
 

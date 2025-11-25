@@ -8,24 +8,17 @@ from typing import Callable, List, Optional
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
-    QLabel,
-    QWidget,
-    QDialog,
-    QLineEdit,
-    QCheckBox,
-    QFileDialog,
-    QVBoxLayout,
-    QHBoxLayout,
+    QDialog, QWidget,
+    QCheckBox, QFileDialog, QLabel, QLineEdit,
+    QVBoxLayout, QHBoxLayout,
     QSizePolicy,
 )
 
 from utils.style import TEXT_HEAD
 from utils.typedefs import GestureInput, TAB1
 from utils.ui import (
-    spacedv,
-    blank_line,
-    create_button,
-    labelled_text_widget,
+    spacedv, blank_line,
+    create_button, labelled_text_widget,
 )
 from .checks import (
     check_empty_string,
