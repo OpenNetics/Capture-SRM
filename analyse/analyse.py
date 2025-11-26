@@ -10,7 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 from sklearn.mixture import GaussianMixture
 
-from utils.typedefs import SensorData, float3d_t, ModelParameters
+from utils.typing import SensorData, float3d_t, ModelParameters
 from .dotgesture import create_gesture, write_gmm
 
 

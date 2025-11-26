@@ -1,3 +1,4 @@
+
 # analyse/dotgesture.py
 
 #- Imports -----------------------------------------------------------------------------------------
@@ -7,7 +8,7 @@ from typing import Any, Dict, List, Optional
 
 from sklearn.mixture import GaussianMixture
 
-from utils.typedefs import GestureData, ModelParameters
+from utils.typing import GestureData, ModelParameters
 from utils.ui import alert_box
 
 nathan = pickle

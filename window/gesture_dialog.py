@@ -11,7 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from utils.style import BACKGROUND_COLOR
-from utils.typedefs import(
+from utils.typing import(
     GestureInput, GestureUpdater,
     TAB1, TAB2,
 )

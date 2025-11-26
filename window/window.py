@@ -25,7 +25,7 @@ from utils.style import (
     WINDOW_SIZE, GRAPH_HEIGHT,
     RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE,
 )
-from utils.typedefs import (
+from utils.typing import (
     SensorData,
     int2d_t,
     RECORD_ACTION_STOP,
@@ -75,7 +75,7 @@ class GestureTracker(QWidget):
         self.init_graph_footer()
         self.init_raw_data()
 
-    #- Initialise Components ----------------------------------------------------------------------
+    #- Initialise Components -----------------------------------------------------------------------
 
     # Build the top button row and attach callbacks.
     def init_buttons(self) -> None:
@@ -159,7 +159,7 @@ class GestureTracker(QWidget):
 
         self.layout.addWidget(self.scroll_area)
 
-    #- Sensor Data --------------------------------------------------------------------------------
+    #- Sensor Data ---------------------------------------------------------------------------------
 
     # Update the plot from graphlines unless the UI is frozen.
     def update_plot(self) -> None:
@@ -221,7 +221,7 @@ class GestureTracker(QWidget):
 
         self.update_plot()
 
-    #- Button Actions -----------------------------------------------------------------------------
+    #- Button Actions ------------------------------------------------------------------------------
 
     # Toggle between showing latest windowed values and full history.
     def button_toggle_recent(self) -> None:

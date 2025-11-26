@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
 )
 
 from utils.style import TEXT_HEAD
-from utils.typedefs import (
+from utils.typing import (
     TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
     GestureInput, ModelParameters,

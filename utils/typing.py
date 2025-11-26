@@ -1,3 +1,4 @@
+
 # utils/typedefs.py
 
 #- Imports -----------------------------------------------------------------------------------------
@@ -18,6 +19,7 @@ RECORD_ACTION_TERMINATE: int = 4
 
 TAB1: int = 1
 TAB2: int = 2
+TAB3: int = 3
 
 LABEL_RANDOM_STATE: str = "Random State"
 LABEL_N_COMPONENT: str = "n Components"
@@ -29,7 +31,10 @@ LABEL_THRESHOLD: str = "Threshold"
 float2d_t = List[List[float]]
 float3d_t = List[List[List[float]]]
 int2d_t = List[List[int]]
+data_dict_t = dict[str, List[GaussianMixture]]
 
+
+#- Data Classes ------------------------------------------------------------------------------------
 
 # Dataclass holding sensor name and appended time/reading pairs for analysis.
 @dataclass
@@ -50,6 +55,13 @@ class ModelParameters:
     threshold: float
 
 
+# Structure representing saved gesture data: parameters plus per-model GaussianMixture lists.
+@dataclass(frozen=True)
+class GestureData:
+    parameters: ModelParameters
+    models: data_dict_t
+
+
 # Immutable input bundle used when recording a new gesture (name, repeats, sensors, params).
 @dataclass(frozen=True)
 class GestureInput:
@@ -59,16 +71,9 @@ class GestureInput:
     parameters: ModelParameters
 
 
-# Structure representing saved gesture data: parameters plus per-model GaussianMixture lists.
-@dataclass(frozen=True)
-class GestureData:
-    parameters: ModelParameters
-    models: dict[str, List[GaussianMixture]]
-
-
 # Structure used when updating an existing gesture file (filename, new data and original inputs).
 @dataclass(frozen=True)
 class GestureUpdater:
     file: GestureInput
-    data: dict[str, List[GaussianMixture]]
+    data: data_dict_t
 

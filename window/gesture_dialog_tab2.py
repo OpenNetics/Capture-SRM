@@ -18,7 +18,7 @@ from utils.style import (
     TEXT_HEAD, TEXT_BODY,
     COMBOBOX_STYLE,
 )
-from utils.typedefs import(
+from utils.typing import(
     TAB2,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
     GestureData, GestureInput, GestureUpdater, ModelParameters
@@ -32,8 +32,8 @@ from analyse import read_gesture
 from .checks import (
     check_empty_string,
     check_string_numeric,
-    check_checkboxes_ticked
 )
+
 
 #- Tab Class ---------------------------------------------------------------------------------------
 
