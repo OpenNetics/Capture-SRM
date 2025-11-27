@@ -14,10 +14,11 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QVBoxLayout, QScrollArea,
 )
 
+from analyse import analyse_create, analyse_update
+from utils.extra import new_color
 from utils.ui import (
     spacedh,
     EditLabel, create_button,
-    new_color,
 )
 from utils.style import (
     APPLICATION_NAME,
@@ -39,7 +40,6 @@ from serial import (
     select_port, select_baud_rate,
     baud_rates, connected_ports
 )
-from analyse import analyse
 
 from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs

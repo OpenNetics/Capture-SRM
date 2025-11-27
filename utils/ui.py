@@ -3,8 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-import sys
-from typing import Tuple, Any, Callable
+from typing import Any, Callable
 
 from PySide6.QtWidgets import (
     QLabel,
@@ -23,14 +22,9 @@ from .style import (
     TEXT_BODY,
 )
 
+from .extra import print_alert
 
 #- Lib ---------------------------------------------------------------------------------------------
-
-# Return a random RGB color tuple used for new graph lines.
-def new_color() -> Tuple[int, int, int]:
-    from random import randint
-    return (randint(0, 255), randint(60, 255), randint(0, 200))
-
 
 # Insert a horizontal expanding spacer into a QHBoxLayout.
 def spacedh(layout: QHBoxLayout) -> None:
@@ -87,7 +81,7 @@ def create_button(
 
 # Show a simple QMessageBox (also prints to stderr) for alerts and errors.
 def alert_box(status: str, message: str) -> None:
-    print(f"[{status}] {message}", file=sys.stderr)
+    print_alert(status, message)
 
     msg_box = QMessageBox()
     msg_box.setWindowTitle(status)

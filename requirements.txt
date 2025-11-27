@@ -1,4 +1,5 @@
 numpy
 pyside6
+colorama
 pyqtgraph
 scikit-learn
