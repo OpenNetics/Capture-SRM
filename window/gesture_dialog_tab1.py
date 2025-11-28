@@ -43,11 +43,13 @@ class Tab1:
             parent: QDialog,
             parent_layout: QWidget,
             input_names: List[str],
-            submit: Callable[[int], None]
+            submit: Callable[[int], None],
+            cancel: Callable[[], None]
         ) -> None:
 
         self.parent = parent
         self.submit: Callable[[int], None] = submit
+        self.cancel: Callable[[], None] = cancel
         self.input_names: List[str] = input_names
 
         self.layout = QVBoxLayout()
@@ -138,7 +140,7 @@ class Tab1:
         spacedv(self.layout)
         button_layout = QHBoxLayout()
 
-        self.cancel_button = create_button("Cancel", "[esc]" ,self.parent.reject)
+        self.cancel_button = create_button("Cancel", "[esc]" ,self.cancel)
         self.continue_button = create_button("Continue", "[return]", self.finish)
 
         button_layout.addWidget(self.cancel_button)

@@ -47,14 +47,16 @@ class Tab2:
             parent: QDialog,
             parent_layout: QWidget,
             input_names: List[str],
-            submit: Callable[[int], None]
+            submit: Callable[[int], None],
+            cancel: Callable[[], None],
         ) -> None:
 
-        self.parent = parent
+        self.parent: QDialog = parent
         self.submit: Callable[[int], None] = submit
+        self.cancel: Callable[[], None] = cancel
         self.input_names: List[str] = input_names
 
-        self.layout = QVBoxLayout()
+        self.layout: QVBoxLayout = QVBoxLayout()
         self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.layout.setContentsMargins(10, 10, 10, 10)
         parent_layout.setLayout(self.layout)
@@ -73,7 +75,7 @@ class Tab2:
         # Gesture Name
         file_name_layout = QHBoxLayout()
 
-        self.gesture_file = QLineEdit(self.parent)
+        self.gesture_file: QLineEdit = QLineEdit(self.parent)
         self.gesture_file.setPlaceholderText("Gesture Path")
         self.gesture_file.setToolTip("File to further update.")
         self.gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
@@ -106,7 +108,7 @@ class Tab2:
         spacedv(self.layout)
         button_layout = QHBoxLayout()
 
-        self.cancel_button = create_button("Cancel", "[esc]", self.parent.reject)
+        self.cancel_button = create_button("Cancel", "[esc]", self.cancel)
         self.continue_button = create_button("Continue", "[return]", self.finish)
 
         button_layout.addWidget(self.cancel_button)
@@ -184,7 +186,8 @@ class Tab2:
 
     # Return tuple of source matches
     def source_matches(self) -> Optional[Tuple[int, ...]]:
-        return None
+        #TODO: alert-box when None
+        return (1,2,3)
 
 
     # Return assembled GestureUpdater values if finish() previously validated them.
@@ -194,6 +197,8 @@ class Tab2:
 
     # Validate inputs, assemble GestureUpdater dataclass and submit tab result.
     def finish(self) -> None:
+        if not hasattr(self, 'entered_parameters'): self.cancel()
+
         name = self.gesture_file.text()
         error = check_empty_string(name, "Gesture Name: Missing title.")
         if error:
