@@ -3,9 +3,9 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Any, List, Tuple
+from typing import Any, List, Optional, Tuple, Union
 
-from redwrenlib.typing import int2d_t
+from redwrenlib.typing import int2d_t, ModelParameters
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QKeyEvent
@@ -29,6 +29,7 @@ from utils.style import (
 )
 from utils.typing import (
     SensorData,
+    GestureInput, GestureUpdater,
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,
@@ -290,13 +291,31 @@ class GestureTracker(QWidget):
 
         tab, dialog_inputs = dialog_return
 
-        inputs = RecordInputs(dialog_inputs.repeats, self.record_data)
+        if tab == TAB1:
+            # dialog_inputs: GestureInput
+            repeats: int = dialog_inputs.repeats
+            sensors: Tuple[int, ...] = dialog_inputs.sensors
+            name: str = dialog_inputs.name
+            parameters: ModelParameters = dialog_inputs.parameters
+            analyse_method = analyse_create
+
+        elif tab == TAB2:
+            # dialog_inputs: GestureUpdater
+            repeats: int = dialog_inputs.file.repeats
+            sensors: Tuple[int, ...] = dialog_inputs.file.sensors
+            name: str = dialog_inputs.file.name
+            parameters: ModelParameters = dialog_inputs.file.parameters
+            analyse_method = analyse_update
+        else:
+            return
+
+        inputs = RecordInputs(repeats, self.record_data)
         if inputs.exec() != QDialog.Accepted:
             self.record_data(RECORD_ACTION_TERMINATE)
             return
 
         analyse_data: List[SensorData] = []
-        for source in dialog_inputs.sensors:
+        for source in sensors:
             source_info: SensorData = SensorData(source_names[source])
 
             for start, end in self.records_stamps:
@@ -307,8 +326,7 @@ class GestureTracker(QWidget):
 
             analyse_data.append(source_info)
 
-        if tab == TAB1:
-            analyse(dialog_inputs.name, analyse_data, dialog_inputs.parameters)
+        analyse_method(name, analyse_data, parameters, getattr(dialog_inputs, 'data', None))
 
 
     # Record control callback implementing start/stop/discard/restart semantics.
