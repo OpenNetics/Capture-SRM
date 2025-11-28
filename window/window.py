@@ -5,6 +5,7 @@
 
 from typing import Any, List, Tuple
 
+from redwrenlib.typing import int2d_t
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QKeyEvent
@@ -28,7 +29,6 @@ from utils.style import (
 )
 from utils.typing import (
     SensorData,
-    int2d_t,
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,

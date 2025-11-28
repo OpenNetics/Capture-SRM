@@ -1,5 +1,5 @@
 
-# utils/typedefs.py
+# utils/typing.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
@@ -7,6 +7,10 @@ from dataclasses import dataclass, field
 from typing import List, Tuple
 
 from sklearn.mixture import GaussianMixture
+from redwrenlib.typing import (
+    ModelParameters,
+    float2d_t, float3d_t, data_dict_t
+)
 
 
 #- Constants ---------------------------------------------------------------------------------------
@@ -26,14 +30,6 @@ LABEL_N_COMPONENT: str = "n Components"
 LABEL_THRESHOLD: str = "Threshold"
 
 
-#- Type Definitions --------------------------------------------------------------------------------
-
-float2d_t = List[List[float]]
-float3d_t = List[List[List[float]]]
-int2d_t = List[List[int]]
-data_dict_t = dict[str, List[GaussianMixture]]
-
-
 #- Data Classes ------------------------------------------------------------------------------------
 
 # Dataclass holding sensor name and appended time/reading pairs for analysis.
@@ -45,14 +41,6 @@ class SensorData:
     def AddValues(self, counter: List[float], readings: List[float]) -> None:
         read_values: float2d_t = [[x, y] for x, y in zip(counter, readings)]
         self.values.append(read_values)
-
-
-# Immutable container for model configuration and inputs used when creating gestures.
-@dataclass(frozen=True)
-class ModelParameters:
-    random_state: int
-    n_component: int
-    threshold: float
 
 
 # Structure representing saved gesture data: parameters plus per-model GaussianMixture lists.

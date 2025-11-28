@@ -5,6 +5,8 @@
 
 from typing import Callable, List, Optional, Union, Tuple
 
+from redwrenlib import GestureFile
+from redwrenlib.typing import ModelParameters
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
@@ -21,13 +23,12 @@ from utils.style import (
 from utils.typing import(
     TAB2,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
-    GestureData, GestureInput, GestureUpdater, ModelParameters
+    GestureData, GestureInput, GestureUpdater
 )
 from utils.ui import (
     spacedv, blank_line,
     create_button, labelled_text_widget,
 )
-from analyse import read_gesture
 
 from .checks import (
     check_empty_string,
@@ -117,8 +118,8 @@ class Tab2:
 
     # Read file data and add dynamic widgets to body layout, with data from gesture file.
     def dynamic_source_list(self) -> None:
-        self.gesture_data: Optional[GestureData] = read_gesture(self.gesture_file.text())
-        if self.gesture_data is None: return
+        self.gesture_data = GestureFile(self.gesture_file.text())
+        if not self.gesture_data.read(): return
 
         # clear previous body layout
         while self.body_layout.count():
@@ -135,7 +136,7 @@ class Tab2:
 
         self.drop_boxes: List[QComboBox] = []
 
-        for model in self.gesture_data.models.keys():
+        for model in self.gesture_data.get_models().keys():
             label_holder: QHBoxLayout = QHBoxLayout()
 
             text_label = QLabel(model)
@@ -168,9 +169,10 @@ class Tab2:
             text_widget = labelled_text_widget(label, text_label, text_label, self.body_layout)
             self.entered_parameters[label] = (text_widget)
 
-        show_saved_values(LABEL_RANDOM_STATE, self.gesture_data.parameters.random_state)
-        show_saved_values(LABEL_N_COMPONENT, self.gesture_data.parameters.n_component)
-        show_saved_values(LABEL_THRESHOLD, self.gesture_data.parameters.threshold)
+        parameters: ModelParameters = self.gesture_data.get_parameters()
+        show_saved_values(LABEL_RANDOM_STATE, parameters.random_state)
+        show_saved_values(LABEL_N_COMPONENT, parameters.n_component)
+        show_saved_values(LABEL_THRESHOLD, parameters.threshold)
 
         repeats_widget = labelled_text_widget("Repeats", "", "Positive Integer", self.body_layout)
         repeats_widget.setToolTip("Number of times to repeat the gesture recording.")
@@ -231,7 +233,7 @@ class Tab2:
                 sensors=source_matches,
                 parameters=ModelParameters(random_state, n_component, threshold)
             ),
-            data=self.gesture_data.models
+            data=self.gesture_data.get_models()
         )
 
         self.submit(TAB2)

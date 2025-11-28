@@ -5,6 +5,7 @@
 
 from typing import Callable, List, Optional
 
+from redwrenlib.typing import ModelParameters
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
@@ -18,7 +19,7 @@ from utils.style import TEXT_HEAD
 from utils.typing import (
     TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
-    GestureInput, ModelParameters,
+    GestureInput,
 )
 from utils.ui import (
     spacedv, blank_line,
