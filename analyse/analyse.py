@@ -33,11 +33,12 @@ def _create_model(data: float3d_t, random_state: int, n_components: int ) -> Lis
 
 
 def _single_thread_analyse(name: str, readings: List[SensorData], mp: ModelParameters) -> None:
-    if not (gesture_file := GestureFile(name)):
+    gesture_file: GestureFile = GestureFile(name)
+    gesture_file.set_parameters(mp)
+
+    if not (gesture_file.create()):
         # failed to create gesture file
         return
-
-    gesture_file.set_parameters(mp)
 
     for r in readings:
         model: List[GaussianMixture] = _create_model(r.values, mp.random_state, mp.n_components)
