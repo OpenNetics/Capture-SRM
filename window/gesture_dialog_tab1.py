@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
 from utils.style import TEXT_HEAD
 from utils.typing import (
     TAB1,
-    LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
+    LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
     GestureInput,
 )
 from utils.ui import (
@@ -127,8 +127,8 @@ class Tab1:
         self.random_state_label = labelled_text_widget(
             LABEL_RANDOM_STATE, "42", "integer in the range [0, 4294967295]", self.layout)
 
-        self.n_component_label = labelled_text_widget(
-            LABEL_N_COMPONENT, "2", "positive integer", self.layout)
+        self.n_components_label = labelled_text_widget(
+            LABEL_N_COMPONENTS, "2", "positive integer", self.layout)
 
         self.threshold_label = labelled_text_widget(
             LABEL_THRESHOLD, "-10", "", self.layout)
@@ -186,17 +186,17 @@ class Tab1:
         )
         if threshold is None: return None
 
-        n_component = check_string_numeric(
-            self.n_component_label,
+        n_components = check_string_numeric(
+            self.n_components_label,
             "n Component: Enter valid integer value.", int, 1
         )
-        if not n_component: return None
+        if not n_components: return None
 
         self.values = GestureInput(
             name=name,
             repeats=repeats,
             sensors=tuple(selected_sensors), # convert sensors list -> tuple for immutability
-            parameters=ModelParameters(random_state, n_component, threshold)
+            parameters=ModelParameters(random_state, n_components, threshold)
         )
 
         self.submit(TAB1)

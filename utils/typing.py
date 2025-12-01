@@ -26,7 +26,7 @@ TAB2: int = 2
 TAB3: int = 3
 
 LABEL_RANDOM_STATE: str = "Random State"
-LABEL_N_COMPONENT: str = "n Components"
+LABEL_N_COMPONENTS: str = "n Components"
 LABEL_THRESHOLD: str = "Threshold"
 
 

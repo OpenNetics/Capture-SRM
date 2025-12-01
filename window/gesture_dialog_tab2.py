@@ -22,7 +22,7 @@ from utils.style import (
 )
 from utils.typing import(
     TAB2,
-    LABEL_RANDOM_STATE, LABEL_N_COMPONENT, LABEL_THRESHOLD,
+    LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
     GestureData, GestureInput, GestureUpdater
 )
 from utils.ui import (
@@ -173,7 +173,7 @@ class Tab2:
 
         parameters: ModelParameters = self.gesture_data.get_parameters()
         show_saved_values(LABEL_RANDOM_STATE, parameters.random_state)
-        show_saved_values(LABEL_N_COMPONENT, parameters.n_component)
+        show_saved_values(LABEL_N_COMPONENTS, parameters.n_components)
         show_saved_values(LABEL_THRESHOLD, parameters.threshold)
 
         repeats_widget = labelled_text_widget("Repeats", "", "Positive Integer", self.body_layout)
@@ -216,11 +216,11 @@ class Tab2:
         )
         if threshold is None: return None
 
-        n_component = check_string_numeric(
-            self.entered_parameters[LABEL_N_COMPONENT],
+        n_components = check_string_numeric(
+            self.entered_parameters[LABEL_N_COMPONENTS],
             "n Component: Enter valid integer value.", int, 1
         )
-        if not n_component: return None
+        if not n_components: return None
 
         repeats = check_string_numeric(
             self.entered_parameters["repeats"],
@@ -236,7 +236,7 @@ class Tab2:
                 name=name,
                 repeats=repeats,
                 sensors=source_matches,
-                parameters=ModelParameters(random_state, n_component, threshold)
+                parameters=ModelParameters(random_state, n_components, threshold)
             ),
             data=self.gesture_data.get_models()
         )

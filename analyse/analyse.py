@@ -20,12 +20,12 @@ from utils.typing import SensorData
 
 #- Private Methods ---------------------------------------------------------------------------------
 
-def _create_model(data: float3d_t, random_state: int, n_component: int ) -> List[GaussianMixture]:
+def _create_model(data: float3d_t, random_state: int, n_components: int ) -> List[GaussianMixture]:
     train_traces: List[NDArray[np.float64]] = [np.array(t) for t in data if len(t) > 0]
 
     gmm_models: List[GaussianMixture] = []
     for trace in train_traces:
-        gmm = GaussianMixture(n_components=n_component, random_state=random_state)
+        gmm = GaussianMixture(n_components=n_components, random_state=random_state)
         gmm.fit(trace)
         gmm_models.append(gmm)
 
@@ -40,7 +40,7 @@ def _single_thread_analyse(name: str, readings: List[SensorData], mp: ModelParam
     gesture_file.set_parameters(mp)
 
     for r in readings:
-        model: List[GaussianMixture] = _create_model(r.values, mp.random_state, mp.n_component)
+        model: List[GaussianMixture] = _create_model(r.values, mp.random_state, mp.n_components)
         gesture_file.append_reading(r.sensor, model)
 
     print(f"Gesture '{name}' analysis complete.")
