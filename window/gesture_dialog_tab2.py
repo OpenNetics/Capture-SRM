@@ -126,6 +126,8 @@ class Tab2:
             alert_box("Error", f"Invalid filename: {self._gesture_file.text()}")
             return
 
+        self.__selected_file = self._gesture_file.text()
+
         # clear previous body layout
         while self._body_layout.count():
             item: QLayout = self._body_layout.takeAt(0)
@@ -195,12 +197,10 @@ class Tab2:
 
     # Validate inputs, assemble GestureUpdater dataclass and submit tab result.
     def _finish(self) -> None:
-        if not hasattr(self, 'entered_parameters'): self._cancel()
+        if not hasattr(self, '_entered_parameters'): return None
 
-        name = self._gesture_file.text()
-        error = check_empty_string(name, "Gesture Name: Missing title.")
-        if error:
-            return None
+        error = check_empty_string(self.__selected_file, "Gesture Name: Missing title.")
+        if error: return None
 
         random_state = check_string_numeric(
             self._entered_parameters[LABEL_RANDOM_STATE],
@@ -231,7 +231,7 @@ class Tab2:
 
         self._values = GestureUpdater(
             file=GestureInput(
-                name=name,
+                name=self.__selected_file,
                 repeats=repeats,
                 sensors=source_matches,
                 parameters=ModelParameters(random_state, n_components, threshold)
@@ -245,7 +245,7 @@ class Tab2:
 
     # Return assembled GestureUpdater values if finish() previously validated them.
     def get_inputs(self) -> Optional[GestureUpdater]:
-        return self._values if hasattr(self, 'values') else None
+        return self._values if hasattr(self, '_values') else None
 
 
     #- Keyboard Shortcut Override ------------------------------------------------------------------

@@ -155,8 +155,7 @@ class Tab1:
     def _finish(self) -> None:
         name = file_name_path(self._gesture_file.text())
         error = check_empty_string(name, "Gesture Name: Missing title.")
-        if error:
-            return None
+        if error: return None
 
         repeats = check_string_numeric(
             self._repeats_input,
