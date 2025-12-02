@@ -1,5 +1,5 @@
 numpy
 pyside6
-colorama
 pyqtgraph
+redwrenlib
 scikit-learn

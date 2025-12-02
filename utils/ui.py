@@ -5,6 +5,7 @@
 
 from typing import Any, Callable
 
+from redwrenlib.utils.debug import alert
 from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
@@ -22,7 +23,6 @@ from .style import (
     TEXT_BODY,
 )
 
-from .extra import print_alert
 
 #- Lib ---------------------------------------------------------------------------------------------
 
@@ -81,7 +81,8 @@ def create_button(
 
 # Show a simple QMessageBox (also prints to stderr) for alerts and errors.
 def alert_box(status: str, message: str) -> None:
-    print_alert(status, message)
+    # backtrack twice to refer the code-block that called alert_box()
+    alert(message, backtrack=2, level="error")
 
     msg_box = QMessageBox()
     msg_box.setWindowTitle(status)
