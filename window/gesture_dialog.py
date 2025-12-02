@@ -41,12 +41,12 @@ class GestureDialog(QDialog):
         # Record Tab
         t1 = QWidget()
         tab_widget.addTab(t1, "Record")
-        self.tab1 = Tab1(self, t1, input_names, self.submit, self.reject)
+        self.tab1 = Tab1(self, t1, input_names, self._submit, self.reject)
 
         # Update Tab
         t2 = QWidget()
         tab_widget.addTab(t2, "Update")
-        self.tab2 = Tab2(self, t2, input_names, self.submit, self.reject)
+        self.tab2 = Tab2(self, t2, input_names, self._submit, self.reject)
 
         self.layout.addWidget(tab_widget)
 
@@ -63,7 +63,7 @@ class GestureDialog(QDialog):
 
 
     # Record which tab produced the inputs and accept the dialog to close it.
-    def submit(self, tab: int) -> None:
+    def _submit(self, tab: int) -> None:
         self.final_tab = tab
         self.accept()
 

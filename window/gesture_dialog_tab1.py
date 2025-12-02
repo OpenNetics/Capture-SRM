@@ -47,168 +47,169 @@ class Tab1:
             cancel: Callable[[], None]
         ) -> None:
 
-        self.parent = parent
-        self.submit: Callable[[int], None] = submit
-        self.cancel: Callable[[], None] = cancel
-        self.input_names: List[str] = input_names
+        self._parent = parent
+        self._submit: Callable[[int], None] = submit
+        self._cancel: Callable[[], None] = cancel
+        self._input_names: List[str] = input_names
 
-        self.layout = QVBoxLayout()
-        self.layout.setAlignment(Qt.AlignmentFlag.AlignTop)
-        self.layout.setContentsMargins(10, 10, 10, 10)
-        parent_layout.setLayout(self.layout)
+        self._layout = QVBoxLayout()
+        self._layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self._layout.setContentsMargins(10, 10, 10, 10)
+        parent_layout.setLayout(self._layout)
 
-        self.init_input_fields()
-        self.init_checkboxes()
-        self.init_model_params()
-        self.init_buttons()
+        self._init_input_fields()
+        self._init_checkboxes()
+        self._init_model_params()
+        self._init_buttons()
 
-    #- Init Modules --------------------------------------------------------------------------------
+    #- Private: init modules -----------------------------------------------------------------------
 
     # Create line edits for gesture name and repeats with a browse/save helper.
-    def init_input_fields(self) -> None:
+    def _init_input_fields(self) -> None:
         # Gesture Name
         file_name_layout = QHBoxLayout()
 
-        self.gesture_file = QLineEdit(self.parent)
-        self.gesture_file.setPlaceholderText("Gesture Name")
-        self.gesture_file.setToolTip("Path to save gesture file to.")
-        self.gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        file_name_layout.addWidget(self.gesture_file, 1)
+        self._gesture_file = QLineEdit(self._parent)
+        self._gesture_file.setPlaceholderText("Gesture Name")
+        self._gesture_file.setToolTip("Path to save gesture file to.")
+        self._gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        file_name_layout.addWidget(self._gesture_file, 1)
 
         browse_button = create_button(
-            "Browse", "Path to save gesture file to.", self.init_input_filepath)
+            "Browse", "Path to save gesture file to.", self._init_input_filepath)
 
         browse_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         file_name_layout.addWidget(browse_button, 0)
 
-        self.layout.addLayout(file_name_layout)
+        self._layout.addLayout(file_name_layout)
 
         # Repeats
-        self.repeats_input = QLineEdit(self.parent)
-        self.repeats_input.setToolTip("Number of times to repeat the gesture recording.")
-        self.repeats_input.setPlaceholderText("Repeats (integer)")
-        self.layout.addWidget(self.repeats_input)
+        self._repeats_input = QLineEdit(self._parent)
+        self._repeats_input.setToolTip("Number of times to repeat the gesture recording.")
+        self._repeats_input.setPlaceholderText("Repeats (integer)")
+        self._layout.addWidget(self._repeats_input)
 
 
     # Open file dialog to choose target save path for the gesture file.
-    def init_input_filepath(self) -> None:
+    def _init_input_filepath(self) -> None:
         file_path, _ = QFileDialog.getSaveFileName(
-            self.parent, "Save Gesture", "", "Gesture Files (*.ges);;All Files (*)",
+            self._parent, "Save Gesture", "", "Gesture Files (*.ges);;All Files (*)",
             options=QFileDialog.Options()
         )
         if file_path:
-            self.gesture_file.setText(file_path)
+            self._gesture_file.setText(file_path)
 
 
     # Build sensor selection checkboxes for available input names.
-    def init_checkboxes(self) -> None:
-        blank_line(self.layout)
+    def _init_checkboxes(self) -> None:
+        blank_line(self._layout)
 
         text_label = QLabel("Select Sensors")
         text_label.setStyleSheet(TEXT_HEAD)
-        self.layout.addWidget(text_label)
+        self._layout.addWidget(text_label)
 
         # Sensor Select Checkboxes
-        self.sensor_checkboxes: List[QCheckBox] = []
-        for name in self.input_names:
-            checkbox = QCheckBox(name, self.parent)
-            self.sensor_checkboxes.append(checkbox)
-            self.layout.addWidget(checkbox)
+        self._sensor_checkboxes: List[QCheckBox] = []
+        for name in self._input_names:
+            checkbox = QCheckBox(name, self._parent)
+            self._sensor_checkboxes.append(checkbox)
+            self._layout.addWidget(checkbox)
 
 
     # Add widgets to configure model parameters (random state, n components, threshold).
-    def init_model_params(self) -> None:
-        blank_line(self.layout)
+    def _init_model_params(self) -> None:
+        blank_line(self._layout)
 
         text_label = QLabel("Model Parameters")
         text_label.setStyleSheet(TEXT_HEAD)
-        self.layout.addWidget(text_label)
+        self._layout.addWidget(text_label)
 
-        self.random_state_label = labelled_text_widget(
-            LABEL_RANDOM_STATE, "42", "integer in the range [0, 4294967295]", self.layout)
+        self._random_state_label = labelled_text_widget(
+            LABEL_RANDOM_STATE, "42", "integer in the range [0, 4294967295]", self._layout)
 
-        self.n_components_label = labelled_text_widget(
-            LABEL_N_COMPONENTS, "2", "positive integer", self.layout)
+        self._n_components_label = labelled_text_widget(
+            LABEL_N_COMPONENTS, "2", "positive integer", self._layout)
 
-        self.threshold_label = labelled_text_widget(
-            LABEL_THRESHOLD, "-10", "", self.layout)
+        self._threshold_label = labelled_text_widget(
+            LABEL_THRESHOLD, "-10", "", self._layout)
 
 
     # Create Cancel / Continue buttons and wire them to actions.
-    def init_buttons(self) -> None:
-        blank_line(self.layout)
-        spacedv(self.layout)
+    def _init_buttons(self) -> None:
+        blank_line(self._layout)
+        spacedv(self._layout)
         button_layout = QHBoxLayout()
 
-        self.cancel_button = create_button("Cancel", "[esc]" ,self.cancel)
-        self.continue_button = create_button("Continue", "[return]", self.finish)
+        self._cancel_button = create_button("Cancel", "[esc]" ,self._cancel)
+        self._continue_button = create_button("Continue", "[return]", self._finish)
 
-        button_layout.addWidget(self.cancel_button)
-        button_layout.addWidget(self.continue_button)
+        button_layout.addWidget(self._cancel_button)
+        button_layout.addWidget(self._continue_button)
 
-        self.layout.addLayout(button_layout)
+        self._layout.addLayout(button_layout)
 
-    #- Getters and Actions -------------------------------------------------------------------------
-
-    # Return assembled GestureInput values if finish() previously validated them.
-    def get_inputs(self) -> Optional[GestureInput]:
-        return self.values if hasattr(self, 'values') else None
-
+    #- Private: actions ----------------------------------------------------------------------------
 
     # Validate inputs, assemble GestureInput dataclass and submit tab result.
-    def finish(self) -> None:
-        name = self.gesture_file.text()
+    def _finish(self) -> None:
+        name = self._gesture_file.text()
         error = check_empty_string(name, "Gesture Name: Missing title.")
         if error:
             return None
 
         repeats = check_string_numeric(
-            self.repeats_input,
+            self._repeats_input,
             "Repeat Count: Enter valid integer.", int, 1
         )
         if not repeats: return None
 
         selected_sensors = check_checkboxes_ticked(
-            self.sensor_checkboxes,
+            self._sensor_checkboxes,
             1, "Sources: Select sources to record."
         )
         if not selected_sensors: return None
 
         random_state = check_string_numeric(
-            self.random_state_label,
+            self._random_state_label,
             "Random State: Enter integer value in the valid range", int, 0, 4294967295
         )
         if random_state is None: return None
 
         threshold = check_string_numeric(
-            self.threshold_label,
+            self._threshold_label,
             "Threshold: Enter valid integer value.", float
         )
         if threshold is None: return None
 
         n_components = check_string_numeric(
-            self.n_components_label,
+            self._n_components_label,
             "n Component: Enter valid integer value.", int, 1
         )
         if not n_components: return None
 
-        self.values = GestureInput(
+        self._values = GestureInput(
             name=name,
             repeats=repeats,
             sensors=tuple(selected_sensors), # convert sensors list -> tuple for immutability
             parameters=ModelParameters(random_state, n_components, threshold)
         )
 
-        self.submit(TAB1)
+        self._submit(TAB1)
 
-    #- Key Events ----------------------------------------------------------------------------------
+    #- Public Calls --------------------------------------------------------------------------------
+
+    # Return assembled GestureInput values if finish() previously validated them.
+    def get_inputs(self) -> Optional[GestureInput]:
+        return self._values if hasattr(self, '_values') else None
+
+    #- Keyboard Shortcut Override ------------------------------------------------------------------
 
     # Map keyboard events to dialog interactions (enter/escape).
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() in [Qt.Key_Return, Qt.Key_Enter]:
-            self.continue_button.click()
+            self._continue_button.click()
         elif event.key() == Qt.Key_Escape:
-            self.cancel_button.click()
+            self._cancel_button.click()
         else:
             super().keyPressEvent(event)
 

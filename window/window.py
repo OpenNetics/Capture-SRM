@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Tuple
 
 from redwrenlib.typing import int2d_t, ModelParameters
 import pyqtgraph as pg
@@ -29,7 +29,6 @@ from utils.style import (
 )
 from utils.typing import (
     SensorData,
-    GestureInput, GestureUpdater,
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,
@@ -61,201 +60,157 @@ class GestureTracker(QWidget):
         self.resize(WINDOW_SIZE["width"], WINDOW_SIZE["height"])
         self.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
 
-        self.layout: QVBoxLayout = QVBoxLayout()
-        self.setLayout(self.layout)
+        self._layout: QVBoxLayout = QVBoxLayout()
+        self.setLayout(self._layout)
 
         # Variables
-        self.graphlines: List[GraphLine] = []
-        self.counter: List[float] = [0]
-        self.toggle_recent: int = 0
-        self.freeze: bool = False
+        self._graphlines: List[GraphLine] = []
+        self._counter: List[float] = [0]
+        self._toggle_recent: int = 0
+        self._freeze: bool = False
 
         # Build UI Components
-        self.init_buttons()
-        self.init_graph_plot()
-        self.init_graph_footer()
-        self.init_raw_data()
+        self._init_buttons()
+        self._init_graph_plot()
+        self._init_graph_footer()
+        self._init_raw_data()
 
-    #- Initialise Components -----------------------------------------------------------------------
+    #- Private: Initialise Components --------------------------------------------------------------
 
     # Build the top button row and attach callbacks.
-    def init_buttons(self) -> None:
+    def _init_buttons(self) -> None:
         button_layout = QHBoxLayout()
 
-        self.gesture_button = create_button(
-            "Gesture", "Play with gesture files [g]", self.button_gesture)
-        self.save_button = create_button(
-            "Save", "Save read data in text file [s]", self.button_save)
-        self.data_view_button = create_button(
-            "Zoom Latest", "Plot only latest 10 readings [t]", self.button_toggle_recent)
-        self.freeze_button = create_button(
-            "Freeze", "Toggle freezing live plot [space]", self.button_freeze)
-        self.clear_button = create_button(
-            "Clear", "Clear all read data [esc]", self.button_clear_data)
+        self._gesture_button = create_button(
+            "Gesture", "Play with gesture files [g]", self._button_gesture)
+        self._save_button = create_button(
+            "Save", "Save read data in text file [s]", self._button_save)
+        self._data_view_button = create_button(
+            "Zoom Latest", "Plot only latest 10 readings [t]", self._button_toggle_recent)
+        self._freeze_button = create_button(
+            "Freeze", "Toggle freezing live plot [space]", self._button_freeze)
+        self._clear_button = create_button(
+            "Clear", "Clear all read data [esc]", self._button_clear_data)
 
-        button_layout.addWidget(self.gesture_button)
-        button_layout.addWidget(self.save_button)
+        button_layout.addWidget(self._gesture_button)
+        button_layout.addWidget(self._save_button)
         spacedh(button_layout)
-        button_layout.addWidget(self.data_view_button)
-        button_layout.addWidget(self.freeze_button)
-        button_layout.addWidget(self.clear_button)
+        button_layout.addWidget(self._data_view_button)
+        button_layout.addWidget(self._freeze_button)
+        button_layout.addWidget(self._clear_button)
 
-        self.layout.addLayout(button_layout)
+        self._layout.addLayout(button_layout)
 
 
     # Create and configure the plot widget used for realtime graphs.
-    def init_graph_plot(self) -> None:
-        self.plot_widget = pg.PlotWidget()
-        self.plot_widget.setBackground(BACKGROUND_COLOR)
-        self.layout.addWidget(self.plot_widget)
-        self.plot_widget.setFixedHeight(GRAPH_HEIGHT)
+    def _init_graph_plot(self) -> None:
+        self._plot_widget = pg.PlotWidget()
+        self._plot_widget.setBackground(BACKGROUND_COLOR)
+        self._layout.addWidget(self._plot_widget)
+        self._plot_widget.setFixedHeight(GRAPH_HEIGHT)
 
-        self.plot_widget.showGrid(x=True, y=True)
-        self.plot_widget.setMouseEnabled(True, True)
+        self._plot_widget.showGrid(x=True, y=True)
+        self._plot_widget.setMouseEnabled(True, True)
 
 
     # Create footer area containing legends and connection/baud selectors.
-    def init_graph_footer(self) -> None:
+    def _init_graph_footer(self) -> None:
         # Legends are added to this layout
-        self.legend_layout = QHBoxLayout()
-        self.layout.addLayout(self.legend_layout)
+        self._legend_layout = QHBoxLayout()
+        self._layout.addLayout(self._legend_layout)
 
         # Port & Baud Rate Selector
-        self.connection_list = QComboBox()
-        self.connection_list.addItems(["<SELECT>"] + connected_ports())
-        self.connection_list.setToolTip("Select Connection Port")
-        self.connection_list.setStyleSheet(COMBOBOX_STYLE)
-        self.connection_list.currentTextChanged.connect(select_port)
+        self._connection_list = QComboBox()
+        self._connection_list.addItems(["<SELECT>"] + connected_ports())
+        self._connection_list.setToolTip("Select Connection Port")
+        self._connection_list.setStyleSheet(COMBOBOX_STYLE)
+        self._connection_list.currentTextChanged.connect(select_port)
 
         connection_refresh_button = create_button(
-            "Refresh", "Reflesh port list", self.button_refresh_connections)
+            "Refresh", "Reflesh port list", self._button_refresh_connections)
 
-        self.baud_rate_list = QComboBox()
-        self.baud_rate_list.addItems(baud_rates())
-        self.baud_rate_list.setToolTip("Select Baud Rate")
-        self.baud_rate_list.setCurrentText("115200")
-        self.baud_rate_list.setStyleSheet(COMBOBOX_STYLE)
-        self.baud_rate_list.currentTextChanged.connect(select_baud_rate)
+        self._baud_rate_list = QComboBox()
+        self._baud_rate_list.addItems(baud_rates())
+        self._baud_rate_list.setToolTip("Select Baud Rate")
+        self._baud_rate_list.setCurrentText("115200")
+        self._baud_rate_list.setStyleSheet(COMBOBOX_STYLE)
+        self._baud_rate_list.currentTextChanged.connect(select_baud_rate)
 
-        self.legend_layout.addWidget(connection_refresh_button)
-        self.legend_layout.addWidget(self.connection_list)
-        self.legend_layout.addWidget(self.baud_rate_list)
-        spacedh(self.legend_layout)
+        self._legend_layout.addWidget(connection_refresh_button)
+        self._legend_layout.addWidget(self._connection_list)
+        self._legend_layout.addWidget(self._baud_rate_list)
+        spacedh(self._legend_layout)
 
 
     # Create the scrollable raw data text area for incoming sensor values.
-    def init_raw_data(self) -> None:
-        self.scroll_area = QScrollArea()
-        self.scroll_area.setWidgetResizable(True)
+    def _init_raw_data(self) -> None:
+        self._scroll_area = QScrollArea()
+        self._scroll_area.setWidgetResizable(True)
 
-        self.scroll_area_content = QWidget()
-        self.scroll_area_layout = QVBoxLayout(self.scroll_area_content)
+        self._scroll_area_content = QWidget()
+        self._scroll_area_layout = QVBoxLayout(self._scroll_area_content)
 
-        self.data_display = QTextEdit()
-        self.data_display.setStyleSheet(RAW_VALUE_BOX_STYLE)
-        self.data_display.setReadOnly(True)
+        self._data_display = QTextEdit()
+        self._data_display.setStyleSheet(RAW_VALUE_BOX_STYLE)
+        self._data_display.setReadOnly(True)
 
-        self.scroll_area_layout.addWidget(self.data_display)
-        self.scroll_area.setWidget(self.scroll_area_content)
+        self._scroll_area_layout.addWidget(self._data_display)
+        self._scroll_area.setWidget(self._scroll_area_content)
 
-        self.layout.addWidget(self.scroll_area)
+        self._layout.addWidget(self._scroll_area)
 
-    #- Sensor Data ---------------------------------------------------------------------------------
+    #- Private: Sensor Data ------------------------------------------------------------------------
 
     # Update the plot from graphlines unless the UI is frozen.
-    def update_plot(self) -> None:
-        if self.freeze:
+    def _update_plot(self) -> None:
+        if self._freeze:
             return
 
-        self.plot_widget.clear()
+        self._plot_widget.clear()
 
-        for line in self.graphlines:
+        for line in self._graphlines:
             sliced_line = pg.PlotDataItem(
-                x = self.counter[self.toggle_recent:],
-                y = line.Reading(self.toggle_recent),
+                x = self._counter[self._toggle_recent:],
+                y = line.Reading(self._toggle_recent),
                 pen = pg.mkPen(color=line.Color(), width=2),
             )
 
-            self.plot_widget.addItem(sliced_line)
+            self._plot_widget.addItem(sliced_line)
 
-
-    # Append new sensor values to internal buffers and create graph lines as needed.
-    def add_data(self, values: List[Any]) -> None:
-        # add data to the raw data area
-        self.data_display.append(str(values))
-        self.counter.append(self.counter[-1] + 1)
-
-        # Clear old data and add new lines
-        for i, value in enumerate(values):
-            # only plot data if values are numeric
-            if not (isinstance(value, float) or isinstance(value, int)):
-                continue
-
-            if i >= len(self.graphlines):
-                colors: Tuple[int, int, int] = new_color()
-                text_label = EditLabel(f"source{i+1}")
-
-                new_line: GraphLine = GraphLine(
-                    reading=[value] * len(self.counter),
-                    color=colors,
-                    title=text_label
-                )
-
-                self.graphlines.append(new_line)
-
-                # Draw legend
-                square = QLabel()
-                square.setFixedSize(QSize(20, 20))
-                square.setStyleSheet(
-                    f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
-                )
-
-                h_layout = QHBoxLayout()
-                h_layout.addWidget(square)
-                h_layout.addWidget(text_label)
-
-                self.legend_layout.addLayout(h_layout)
-
-            else:
-                graphline: GraphLine = self.graphlines[i]
-                graphline.AddReading(value)
-
-        self.update_plot()
-
-    #- Button Actions ------------------------------------------------------------------------------
+    #- Private: Button Actions ---------------------------------------------------------------------
 
     # Toggle between showing latest windowed values and full history.
-    def button_toggle_recent(self) -> None:
+    def _button_toggle_recent(self) -> None:
         view_button_options = [ "Zoom Latest", "View All" ]
         view_button_tips = ["Plot only latest 10 readings [t]", "Plot all readings [t]"]
 
-        self.toggle_recent = 0 - 10 - self.toggle_recent
-        self.data_view_button.setText(view_button_options[self.toggle_recent % 11])
-        self.data_view_button.setToolTip(view_button_tips[self.toggle_recent % 11])
-        self.update_plot()
+        self._toggle_recent = 0 - 10 - self._toggle_recent
+        self._data_view_button.setText(view_button_options[self._toggle_recent % 11])
+        self._data_view_button.setToolTip(view_button_tips[self._toggle_recent % 11])
+        self._update_plot()
 
 
     # Clear all recorded data and reset view state.
-    def button_clear_data(self) -> None:
-        self.counter = [0]
-        self.toggle_recent = 0
+    def _button_clear_data(self) -> None:
+        self._counter = [0]
+        self._toggle_recent = 0
 
-        for line in self.graphlines:
+        for line in self._graphlines:
             line.ResetReading()
 
-        self.data_display.clear()
-        self.update_plot()
+        self._data_display.clear()
+        self._update_plot()
 
 
     # Toggle freezing of live plotting (pause/resume visuals).
-    def button_freeze(self) -> None:
-        self.freeze = not self.freeze
-        self.freeze_button.setText("Unfreeze" if self.freeze else "Freeze")
-        self.update_plot()
+    def _button_freeze(self) -> None:
+        self._freeze = not self._freeze
+        self._freeze_button.setText("Unfreeze" if self._freeze else "Freeze")
+        self._update_plot()
 
 
     # Open a file dialog and save the raw text of incoming data to disk.
-    def button_save(self) -> None:
+    def _button_save(self) -> None:
         # Open file dialog to select save location
         file_path, _ = QFileDialog.getSaveFileName(
             self, "Save File", "lol", "Text Files (*.txt);;All Files (*)",
@@ -264,7 +219,7 @@ class GestureTracker(QWidget):
 
         if file_path:
             with open(file_path, 'w') as file:
-                file.write(self.data_display.toPlainText())
+                file.write(self._data_display.toPlainText())
 
             msg_box = QMessageBox(self)
             msg_box.setIcon(QMessageBox.NoIcon)
@@ -274,17 +229,13 @@ class GestureTracker(QWidget):
 
 
     # Launch gesture dialog, handle recording flow and hand over data to analyser.
-    def button_gesture(self) -> None:
-        source_names: List[str] = [ source.Title().text() for source in self.graphlines ]
-        if not check_sources_name(source_names):
-            return
+    def _button_gesture(self) -> None:
+        source_names: List[str] = [ source.Title().text() for source in self._graphlines ]
+        if not check_sources_name(source_names): return
 
-        self.records_stamps: int2d_t = [] # start blank recording session
-
+        self._records_stamps: int2d_t = [] # start blank recording session
         dialog = GestureDialog(source_names)
-
-        if dialog.exec() != QDialog.Accepted:
-            return
+        if dialog.exec() != QDialog.Accepted: return
 
         dialog_return = dialog.get_inputs()
         if not dialog_return: return
@@ -309,19 +260,19 @@ class GestureTracker(QWidget):
         else:
             return
 
-        inputs = RecordInputs(repeats, self.record_data)
+        inputs = RecordInputs(repeats, self._record_data)
         if inputs.exec() != QDialog.Accepted:
-            self.record_data(RECORD_ACTION_TERMINATE)
+            self._record_data(RECORD_ACTION_TERMINATE)
             return
 
         analyse_data: List[SensorData] = []
         for source in sensors:
             source_info: SensorData = SensorData(source_names[source])
 
-            for start, end in self.records_stamps:
+            for start, end in self._records_stamps:
                 source_info.AddValues(
-                    self.counter[start:end],
-                    self.graphlines[source].Reading(start, end)
+                    self._counter[start:end],
+                    self._graphlines[source].Reading(start, end)
                 )
 
             analyse_data.append(source_info)
@@ -330,49 +281,95 @@ class GestureTracker(QWidget):
 
 
     # Record control callback implementing start/stop/discard/restart semantics.
-    def record_data(self, action: int) -> None:
+    def _record_data(self, action: int) -> None:
         if action == RECORD_ACTION_START:
-            self.records_stamps.append([len(self.counter)])
-            self.plot_widget.setBackground("#121212")
+            self._records_stamps.append([len(self._counter)])
+            self._plot_widget.setBackground("#121212")
 
         elif action == RECORD_ACTION_STOP:
-            self.records_stamps[-1].append(len(self.counter))
-            self.plot_widget.setBackground(BACKGROUND_COLOR)
+            self._records_stamps[-1].append(len(self._counter))
+            self._plot_widget.setBackground(BACKGROUND_COLOR)
 
         elif action == RECORD_ACTION_DISCARD:
-            self.records_stamps.pop()
-            self.plot_widget.setBackground("#1f1212")
+            self._records_stamps.pop()
+            self._plot_widget.setBackground("#1f1212")
 
         elif action == RECORD_ACTION_RESTART:
-            self.records_stamps[-1][0] = len(self.counter)
+            self._records_stamps[-1][0] = len(self._counter)
 
         else:
-            self.records_stamps = []
-            self.plot_widget.setBackground(BACKGROUND_COLOR)
+            self._records_stamps = []
+            self._plot_widget.setBackground(BACKGROUND_COLOR)
 
 
     # Refresh the list of available serial connection ports in the combobox.
-    def button_refresh_connections(self) -> None:
-        self.connection_list.clear()
-        self.connection_list.addItems(connected_ports())
+    def _button_refresh_connections(self) -> None:
+        self._connection_list.clear()
+        self._connection_list.addItems(connected_ports())
 
+    #- Public Calls --------------------------------------------------------------------------------
+
+    # Append new sensor values to internal buffers and create graph lines as needed.
+    def add_data(self, values: List[Any]) -> None:
+        # add data to the raw data area
+        self._data_display.append(str(values))
+        self._counter.append(self._counter[-1] + 1)
+
+        # Clear old data and add new lines
+        for i, value in enumerate(values):
+            # only plot data if values are numeric
+            if not (isinstance(value, float) or isinstance(value, int)):
+                continue
+
+            if i >= len(self._graphlines):
+                colors: Tuple[int, int, int] = new_color()
+                text_label = EditLabel(f"source{i+1}")
+
+                new_line: GraphLine = GraphLine(
+                    reading=[value] * len(self._counter),
+                    color=colors,
+                    title=text_label
+                )
+
+                self._graphlines.append(new_line)
+
+                # Draw legend
+                square = QLabel()
+                square.setFixedSize(QSize(20, 20))
+                square.setStyleSheet(
+                    f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
+                )
+
+                h_layout = QHBoxLayout()
+                h_layout.addWidget(square)
+                h_layout.addWidget(text_label)
+
+                self._legend_layout.addLayout(h_layout)
+
+            else:
+                graphline: GraphLine = self._graphlines[i]
+                graphline.AddReading(value)
+
+        self._update_plot()
+
+    #- Keyboard Shortcut Override ------------------------------------------------------------------
 
     # Map keyboard events to the corresponding toolbar button actions.
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key_G:
-            self.gesture_button.click()
+            self._gesture_button.click()
 
         elif event.key() == Qt.Key_Space:
-            self.freeze_button.click()
+            self._freeze_button.click()
 
         elif event.key() == Qt.Key_S:
-            self.save_button.click()
+            self._save_button.click()
 
         elif event.key() == Qt.Key_T:
-            self.data_view_button.click()
+            self._data_view_button.click()
 
         elif event.key() == Qt.Key_Escape:
-            self.clear_button.click()
+            self._clear_button.click()
 
         else:
             super().keyPressEvent(event)
