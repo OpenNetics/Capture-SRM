@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
+from utils.extra import file_name_path
 from utils.style import TEXT_HEAD
 from utils.typing import (
     TAB1,
@@ -152,7 +153,7 @@ class Tab1:
 
     # Validate inputs, assemble GestureInput dataclass and submit tab result.
     def _finish(self) -> None:
-        name = self._gesture_file.text()
+        name = file_name_path(self._gesture_file.text())
         error = check_empty_string(name, "Gesture Name: Missing title.")
         if error:
             return None

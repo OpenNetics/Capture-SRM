@@ -13,3 +13,11 @@ def new_color() -> Tuple[int, int, int]:
     from random import randint
     return (randint(0, 255), randint(60, 255), randint(0, 200))
 
+
+# Return filepath for filename
+def file_name_path(file: str) -> str:
+    import os
+    if not os.path.splitext(file)[1]: file += ".ges"
+    if os.path.isabs(file): return file
+    return os.path.expanduser("~") + "/" + file
+
