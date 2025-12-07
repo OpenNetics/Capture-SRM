@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
 )
 
 from analyse import analyse_create, analyse_update
-from utils.extra import new_color
+from utils.extra import new_color, datestring
 from utils.ui import (
     spacedh,
     EditLabel, create_button,
@@ -213,7 +213,7 @@ class GestureTracker(QWidget):
     def _button_save(self) -> None:
         # Open file dialog to select save location
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Save File", "lol", "Text Files (*.txt);;All Files (*)",
+            self, "Save File", datestring(), "Text Files (*.txt);;All Files (*)",
             options=QFileDialog.Options()
         )
 

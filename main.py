@@ -26,7 +26,7 @@ class DataGenerator(QThread):
             time.sleep(1)
 
 
-def main():
+if __name__ == "__main__":
     app = QApplication( sys.argv )
     window = GestureTracker()
     window.show()
@@ -39,8 +39,4 @@ def main():
     data_thread.terminate()
 
     sys.exit(exit_code)
-
-
-if __name__ == "__main__":
-    main()
 

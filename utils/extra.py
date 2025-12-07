@@ -21,3 +21,10 @@ def file_name_path(file: str) -> str:
     if os.path.isabs(file): return file
     return os.path.expanduser("~") + "/" + file
 
+
+# Return month-date-24time
+def datestring() -> str:
+    from datetime import datetime
+    now = datetime.now()
+    return now.strftime(f"%m-%d-%H%M")
+

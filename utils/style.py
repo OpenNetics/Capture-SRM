@@ -5,7 +5,7 @@ BACKGROUND_COLOR: str = "#101e15"
 
 FONT_COLOR: str = "#7d8b94"
 
-APPLICATION_NAME: str = "Gesture Tracker v0.0.1"
+APPLICATION_NAME: str = "Gesture Tracker v0.1.0"
 
 WINDOW_SIZE: dict[str,int] = {
     "width": 1200,
@@ -23,7 +23,7 @@ BUTTON_STYLE: str = """
     QPushButton {
         background-color: #112719;
         border: 2px solid #0b1e14;
-        border-radius: 5px;
+        border-radius: 15px;
         padding: 5% 10%;
         color: #7d8b94;
     }
@@ -36,7 +36,7 @@ COMBOBOX_STYLE: str = """
     QComboBox {
         background-color: #112719;
         border: 2px solid #0b1e14;
-        border-radius: 5px;
+        border-radius: 15px;
         padding: 5% 15%;
         color: #7d8b94;
     }
