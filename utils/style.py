@@ -40,5 +40,13 @@ COMBOBOX_STYLE: str = """
         padding: 5% 15%;
         color: #7d8b94;
     }
+
+    QComboBox::drop-down {
+        border-left-width: 0;
+    }
+    QComboBox::down-arrow:on {
+        top: 0;
+        left: 0;
+    }
 """
 

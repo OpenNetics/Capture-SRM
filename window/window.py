@@ -305,7 +305,7 @@ class GestureTracker(QWidget):
     # Refresh the list of available serial connection ports in the combobox.
     def _button_refresh_connections(self) -> None:
         self._connection_list.clear()
-        self._connection_list.addItems(connected_ports())
+        self._connection_list.addItems(["<SELECT>"] + connected_ports())
 
     #- Public Calls --------------------------------------------------------------------------------
 
