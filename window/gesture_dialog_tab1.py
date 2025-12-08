@@ -30,7 +30,6 @@ from utils.ui import (
 from .checks import (
     check_empty_string,
     check_string_numeric,
-    check_checkboxes_ticked
 )
 
 #- Local Datatypes ---------------------------------------------------------------------------------
@@ -182,17 +181,11 @@ class Tab1:
         )
         if not repeats: return None
 
-        selected_sensors = check_checkboxes_ticked(
-            self._sensor_checkboxes,
-            1, "Sources: Select sources to record."
-        )
-        if not selected_sensors: return None
-
-        selected_sensors_models_parameters: List[ModelParameters] = []
+        selected_sensors_models_parameters: Dict[int, ModelParameters] = {}
 
         # Break if any model parameter value isn't valid
         for i, label in enumerate(self._params_labels.keys()):
-            if i not in selected_sensors: #only read/care about values for selected sensors
+            if not self._params_labels[label].checkbox.isChecked():
                 continue
 
             random_state = check_string_numeric(
@@ -214,17 +207,16 @@ class Tab1:
             )
             if n_components is None: return None
 
-            selected_sensors_models_parameters.append(ModelParameters(
+            selected_sensors_models_parameters[i] = ModelParameters(
                 random_state=random_state,
                 threshold=threshold,
                 n_components=n_components
-            ))
+            )
 
         self._values = GestureInput(
             filename=name,
             repeats=repeats,
-            sensors=selected_sensors,
-            parameters=tuple(selected_sensors_models_parameters) # list -> tuple for immutability
+            parameters=selected_sensors_models_parameters
         )
 
         self._submit(TAB1)

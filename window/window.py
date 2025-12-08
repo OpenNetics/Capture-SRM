@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
@@ -27,8 +27,8 @@ from utils.style import (
     RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE,
 )
 from utils.typing import (
-    SensorValues,
-    model_parameters_t, sensor_values_t,
+    SensorValues, ModelParameters,
+    sensor_values_t,
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,
@@ -245,17 +245,15 @@ class GestureTracker(QWidget):
         if tab == TAB1:
             # dialog_inputs: GestureInput
             repeats: int = dialog_inputs.repeats
-            sensors: Tuple[int, ...] = dialog_inputs.sensors
             filename: str = dialog_inputs.filename
-            parameters: model_parameters_t = dialog_inputs.parameters
+            parameters: Dict[int, ModelParameters] = dialog_inputs.parameters
             analyse_method = analyse_create
 
         elif tab == TAB2:
             # dialog_inputs: GestureUpdater
             repeats: int = dialog_inputs.file.repeats
-            sensors: Tuple[int, ...] = dialog_inputs.file.sensors
             filename: str = dialog_inputs.file.filename
-            parameters: model_parameters_t = dialog_inputs.file.parameters
+            parameters: Dict[int, ModelParameters] = dialog_inputs.file.parameters
             analyse_method = analyse_update
         else:
             return
@@ -267,7 +265,7 @@ class GestureTracker(QWidget):
             return
 
         analyse_data: sensor_values_t = []
-        for source in sensors:
+        for source in parameters.keys():
             source_info: SensorValues = SensorValues(source_names[source])
 
             for start, end in self._records_stamps:
@@ -278,7 +276,10 @@ class GestureTracker(QWidget):
 
             analyse_data.append(source_info)
 
-        analyse_method(filename, analyse_data, parameters, getattr(dialog_inputs, 'data', None))
+        analyse_method(
+            filename, analyse_data, parameters.values(),
+            getattr(dialog_inputs, 'data', None)
+        )
 
 
     # Record control callback implementing start/stop/discard/restart semantics.
