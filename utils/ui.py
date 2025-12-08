@@ -45,27 +45,6 @@ def blank_line(layout: QVBoxLayout) -> None:
     layout.addWidget(line)
 
 
-# Create a labelled QLineEdit row and add it to the parent layout; returns the QLineEdit.
-def labelled_text_widget(
-    title: str, value: str, placeholder: str, parent_layout: QBoxLayout
-) -> QLineEdit:
-    layout = QHBoxLayout()
-
-    text_label = QLabel(title)
-    text_label.setStyleSheet(TEXT_BODY)
-    text_label.setFixedWidth(100)
-    layout.addWidget(text_label)
-
-    text_input = QLineEdit()
-    text_input.setPlaceholderText(placeholder)
-    text_input.setText(value)
-    text_input.setStyleSheet(TEXT_BODY)
-    layout.addWidget(text_input)
-
-    parent_layout.addLayout(layout)
-    return text_input
-
-
 # Create a styled QPushButton wired to the given callback and arguments.
 def create_button(
         text: str, hover: str, callback: Callable[..., None], *cb_args: Any, **cb_kwargs: Any
@@ -107,3 +86,35 @@ class EditLabel(QLineEdit):
         text_width = metrics.horizontalAdvance(self.text())
         self.setFixedWidth(min(text_width + 10, 100))
 
+
+class LabelledText:
+
+    def __init__(
+        self, title: str, value: str, placeholder: str, parent_layout: QBoxLayout,
+        visible: bool = True
+    ) -> None:
+        layout = QHBoxLayout()
+
+        self._text_label = QLabel(title)
+        self._text_label.setVisible(visible)
+        self._text_label.setStyleSheet(TEXT_BODY)
+        self._text_label.setFixedWidth(100)
+        layout.addWidget(self._text_label)
+
+        self._text_input = QLineEdit()
+        self._text_input.setVisible(visible)
+        self._text_input.setPlaceholderText(placeholder)
+        self._text_input.setText(value)
+        self._text_input.setStyleSheet(TEXT_BODY)
+        layout.addWidget(self._text_input)
+
+        parent_layout.addLayout(layout)
+
+
+    def visibility(self, visible: bool) -> None:
+        self._text_label.setVisible(visible)
+        self._text_input.setVisible(visible)
+
+
+    def text(self) -> str:
+        return self._text_input.text()

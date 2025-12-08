@@ -7,8 +7,8 @@ from dataclasses import dataclass, field
 from typing import List, Tuple
 
 from sklearn.mixture import GaussianMixture
+from redwrenlib.utils import defaults
 from redwrenlib.typing import (
-    ModelParameters,
     float2d_t, float3d_t, data_dict_t
 )
 
@@ -34,8 +34,8 @@ LABEL_THRESHOLD: str = "Threshold"
 
 # Dataclass holding sensor name and appended time/reading pairs for analysis.
 @dataclass
-class SensorData:
-    sensor: str
+class SensorValues:
+    label: str
     values: float3d_t = field(default_factory=list)
 
     def AddValues(self, counter: List[float], readings: List[float]) -> None:
@@ -43,25 +43,40 @@ class SensorData:
         self.values.append(read_values)
 
 
+#
+@dataclass(frozen=True)
+class ModelParameters:
+    threshold:  float = defaults.MODEL_THRESHOLD
+    random_state: int = defaults.MODEL_RANDOM_STATE
+    n_components: int = defaults.MODEL_N_COMPONENTS
+
+
 # Structure representing saved gesture data: parameters plus per-model GaussianMixture lists.
 @dataclass(frozen=True)
-class GestureData:
-    parameters: ModelParameters
+class GestureData: # identical to SensorData, exactly
+    parameters: List[ModelParameters]
     models: data_dict_t
 
 
 # Immutable input bundle used when recording a new gesture (name, repeats, sensors, params).
 @dataclass(frozen=True)
 class GestureInput:
-    name: str
+    filename: str
     repeats: int
     sensors: Tuple[int, ...]
-    parameters: ModelParameters
+    parameters: Tuple[ModelParameters, ...]
 
 
 # Structure used when updating an existing gesture file (filename, new data and original inputs).
 @dataclass(frozen=True)
 class GestureUpdater:
     file: GestureInput
-    data: data_dict_t
+    data: dict[str, List[GaussianMixture]]
+
+
+#- Aliases -----------------------------------------------------------------------------------------
+
+sensor_values_t = List[SensorValues]
+model_parameters_t = Tuple[ModelParameters, ...]
+
 

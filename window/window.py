@@ -5,7 +5,6 @@
 
 from typing import Any, List, Tuple
 
-from redwrenlib.typing import int2d_t, ModelParameters
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QKeyEvent
@@ -28,7 +27,8 @@ from utils.style import (
     RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE,
 )
 from utils.typing import (
-    SensorData,
+    SensorValues,
+    model_parameters_t, sensor_values_t,
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,
@@ -246,28 +246,29 @@ class GestureTracker(QWidget):
             # dialog_inputs: GestureInput
             repeats: int = dialog_inputs.repeats
             sensors: Tuple[int, ...] = dialog_inputs.sensors
-            name: str = dialog_inputs.name
-            parameters: ModelParameters = dialog_inputs.parameters
+            filename: str = dialog_inputs.filename
+            parameters: model_parameters_t = dialog_inputs.parameters
             analyse_method = analyse_create
 
         elif tab == TAB2:
             # dialog_inputs: GestureUpdater
             repeats: int = dialog_inputs.file.repeats
             sensors: Tuple[int, ...] = dialog_inputs.file.sensors
-            name: str = dialog_inputs.file.name
-            parameters: ModelParameters = dialog_inputs.file.parameters
+            filename: str = dialog_inputs.file.filename
+            parameters: model_parameters_t = dialog_inputs.file.parameters
             analyse_method = analyse_update
         else:
             return
 
+        # exit if pressed cancel on the record prompt
         inputs = RecordInputs(repeats, self._record_data)
         if inputs.exec() != QDialog.Accepted:
             self._record_data(RECORD_ACTION_TERMINATE)
             return
 
-        analyse_data: List[SensorData] = []
+        analyse_data: sensor_values_t = []
         for source in sensors:
-            source_info: SensorData = SensorData(source_names[source])
+            source_info: SensorValues = SensorValues(source_names[source])
 
             for start, end in self._records_stamps:
                 source_info.AddValues(
@@ -277,7 +278,7 @@ class GestureTracker(QWidget):
 
             analyse_data.append(source_info)
 
-        analyse_method(name, analyse_data, parameters, getattr(dialog_inputs, 'data', None))
+        analyse_method(filename, analyse_data, parameters, getattr(dialog_inputs, 'data', None))
 
 
     # Record control callback implementing start/stop/discard/restart semantics.

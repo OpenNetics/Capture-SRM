@@ -3,9 +3,9 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Callable, List, Optional
+from dataclasses import dataclass
+from typing import Callable, Dict, List, Optional
 
-from redwrenlib.typing import ModelParameters
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
@@ -20,17 +20,27 @@ from utils.style import TEXT_HEAD
 from utils.typing import (
     TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
-    GestureInput,
+    GestureInput, ModelParameters
 )
 from utils.ui import (
     spacedv, blank_line,
-    create_button, labelled_text_widget,
+    create_button, LabelledText,
 )
+
 from .checks import (
     check_empty_string,
     check_string_numeric,
     check_checkboxes_ticked
 )
+
+#- Local Datatypes ---------------------------------------------------------------------------------
+
+@dataclass
+class ModelParametersLabels:
+    checkbox: QCheckBox
+    threshold: LabelledText
+    n_components: LabelledText
+    random_state: LabelledText
 
 
 #- Tab Class ---------------------------------------------------------------------------------------
@@ -52,15 +62,16 @@ class Tab1:
         self._submit: Callable[[int], None] = submit
         self._cancel: Callable[[], None] = cancel
         self._input_names: List[str] = input_names
+        self._params_labels: Dict[str, ModelParametersLabels] = {}
 
         self._layout = QVBoxLayout()
         self._layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._layout.setContentsMargins(10, 10, 10, 10)
         parent_layout.setLayout(self._layout)
 
+
         self._init_input_fields()
         self._init_checkboxes()
-        self._init_model_params()
         self._init_buttons()
 
     #- Private: init modules -----------------------------------------------------------------------
@@ -113,26 +124,25 @@ class Tab1:
         self._sensor_checkboxes: List[QCheckBox] = []
         for name in self._input_names:
             checkbox = QCheckBox(name, self._parent)
+            checkbox.stateChanged.connect(
+                lambda state, name=name: self._toggle_model_parameters(state, name)
+            )
+
             self._sensor_checkboxes.append(checkbox)
             self._layout.addWidget(checkbox)
 
+            self._params_labels[name] = ModelParametersLabels(
+                checkbox=checkbox,
 
-    # Add widgets to configure model parameters (random state, n components, threshold).
-    def _init_model_params(self) -> None:
-        blank_line(self._layout)
+                random_state=LabelledText(LABEL_RANDOM_STATE, "42",
+                    "integer in the range [0, 4294967295]", self._layout, visible=False),
 
-        text_label = QLabel("Model Parameters")
-        text_label.setStyleSheet(TEXT_HEAD)
-        self._layout.addWidget(text_label)
+                n_components=LabelledText(LABEL_N_COMPONENTS, "2",
+                    "positive integer", self._layout, visible=False),
 
-        self._random_state_label = labelled_text_widget(
-            LABEL_RANDOM_STATE, "42", "integer in the range [0, 4294967295]", self._layout)
-
-        self._n_components_label = labelled_text_widget(
-            LABEL_N_COMPONENTS, "2", "positive integer", self._layout)
-
-        self._threshold_label = labelled_text_widget(
-            LABEL_THRESHOLD, "-10", "", self._layout)
+                threshold=LabelledText(LABEL_THRESHOLD, "-10",
+                    "", self._layout, visible=False)
+            )
 
 
     # Create Cancel / Continue buttons and wire them to actions.
@@ -151,6 +161,15 @@ class Tab1:
 
     #- Private: actions ----------------------------------------------------------------------------
 
+    # Make model parameters visible for the selected models
+    def _toggle_model_parameters(self, state: int, label: str) -> None:
+        visible = state == 2  # Checkbox is checked
+
+        self._params_labels[label].threshold.visibility(visible)
+        self._params_labels[label].n_components.visibility(visible)
+        self._params_labels[label].random_state.visibility(visible)
+
+
     # Validate inputs, assemble GestureInput dataclass and submit tab result.
     def _finish(self) -> None:
         name = file_name_path(self._gesture_file.text())
@@ -158,7 +177,7 @@ class Tab1:
         if error: return None
 
         repeats = check_string_numeric(
-            self._repeats_input,
+            self._repeats_input.text(),
             "Repeat Count: Enter valid integer.", int, 1
         )
         if not repeats: return None
@@ -169,29 +188,43 @@ class Tab1:
         )
         if not selected_sensors: return None
 
-        random_state = check_string_numeric(
-            self._random_state_label,
-            "Random State: Enter integer value in the valid range", int, 0, 4294967295
-        )
-        if random_state is None: return None
+        selected_sensors_models_parameters: List[ModelParameters] = []
 
-        threshold = check_string_numeric(
-            self._threshold_label,
-            "Threshold: Enter valid integer value.", float
-        )
-        if threshold is None: return None
+        # Break if any model parameter value isn't valid
+        for i, label in enumerate(self._params_labels.keys()):
+            if i not in selected_sensors: #only read/care about values for selected sensors
+                continue
 
-        n_components = check_string_numeric(
-            self._n_components_label,
-            "n Component: Enter valid integer value.", int, 1
-        )
-        if not n_components: return None
+            random_state = check_string_numeric(
+                self._params_labels[label].random_state.text(),
+                f"[{label}] Random State: Enter integer value in the valid range",
+                int, 0, 4294967295
+            )
+            if random_state is None: return None
+
+            threshold = check_string_numeric(
+                self._params_labels[label].threshold.text(),
+                f"[{label}] Threshold: Enter valid integer value.", float
+            )
+            if threshold is None: return None
+
+            n_components = check_string_numeric(
+                self._params_labels[label].n_components.text(),
+                f"[{label}] n Component: Enter valid integer value.", int, 1
+            )
+            if n_components is None: return None
+
+            selected_sensors_models_parameters.append(ModelParameters(
+                random_state=random_state,
+                threshold=threshold,
+                n_components=n_components
+            ))
 
         self._values = GestureInput(
-            name=name,
+            filename=name,
             repeats=repeats,
-            sensors=tuple(selected_sensors), # convert sensors list -> tuple for immutability
-            parameters=ModelParameters(random_state, n_components, threshold)
+            sensors=selected_sensors,
+            parameters=tuple(selected_sensors_models_parameters) # list -> tuple for immutability
         )
 
         self._submit(TAB1)

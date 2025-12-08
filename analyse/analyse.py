@@ -11,11 +11,12 @@ from numpy.typing import NDArray
 from sklearn.mixture import GaussianMixture
 from redwrenlib import GestureFile
 from redwrenlib.typing import (
-    ModelParameters,
     float3d_t, data_dict_t
 )
 
-from utils.typing import SensorData
+from utils.typing import (
+    model_parameters_t, sensor_values_t
+)
 
 
 #- Private Methods ---------------------------------------------------------------------------------
@@ -32,28 +33,40 @@ def _create_model(data: float3d_t, random_state: int, n_components: int ) -> Lis
     return gmm_models
 
 
-def _single_thread_analyse(name: str, readings: List[SensorData], mp: ModelParameters) -> None:
+def _single_thread_analyse(name: str, readings: sensor_values_t, mp: model_parameters_t) -> None:
     gesture_file: GestureFile = GestureFile(name)
-    gesture_file.set_parameters(mp)
 
     if not (gesture_file.create()):
         # failed to create gesture file
         return
 
-    for r in readings:
-        model: List[GaussianMixture] = _create_model(r.values, mp.random_state, mp.n_components)
-        gesture_file.append_reading(r.sensor, model)
+    for i, r in enumerate(readings):
+        model = _create_model(r.values, mp[i].random_state, mp[i].n_components)
 
+        gesture_file.append_reading(r.label, model)
+        gesture_file.set_parameters(
+            label=r.label,
+            n_components=mp[i].n_components,
+            random_state=mp[i].random_state,
+            threshold=mp[i].threshold
+        )
+
+    gesture_file.write()
     print(f"Gesture '{name}' analysis complete.")
 
 
 #- Public Methods ----------------------------------------------------------------------------------
 
-def analyse_create(name: str, readings: List[SensorData], mp: ModelParameters, ugh: None) -> None:
+def analyse_create(
+    name: str, readings: sensor_values_t, mp: model_parameters_t, _: None
+) -> None:
     single_thread = Thread(target=_single_thread_analyse, args=(name, readings, mp,))
     single_thread.start()
 
-def analyse_update(name: str, readings: List[SensorData], mp: ModelParameters, old_data: data_dict_t) -> None:
+
+def analyse_update(
+    name: str, readings: sensor_values_t, mp: model_parameters_t, old_data: data_dict_t
+) -> None:
     print("update one called")
     pass
 

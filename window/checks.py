@@ -3,9 +3,9 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Optional, TypeVar, Type
+from typing import List, Optional, TypeVar, Type, Tuple
 
-from PySide6.QtWidgets import QLineEdit, QCheckBox
+from PySide6.QtWidgets import QCheckBox
 
 from utils.ui import alert_box
 
@@ -24,14 +24,14 @@ def check_empty_string(string: str, error: str) -> bool:
 # Generic numeric validator for QLineEdit that enforces optional min/max bounds.
 Numeric = TypeVar('Numeric', int, float)
 def check_string_numeric(
-    string: QLineEdit,
+    text: str,
     error: str,
     numeric_type: Type[Numeric],
     min_value: Optional[float] = None,
     max_value: Optional[float] = None
 ) -> Optional[Numeric]:
     try:
-        value = numeric_type(string.text())
+        value = numeric_type(text)
 
         if min_value is not None and value < min_value:
             raise ValueError
@@ -60,11 +60,11 @@ def check_checkboxes_ticked(
     checkboxes: List[QCheckBox],
     length: int,
     error: str,
-) -> Optional[List[int]]:
+) -> Optional[Tuple[int, ...]]:
     try:
-        selected_boxes = [
+        selected_boxes = tuple(
             index for index, checkbox in enumerate(checkboxes) if checkbox.isChecked()
-        ]
+        )
 
         if len(selected_boxes) < length:
             raise ValueError
@@ -74,3 +74,4 @@ def check_checkboxes_ticked(
     except ValueError:
         alert_box("Error", error)
         return None
+
