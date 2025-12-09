@@ -43,7 +43,7 @@ class SensorValues:
         self.values.append(read_values)
 
 
-#
+# Default parameters for Gaussian Mixture models.
 @dataclass(frozen=True)
 class ModelParameters:
     threshold:  float = defaults.MODEL_THRESHOLD

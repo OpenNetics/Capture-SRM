@@ -57,35 +57,48 @@ class Tab1:
             cancel: Callable[[], None]
         ) -> None:
 
+        #========================================
+        # class vars with their init values
+        #========================================
         self._parent = parent
         self._submit: Callable[[int], None] = submit
         self._cancel: Callable[[], None] = cancel
         self._input_names: List[str] = input_names
         self._params_labels: Dict[str, ModelParametersLabels] = {}
 
+        #========================================
+        # master Layout
+        #========================================
         self._layout = QVBoxLayout()
         self._layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self._layout.setContentsMargins(10, 10, 10, 10)
         parent_layout.setLayout(self._layout)
 
-
+        #========================================
+        # initialise the system
+        #========================================
         self._init_input_fields()
         self._init_checkboxes()
         self._init_buttons()
+
 
     #- Private: init modules -----------------------------------------------------------------------
 
     # Create line edits for gesture name and repeats with a browse/save helper.
     def _init_input_fields(self) -> None:
-        # Gesture Name
+        #========================================
+        # gesture file name (/path)
+        #========================================
         file_name_layout = QHBoxLayout()
 
+        # Text Box for manual path
         self._gesture_file = QLineEdit(self._parent)
         self._gesture_file.setPlaceholderText("Gesture Name")
         self._gesture_file.setToolTip("Path to save gesture file to.")
         self._gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         file_name_layout.addWidget(self._gesture_file, 1)
 
+        # Brown button to select path interactively using OS's file manager
         browse_button = create_button(
             "Browse", "Path to save gesture file to.", self._init_input_filepath)
 
@@ -94,7 +107,9 @@ class Tab1:
 
         self._layout.addLayout(file_name_layout)
 
-        # Repeats
+        #========================================
+        # repeats: how many times to perform a gesture for study
+        #========================================
         self._repeats_input = QLineEdit(self._parent)
         self._repeats_input.setToolTip("Number of times to repeat the gesture recording.")
         self._repeats_input.setPlaceholderText("Repeats (integer)")
@@ -107,21 +122,24 @@ class Tab1:
             self._parent, "Save Gesture", "", "Gesture Files (*.ges);;All Files (*)",
             options=QFileDialog.Options()
         )
-        if file_path:
-            self._gesture_file.setText(file_path)
+
+        # Add selected file path as file text box label
+        if file_path: self._gesture_file.setText(file_path)
 
 
     # Build sensor selection checkboxes for available input names.
     def _init_checkboxes(self) -> None:
         blank_line(self._layout)
-
         text_label = QLabel("Select Sensors")
         text_label.setStyleSheet(TEXT_HEAD)
         self._layout.addWidget(text_label)
 
-        # Sensor Select Checkboxes
+        #========================================
+        # sensor select checkboxes
+        #========================================
         self._sensor_checkboxes: List[QCheckBox] = []
         for name in self._input_names:
+            # The checkbox itself
             checkbox = QCheckBox(name, self._parent)
             checkbox.stateChanged.connect(
                 lambda state, name=name: self._toggle_model_parameters(state, name)
@@ -130,9 +148,9 @@ class Tab1:
             self._sensor_checkboxes.append(checkbox)
             self._layout.addWidget(checkbox)
 
+            # Checkbox's parameters
+            # Hidden by default, are visible when the checkbox is selected
             self._params_labels[name] = ModelParametersLabels(
-                checkbox=checkbox,
-
                 random_state=LabelledText(LABEL_RANDOM_STATE, "42",
                     "integer in the range [0, 4294967295]", self._layout, visible=False),
 
@@ -140,7 +158,9 @@ class Tab1:
                     "positive integer", self._layout, visible=False),
 
                 threshold=LabelledText(LABEL_THRESHOLD, "-10",
-                    "", self._layout, visible=False)
+                    "", self._layout, visible=False),
+
+                checkbox=checkbox,
             )
 
 
@@ -158,6 +178,7 @@ class Tab1:
 
         self._layout.addLayout(button_layout)
 
+
     #- Private: actions ----------------------------------------------------------------------------
 
     # Make model parameters visible for the selected models
@@ -170,22 +191,32 @@ class Tab1:
 
 
     # Validate inputs, assemble GestureInput dataclass and submit tab result.
+    # Prepare the class return type, self._values, which is otherwise None.
     def _finish(self) -> None:
+        #========================================
+        # ensure gesture filename is valid path
+        #========================================
         name = file_name_path(self._gesture_file.text())
         error = check_empty_string(name, "Gesture Name: Missing title.")
         if error: return None
 
+        #========================================
+        # ensure repeates count is a valid integer
+        #========================================
         repeats = check_string_numeric(
-            self._repeats_input.text(),
-            "Repeat Count: Enter valid integer.", int, 1
+            self._repeats_input.text(), "Repeat Count: Enter valid integer.", int, 1
         )
         if not repeats: return None
 
+        #========================================
+        # checked checkboxes and their values
+        #========================================
         selected_sensors_models_parameters: Dict[int, ModelParameters] = {}
 
         # Break if any model parameter value isn't valid
         for i, label in enumerate(self._params_labels.keys()):
             if not self._params_labels[label].checkbox.isChecked():
+                # only check values if the checkbox is selected
                 continue
 
             random_state = check_string_numeric(
@@ -207,25 +238,31 @@ class Tab1:
             )
             if n_components is None: return None
 
+            # add to the dictionary with the index of the sensor/source as key
             selected_sensors_models_parameters[i] = ModelParameters(
                 random_state=random_state,
                 threshold=threshold,
                 n_components=n_components
             )
 
+        #========================================
+        # return type, self._values, generated when all values are valid
+        #========================================
         self._values = GestureInput(
             filename=name,
             repeats=repeats,
             parameters=selected_sensors_models_parameters
         )
 
-        self._submit(TAB1)
+        self._submit(TAB1) # close the window with success return
+
 
     #- Public Calls --------------------------------------------------------------------------------
 
     # Return assembled GestureInput values if finish() previously validated them.
     def get_inputs(self) -> Optional[GestureInput]:
         return self._values if hasattr(self, '_values') else None
+
 
     #- Keyboard Shortcut Override ------------------------------------------------------------------
 

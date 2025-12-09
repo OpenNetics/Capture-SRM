@@ -69,6 +69,8 @@ def alert_box(status: str, message: str) -> None:
     msg_box.exec_()
 
 
+#- Custom UI Elements ------------------------------------------------------------------------------
+
 # Simple editable label that auto-resizes to fit its text.
 class EditLabel(QLineEdit):
 
@@ -87,20 +89,24 @@ class EditLabel(QLineEdit):
         self.setFixedWidth(min(text_width + 10, 100))
 
 
+# Textfield with label next to it.
 class LabelledText:
 
+    # Initialise LabelledText with a label and a textbox.
     def __init__(
         self, title: str, value: str, placeholder: str, parent_layout: QBoxLayout,
         visible: bool = True
     ) -> None:
         layout = QHBoxLayout()
 
+        # label
         self._text_label = QLabel(title)
         self._text_label.setVisible(visible)
         self._text_label.setStyleSheet(TEXT_BODY)
         self._text_label.setFixedWidth(100)
         layout.addWidget(self._text_label)
 
+        # text box
         self._text_input = QLineEdit()
         self._text_input.setVisible(visible)
         self._text_input.setPlaceholderText(placeholder)
@@ -110,11 +116,12 @@ class LabelledText:
 
         parent_layout.addLayout(layout)
 
-
+    # Toggle visibility of the two components.
     def visibility(self, visible: bool) -> None:
         self._text_label.setVisible(visible)
         self._text_input.setVisible(visible)
 
-
+    # Retrieve value of the text box.
     def text(self) -> str:
         return self._text_input.text()
+

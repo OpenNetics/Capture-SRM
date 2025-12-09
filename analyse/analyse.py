@@ -22,8 +22,10 @@ from utils.typing import (
 #- Private Methods ---------------------------------------------------------------------------------
 
 def _create_model(data: float3d_t, random_state: int, n_components: int ) -> List[GaussianMixture]:
+    # creates a numpy list of arrays from the data iterable of only non-empty arrays
     train_traces: List[NDArray[np.float64]] = [np.array(t) for t in data if len(t) > 0]
 
+    # create models
     gmm_models: List[GaussianMixture] = []
     for trace in train_traces:
         gmm = GaussianMixture(n_components=n_components, random_state=random_state)
@@ -57,6 +59,7 @@ def _single_thread_analyse(name: str, readings: sensor_values_t, mp: model_param
 
 #- Public Methods ----------------------------------------------------------------------------------
 
+# Analyse data and create a new file with it.
 def analyse_create(
     name: str, readings: sensor_values_t, mp: model_parameters_t, _: None
 ) -> None:
@@ -64,6 +67,7 @@ def analyse_create(
     single_thread.start()
 
 
+# Analyse data and write it to an existing file.
 def analyse_update(
     name: str, readings: sensor_values_t, mp: model_parameters_t, old_data: data_dict_t
 ) -> None:
