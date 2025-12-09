@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from utils.extra import file_name_path
+from utils.extra import file_name_path, datestring
 from utils.style import TEXT_HEAD
 from utils.typing import (
     TAB1,
@@ -118,9 +118,10 @@ class Tab1:
 
     # Open file dialog to choose target save path for the gesture file.
     def _init_input_filepath(self) -> None:
+        # placeholder filename would be datestring()
         file_path, _ = QFileDialog.getSaveFileName(
-            self._parent, "Save Gesture", "", "Gesture Files (*.ges);;All Files (*)",
-            options=QFileDialog.Options()
+            self._parent, "Save Gesture", datestring(), "Gesture Files (*.ges);;All Files (*)",
+            options = QFileDialog.Options()
         )
 
         # Add selected file path as file text box label

@@ -47,10 +47,10 @@ def _single_thread_analyse(name: str, readings: sensor_values_t, mp: model_param
 
         gesture_file.append_reading(r.label, model)
         gesture_file.set_parameters(
-            label=r.label,
-            n_components=mp[i].n_components,
-            random_state=mp[i].random_state,
-            threshold=mp[i].threshold
+            label = r.label,
+            n_components = mp[i].n_components,
+            random_state = mp[i].random_state,
+            threshold = mp[i].threshold
         )
 
     gesture_file.write()

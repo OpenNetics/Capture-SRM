@@ -61,6 +61,8 @@ class GestureDialog(QDialog):
             result = self.tab2.get_inputs()
             return (TAB2, result) if result is not None else None
 
+        return None
+
 
     # Record which tab produced the inputs and accept the dialog to close it.
     def _submit(self, tab: int) -> None:

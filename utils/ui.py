@@ -7,14 +7,8 @@ from typing import Any, Callable
 
 from redwrenlib.utils.debug import alert
 from PySide6.QtWidgets import (
-    QLabel,
-    QLineEdit,
-    QBoxLayout,
-    QHBoxLayout,
-    QVBoxLayout,
-    QMessageBox,
-    QPushButton,
-    QSpacerItem,
+    QLabel, QLineEdit, QMessageBox, QPushButton, QSpacerItem,
+    QBoxLayout, QHBoxLayout, QVBoxLayout,
     QSizePolicy,
 )
 
