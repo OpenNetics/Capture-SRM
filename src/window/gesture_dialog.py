@@ -10,8 +10,8 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from utils.style import BACKGROUND_COLOR
-from utils.typing import(
+from src.utils.style import BACKGROUND_COLOR
+from src.utils.typing import(
     GestureInput, GestureUpdater,
     TAB1, TAB2,
 )

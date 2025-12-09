@@ -14,7 +14,7 @@ from redwrenlib.typing import (
     float3d_t, data_dict_t
 )
 
-from utils.typing import (
+from src.utils.typing import (
     model_parameters_t, sensor_values_t
 )
 

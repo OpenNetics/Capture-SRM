@@ -1,8 +1,14 @@
 
 # window/graphline.py
 
+#- Imports -----------------------------------------------------------------------------------------
+
 from typing import List, Tuple, Optional
-from utils.ui import EditLabel
+
+from src.utils.ui import EditLabel
+
+
+#- GraphLine class ---------------------------------------------------------------------------------
 
 # Lightweight container representing one plotted sensor line (readings, color, label).
 class GraphLine:

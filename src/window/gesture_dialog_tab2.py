@@ -16,17 +16,17 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from utils.ui import alert_box
-from utils.style import (
+from src.utils.ui import alert_box
+from src.utils.style import (
     TEXT_HEAD, TEXT_BODY,
     COMBOBOX_STYLE,
 )
-from utils.typing import(
+from src.utils.typing import(
     TAB2,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
     GestureInput, GestureUpdater
 )
-from utils.ui import (
+from src.utils.ui import (
     spacedv, blank_line,
     create_button, labelled_text_widget,
 )

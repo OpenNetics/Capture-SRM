@@ -13,11 +13,11 @@ from PySide6.QtWidgets import (
     QHBoxLayout, QVBoxLayout,
 )
 
-from utils.ui import create_button
-from utils.style import (
+from src.utils.ui import create_button
+from src.utils.style import (
     BACKGROUND_COLOR, FONT_COLOR,
 )
-from utils.typing import (
+from src.utils.typing import (
     RECORD_ACTION_STOP,
     RECORD_ACTION_START,
     RECORD_ACTION_DISCARD,

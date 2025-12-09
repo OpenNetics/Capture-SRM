@@ -15,14 +15,14 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from utils.extra import file_name_path, datestring
-from utils.style import TEXT_HEAD
-from utils.typing import (
+from src.utils.extra import file_name_path, datestring
+from src.utils.style import TEXT_HEAD
+from src.utils.typing import (
     TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
     GestureInput, ModelParameters
 )
-from utils.ui import (
+from src.utils.ui import (
     spacedv, blank_line,
     create_button, LabelledText,
 )

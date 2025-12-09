@@ -15,19 +15,19 @@ from PySide6.QtWidgets import (
 )
 from redwrenlib.typing import int2d_t
 
-from analyse import analyse_create, analyse_update
-from utils.extra import new_color, datestring
-from utils.ui import (
+from src.analyse import analyse_create, analyse_update
+from src.utils.extra import new_color, datestring
+from src.utils.ui import (
     EditLabel,
     spacedh, create_button,
 )
-from utils.style import (
+from src.utils.style import (
     APPLICATION_NAME,
     BACKGROUND_COLOR,
     WINDOW_SIZE, GRAPH_HEIGHT,
     RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE,
 )
-from utils.typing import (
+from src.utils.typing import (
     SensorValues, ModelParameters,
     sensor_values_t,
     RECORD_ACTION_STOP,
@@ -37,7 +37,7 @@ from utils.typing import (
     RECORD_ACTION_TERMINATE,
     TAB1, TAB2,
 )
-from serial import (
+from src.serial import (
     select_port, select_baud_rate,
     baud_rates, connected_ports
 )
