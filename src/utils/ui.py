@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Any, Callable
+from typing import Any, Callable, Tuple
 
 from redwrenlib.utils.debug import alert
 from PySide6.QtWidgets import (
@@ -13,8 +13,7 @@ from PySide6.QtWidgets import (
 )
 
 from .style import (
-    BUTTON_STYLE,
-    TEXT_BODY,
+    BUTTON_STYLE, TEXT_BOX_STYLE, LABEL_BODY_STYLE,
 )
 
 
@@ -66,21 +65,26 @@ def alert_box(status: str, message: str) -> None:
 #- Custom UI Elements ------------------------------------------------------------------------------
 
 # Simple editable label that auto-resizes to fit its text.
-class EditLabel(QLineEdit):
+class EditLabel():
 
     # Initialise EditLabel with given text and set up auto-resize behaviour.
-    def __init__(self, label: str) -> None:
-        super().__init__()
-        self.setStyleSheet("max-width: 40px; padding: 2px;")
-        self.textChanged.connect(self.adjustWidth)
-        self.setText(label)
+    def __init__(self, label: str, colors: Tuple[int, int, int]) -> None:
+        self._text_input = QLineEdit()
+        self._text_input.setStyleSheet(
+            TEXT_BOX_STYLE + f"color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
+        )
+        self._text_input.textChanged.connect(self.adjust_width)
+        self._text_input.setText(label)
 
 
     # Adjust the widget width to match the current text content (capped).
-    def adjustWidth(self) -> None:
-        metrics = self.fontMetrics()
-        text_width = metrics.horizontalAdvance(self.text())
-        self.setFixedWidth(min(text_width + 10, 100))
+    def adjust_width(self) -> None:
+        metrics = self._text_input.fontMetrics()
+        text_width = metrics.horizontalAdvance(self._text_input.text())
+        self._text_input.setFixedWidth(min(text_width + 25, 100))
+
+    def obj(self) -> QLineEdit:
+        return self._text_input
 
 
 # Textfield with label next to it.
@@ -96,7 +100,7 @@ class LabelledText:
         # label
         self._text_label = QLabel(title)
         self._text_label.setVisible(visible)
-        self._text_label.setStyleSheet(TEXT_BODY)
+        self._text_label.setStyleSheet(LABEL_BODY_STYLE)
         self._text_label.setFixedWidth(100)
         layout.addWidget(self._text_label)
 
@@ -105,7 +109,7 @@ class LabelledText:
         self._text_input.setVisible(visible)
         self._text_input.setPlaceholderText(placeholder)
         self._text_input.setText(value)
-        self._text_input.setStyleSheet(TEXT_BODY)
+        self._text_input.setStyleSheet(TEXT_BOX_STYLE)
         layout.addWidget(self._text_input)
 
         parent_layout.addLayout(layout)

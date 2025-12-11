@@ -17,7 +17,9 @@ from PySide6.QtWidgets import (
 )
 
 from src.utils.extra import file_name_path, datestring
-from src.utils.style import TEXT_HEAD, SCROLL_BAR_STYLE
+from src.utils.style import (
+    LABEL_HEAD_STYLE, SCROLL_BAR_STYLE, TEXT_BOX_STYLE
+)
 from src.utils.typing import (
     TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
@@ -96,6 +98,7 @@ class Tab1:
         self._gesture_file = QLineEdit(self._parent)
         self._gesture_file.setPlaceholderText("Gesture Name")
         self._gesture_file.setToolTip("Path to save gesture file to.")
+        self._gesture_file.setStyleSheet(TEXT_BOX_STYLE)
         self._gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         file_name_layout.addWidget(self._gesture_file, 1)
 
@@ -114,6 +117,7 @@ class Tab1:
         self._repeats_input = QLineEdit(self._parent)
         self._repeats_input.setToolTip("Number of times to repeat the gesture recording.")
         self._repeats_input.setPlaceholderText("Repeats (integer)")
+        self._repeats_input.setStyleSheet(TEXT_BOX_STYLE)
         self._layout.addWidget(self._repeats_input)
 
 
@@ -136,7 +140,7 @@ class Tab1:
         #========================================
         blank_line(self._layout)
         text_label = QLabel("Select Sensors")
-        text_label.setStyleSheet(TEXT_HEAD)
+        text_label.setStyleSheet(LABEL_HEAD_STYLE)
         self._layout.addWidget(text_label)
 
         #========================================

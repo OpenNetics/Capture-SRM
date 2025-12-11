@@ -206,8 +206,8 @@ class GestureTracker(QWidget):
         for line in self._graphlines:
             sliced_line = pg.PlotDataItem(
                 x = self._counter[self._toggle_recent:],
-                y = line.Reading(self._toggle_recent),
-                pen = pg.mkPen(color=line.Color(), width=2),
+                y = line.reading(self._toggle_recent),
+                pen = pg.mkPen(color=line.color(), width=2),
             )
 
             self._plot_widget.addItem(sliced_line)
@@ -238,7 +238,7 @@ class GestureTracker(QWidget):
         self._counter = [0]
         self._toggle_recent = 0
 
-        for line in self._graphlines: line.ResetReading()
+        for line in self._graphlines: line.reset_reading()
 
         self._data_display.clear()
         self._update_plot()
@@ -276,7 +276,7 @@ class GestureTracker(QWidget):
         # sensor/source names
         #========================================
         # get all the set names from the graph footer EditLabels
-        source_names: List[str] = [ source.Title().text() for source in self._graphlines ]
+        source_names: List[str] = [ source.text() for source in self._graphlines ]
 
         # ensure all sensors have unique names
         if not check_sources_name(source_names): return
@@ -350,7 +350,7 @@ class GestureTracker(QWidget):
             for start, end in self._records_stamps:
                 source_info.AddValues(
                     self._counter[start:end],
-                    self._graphlines[source].Reading(start, end)
+                    self._graphlines[source].reading(start, end)
                 )
 
             analyse_data.append(source_info)
@@ -415,7 +415,7 @@ class GestureTracker(QWidget):
                 # draw the line
                 #========================================
                 colors: Tuple[int, int, int] = new_color()
-                text_label = EditLabel(f"source{i+1}")
+                text_label = EditLabel(f"source{i+1}", colors)
 
                 new_line: GraphLine = GraphLine(
                     reading=[value] * len(self._counter),
@@ -429,14 +429,14 @@ class GestureTracker(QWidget):
                 # draw legend
                 #========================================
                 square = QLabel()
-                square.setFixedSize(QSize(20, 20))
+                square.setFixedSize(QSize(5, 20))
                 square.setStyleSheet(
                     f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
                 )
 
                 h_layout = QHBoxLayout()
                 h_layout.addWidget(square)
-                h_layout.addWidget(text_label)
+                h_layout.addWidget(text_label.obj())
 
                 self._legend_layout.addLayout(h_layout)
 
@@ -445,7 +445,7 @@ class GestureTracker(QWidget):
             #========================================
             else:
                 graphline: GraphLine = self._graphlines[i]
-                graphline.AddReading(value)
+                graphline.add_reading(value)
 
         self._update_plot()
 

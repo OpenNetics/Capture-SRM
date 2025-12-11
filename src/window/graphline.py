@@ -23,26 +23,26 @@ class GraphLine:
 
 
     # Return a slice of the stored readings between start_idx and end_idx.
-    def Reading(self, start_idx: int = 0, end_idx: Optional[int] = None) -> List[float]:
+    def reading(self, start_idx: int = 0, end_idx: Optional[int] = None) -> List[float]:
         return self.__reading[start_idx:end_idx]
 
 
     # Return the color tuple used to render this graph line.
-    def Color(self) -> Tuple[int, int, int]:
+    def color(self) -> Tuple[int, int, int]:
         return self.__color
 
 
     # Return the editable title widget for this line.
-    def Title(self) -> EditLabel:
-        return self.__title
+    def text(self) -> str:
+        return self.__title.obj().text()
 
 
     # Append a new numeric reading to this graph line.
-    def AddReading(self, value: float) -> None:
+    def add_reading(self, value: float) -> None:
         self.__reading.append(value)
 
 
     # Reset readings to keep only the most recent value (used when clearing older data).
-    def ResetReading(self) -> None:
+    def reset_reading(self) -> None:
         self.__reading = [self.__reading[-1]]
 
