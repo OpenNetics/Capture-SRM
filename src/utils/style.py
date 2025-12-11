@@ -1,7 +1,12 @@
 
 # window/style.py
 
+#- Imports -----------------------------------------------------------------------------------------
+
 APPLICATION_NAME: str = "Gesture Tracker v0.1.0"
+
+
+#- Dimensions --------------------------------------------------------------------------------------
 
 WINDOW_SIZE: dict[str,int] = {
     "width": 1200,
@@ -9,7 +14,10 @@ WINDOW_SIZE: dict[str,int] = {
 }
 
 GRAPH_HEIGHT: int = 250
+SCROLL_HEIGHT:int = 450
 
+
+#- Color Scheme ------------------------------------------------------------------------------------
 
 BACKGROUND_COLOR: str = "#050505"
 FONT_COLOR: str = "#c6c6c6"
@@ -17,6 +25,9 @@ ACCENT_COLOR: str = "#ff4252"
 LABEL_COLOR: str = "#91917e"
 BORDER_COLOR: str = "#11211c"
 BACKGROUND_HIGHLIGHT_COLOR: str = "#101112"
+
+
+#- Object Styles -----------------------------------------------------------------------------------
 
 RAW_VALUE_BOX_STYLE: str = f"""
     background-color: {BACKGROUND_HIGHLIGHT_COLOR};
@@ -27,7 +38,7 @@ RAW_VALUE_BOX_STYLE: str = f"""
 TEXT_BOX_STYLE: str = f"""
     padding: 5% 10%;
     background-color: {BACKGROUND_HIGHLIGHT_COLOR};
-    border-radius: 15px;
+    border-radius: 5px;
 """
 
 LABEL_BODY_STYLE: str = f"""
@@ -88,3 +99,4 @@ SCROLL_BAR_STYLE: str = f"""
         background: none; /* hide the page scroll areas */
     }}
 """
+

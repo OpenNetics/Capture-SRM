@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 
 from src.utils.extra import file_name_path, datestring
 from src.utils.style import (
+    SCROLL_HEIGHT,
     LABEL_HEAD_STYLE, SCROLL_BAR_STYLE, TEXT_BOX_STYLE
 )
 from src.utils.typing import (
@@ -35,6 +36,7 @@ from .checks import (
     check_string_numeric,
 )
 
+
 #- Local Datatypes ---------------------------------------------------------------------------------
 
 @dataclass
@@ -43,6 +45,7 @@ class ModelParametersLabels:
     threshold: LabelledText
     n_components: LabelledText
     random_state: LabelledText
+    whitespace: QLabel
 
 
 #- Tab Class ---------------------------------------------------------------------------------------
@@ -94,7 +97,7 @@ class Tab1:
         #========================================
         file_name_layout = QHBoxLayout()
 
-        # Text Box for manual path
+        # text box for manual path
         self._gesture_file = QLineEdit(self._parent)
         self._gesture_file.setPlaceholderText("Gesture Name")
         self._gesture_file.setToolTip("Path to save gesture file to.")
@@ -102,7 +105,7 @@ class Tab1:
         self._gesture_file.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         file_name_layout.addWidget(self._gesture_file, 1)
 
-        # Brown button to select path interactively using OS's file manager
+        # browse button to select path interactively using OS's file manager
         browse_button = create_button(
             "Browse", "Path to save gesture file to.", self._init_input_filepath)
 
@@ -129,7 +132,7 @@ class Tab1:
             options = QFileDialog.Options()
         )
 
-        # Add selected file path as file text box label
+        # add selected file path as file text box label
         if file_path: self._gesture_file.setText(file_path)
 
 
@@ -144,12 +147,12 @@ class Tab1:
         self._layout.addWidget(text_label)
 
         #========================================
-        # sensor select checkboxes
+        # scroll area
         #========================================
         scroll_area = QScrollArea()
         scroll_area.setWidgetResizable(True)
         scroll_area.setFrameStyle(QFrame.NoFrame)
-        scroll_area.setMinimumHeight(250)
+        scroll_area.setMinimumHeight(SCROLL_HEIGHT)
         scroll_area.setStyleSheet(SCROLL_BAR_STYLE)
 
         label_frame = QFrame(scroll_area)
@@ -161,7 +164,6 @@ class Tab1:
         #========================================
         # sensor select checkboxes
         #========================================
-        self._params_labels_space: Dict[str, QLabel] = {}
         for name in self._input_names:
             # the checkbox itself
             checkbox = QCheckBox(name, self._parent)
@@ -170,27 +172,36 @@ class Tab1:
             )
             label_layout.addWidget(checkbox)
 
-            # checkbox's parameters
-            # hidden by default, are visible when the checkbox is selected
-            self._params_labels[name] = ModelParametersLabels(
-                random_state=LabelledText(LABEL_RANDOM_STATE, str(defaults.MODEL_RANDOM_STATE),
-                    "integer in the range [0, 4294967295]", label_layout, visible=False),
-
-                n_components=LabelledText(LABEL_N_COMPONENTS, str(defaults.MODEL_N_COMPONENTS),
-                    "positive integer", label_layout, visible=False),
-
-                threshold=LabelledText(LABEL_THRESHOLD, str(defaults.MODEL_THRESHOLD),
-                    "", label_layout, visible=False),
-
-                checkbox=checkbox,
-            )
-
             # whitespace under the list before the next checkbox
             space_label = QLabel("")
             space_label.setVisible(False)
             space_label.setFixedHeight(1)
+
+            # checkbox's parameters
+            # hidden by default, are visible when the checkbox is selected
+            params_holder = QHBoxLayout() # hold all parameter LabelledTexts in horizontal group
+            self._params_labels[name] = ModelParametersLabels(
+                checkbox=checkbox,
+
+                threshold=LabelledText(
+                    LABEL_THRESHOLD, str(defaults.MODEL_THRESHOLD),
+                    "", params_holder, visible=False
+                ),
+
+                random_state=LabelledText(
+                    LABEL_RANDOM_STATE, str(defaults.MODEL_RANDOM_STATE),
+                    "integer in the range [0, 4294967295]", params_holder, visible=False
+                ),
+
+                n_components=LabelledText(
+                    LABEL_N_COMPONENTS, str(defaults.MODEL_N_COMPONENTS),
+                    "positive integer", params_holder, visible=False
+                ),
+
+                whitespace = space_label
+            )
+            label_layout.addLayout(params_holder)
             label_layout.addWidget(space_label)
-            self._params_labels_space[name] = space_label
 
         spacedv(label_layout)
 
@@ -219,7 +230,7 @@ class Tab1:
         self._params_labels[label].threshold.visibility(visible)
         self._params_labels[label].n_components.visibility(visible)
         self._params_labels[label].random_state.visibility(visible)
-        self._params_labels_space[label].setVisible(visible)
+        self._params_labels[label].whitespace.setVisible(visible)
 
 
     # Validate inputs, assemble GestureInput dataclass and submit tab result.

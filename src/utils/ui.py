@@ -92,7 +92,7 @@ class LabelledText:
 
     # Initialise LabelledText with a label and a textbox.
     def __init__(
-        self, title: str, value: str, placeholder: str, parent_layout: QBoxLayout,
+        self, title: str, value: str, tip: str, parent_layout: QBoxLayout,
         visible: bool = True
     ) -> None:
         layout = QHBoxLayout()
@@ -101,13 +101,13 @@ class LabelledText:
         self._text_label = QLabel(title)
         self._text_label.setVisible(visible)
         self._text_label.setStyleSheet(LABEL_BODY_STYLE)
-        self._text_label.setFixedWidth(100)
         layout.addWidget(self._text_label)
 
         # text box
         self._text_input = QLineEdit()
         self._text_input.setVisible(visible)
-        self._text_input.setPlaceholderText(placeholder)
+        self._text_input.setPlaceholderText(value)
+        self._text_input.setToolTip(tip)
         self._text_input.setText(value)
         self._text_input.setStyleSheet(TEXT_BOX_STYLE)
         layout.addWidget(self._text_input)

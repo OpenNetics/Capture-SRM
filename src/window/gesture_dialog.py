@@ -29,7 +29,7 @@ class GestureDialog(QDialog):
         super().__init__()
 
         self.setWindowTitle("Record Gestures")
-        self.resize(450, 200)
+        self.resize(750, 250)
         self.setStyleSheet(f"background-color: {BACKGROUND_COLOR};")
 
         self.layout = QVBoxLayout(self)
