@@ -15,6 +15,7 @@ WINDOW_SIZE: dict[str,int] = {
 
 GRAPH_HEIGHT: int = 250
 SCROLL_HEIGHT:int = 450
+ZOOM_SLIDER_WIDTH: int = 150
 
 
 #- Color Scheme ------------------------------------------------------------------------------------

@@ -10,10 +10,11 @@ from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
     QDialog, QWidget, QFrame,
-    QComboBox, QFileDialog, QLabel, QMessageBox, QTextEdit,
+    QComboBox, QFileDialog, QLabel, QMessageBox, QTextEdit, QSlider,
     QHBoxLayout, QVBoxLayout, QScrollArea,
 )
 from redwrenlib.typing import int2d_t
+from redwrenlib.utils.debug import alert
 
 from src.analyse import analyse_create, analyse_update
 from src.utils.extra import new_color, datestring
@@ -24,8 +25,8 @@ from src.utils.ui import (
 from src.utils.style import (
     APPLICATION_NAME,
     BACKGROUND_COLOR, BACKGROUND_HIGHLIGHT_COLOR,
-    WINDOW_SIZE, GRAPH_HEIGHT,
-    RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE,
+    WINDOW_SIZE, GRAPH_HEIGHT, ZOOM_SLIDER_WIDTH,
+    RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE, LABEL_BODY_STYLE,
 )
 from src.utils.typing import (
     SensorValues, ModelParameters,
@@ -81,7 +82,7 @@ class GestureTracker(QWidget):
         #========================================
         # initialise the system
         #========================================
-        self._init_buttons()
+        self._init_header()
         self._init_graph_plot()
         self._init_graph_footer()
         self._init_raw_data()
@@ -90,42 +91,56 @@ class GestureTracker(QWidget):
     #- Private: Initialise Components --------------------------------------------------------------
 
     # Build the top button row and attach callbacks.
-    def _init_buttons(self) -> None:
-        button_layout = QHBoxLayout()
+    def _init_header(self) -> None:
+        header_layout = QHBoxLayout()
 
         #========================================
         # top-left buttons
         #========================================
         self._gesture_button = create_button(
             "Gesture", "Play with gesture files [g]", self._button_gesture)
-        button_layout.addWidget(self._gesture_button)
+        header_layout.addWidget(self._gesture_button)
 
         self._save_button = create_button(
             "Save", "Save read data in text file [s]", self._button_save)
-        button_layout.addWidget(self._save_button)
+        header_layout.addWidget(self._save_button)
 
         #========================================
         # whitespace dividing left-right regions
         #========================================
-        spacedh(button_layout)
+        spacedh(header_layout)
+
+        #========================================
+        # view slider
+        #========================================
+        zoom_label = QLabel("Zoom")
+        zoom_label.setStyleSheet(LABEL_BODY_STYLE)
+        header_layout.addWidget(zoom_label)
+
+        self._zoom_slider = QSlider(Qt.Orientation.Horizontal, self)
+        self._zoom_slider.setRange(0, 10)
+        self._zoom_slider.setValue(0)
+        self._zoom_slider.setMaximumWidth(ZOOM_SLIDER_WIDTH)
+        self._zoom_slider.setToolTip(" [All] ")
+        self._zoom_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        header_layout.addWidget(self._zoom_slider)
+
+        # update label only for allowed values
+        self._zoom_slider.valueChanged.connect(self._zoom_value)
 
         #========================================
         # top-right buttons
         #========================================
-        self._data_view_button = create_button(
-            "Zoom Latest", "Plot only latest 10 readings [t]", self._button_toggle_recent)
-        button_layout.addWidget(self._data_view_button)
-
         self._freeze_button = create_button(
             "Freeze", "Toggle freezing live plot [space]", self._button_freeze)
-        button_layout.addWidget(self._freeze_button)
+        header_layout.addWidget(self._freeze_button)
 
         self._clear_button = create_button(
             "Clear", "Clear all read data [esc]", self._button_clear_data)
-        button_layout.addWidget(self._clear_button)
+        header_layout.addWidget(self._clear_button)
 
         # to the layout
-        self._layout.addLayout(button_layout)
+        self._layout.addLayout(header_layout)
 
 
     # Create and configure the plot widget used for realtime graphs.
@@ -216,22 +231,11 @@ class GestureTracker(QWidget):
 
     #- Private: Button Actions ---------------------------------------------------------------------
 
-    # Toggle between showing latest windowed values and full history.
-    def _button_toggle_recent(self) -> None:
-        # dynamic names and hover-descriptions
-        view_button_options = [ "Zoom Latest", "View All" ]
-        view_button_tips = ["Plot only latest 10 readings [t]", "Plot all readings [t]"]
-
-        # toggle between values 0 and -10
-        # don't want to define another static or global variable
-        self._toggle_recent = 0 - 10 - self._toggle_recent
-
-        # don't want to use if else on self._toggle_recent to get 0/1 (index for the two text lists)
-        index = self._toggle_recent % 11
-
-        self._data_view_button.setText(view_button_options[index])
-        self._data_view_button.setToolTip(view_button_tips[index])
-        self._update_plot()
+    def _zoom_value(self, value: int):
+        value *= 5
+        label = " [All] " if value == 0 else f"Latest {value}"
+        self._zoom_slider.setToolTip(label)
+        self._toggle_recent = 0 - value
 
 
     # Clear all recorded data and reset view state.
@@ -469,6 +473,14 @@ class GestureTracker(QWidget):
 
         elif event.key() == Qt.Key_Escape:
             self._clear_button.click()
+
+        elif event.key() in [Qt.Key_Plus, Qt.Key_Equal]:
+            value = self._zoom_slider.value()
+            if value != 10: self._zoom_slider.setValue(value + 1)
+
+        elif event.key() in [Qt.Key_Underscore, Qt.Key_Minus]:
+            value = self._zoom_slider.value()
+            if value != 0: self._zoom_slider.setValue(value - 1)
 
         else:
             super().keyPressEvent(event)
