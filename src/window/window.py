@@ -9,7 +9,7 @@ import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
-    QDialog, QWidget,
+    QDialog, QWidget, QFrame,
     QComboBox, QFileDialog, QLabel, QMessageBox, QTextEdit,
     QHBoxLayout, QVBoxLayout, QScrollArea,
 )
@@ -25,7 +25,7 @@ from src.utils.style import (
     APPLICATION_NAME,
     BACKGROUND_COLOR,
     WINDOW_SIZE, GRAPH_HEIGHT,
-    RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE,
+    RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE,
 )
 from src.utils.typing import (
     SensorValues, ModelParameters,
@@ -179,6 +179,8 @@ class GestureTracker(QWidget):
     def _init_raw_data(self) -> None:
         self._scroll_area = QScrollArea()
         self._scroll_area.setWidgetResizable(True)
+        self._scroll_area.setFrameStyle(QFrame.NoFrame)
+        self._scroll_area.setStyleSheet(SCROLL_BAR_STYLE)
 
         self._scroll_area_content = QWidget()
         self._scroll_area_layout = QVBoxLayout(self._scroll_area_content)

@@ -6,17 +6,18 @@
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional
 
+from redwrenlib.utils import defaults
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
-    QDialog, QWidget,
+    QDialog, QWidget, QFrame,
     QCheckBox, QFileDialog, QLabel, QLineEdit,
-    QVBoxLayout, QHBoxLayout,
+    QVBoxLayout, QHBoxLayout, QScrollArea,
     QSizePolicy,
 )
 
 from src.utils.extra import file_name_path, datestring
-from src.utils.style import TEXT_HEAD
+from src.utils.style import TEXT_HEAD, SCROLL_BAR_STYLE
 from src.utils.typing import (
     TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
@@ -130,6 +131,9 @@ class Tab1:
 
     # Build sensor selection checkboxes for available input names.
     def _init_checkboxes(self) -> None:
+        #========================================
+        # section heading
+        #========================================
         blank_line(self._layout)
         text_label = QLabel("Select Sensors")
         text_label.setStyleSheet(TEXT_HEAD)
@@ -138,31 +142,53 @@ class Tab1:
         #========================================
         # sensor select checkboxes
         #========================================
-        self._sensor_checkboxes: List[QCheckBox] = []
+        scroll_area = QScrollArea()
+        scroll_area.setWidgetResizable(True)
+        scroll_area.setFrameStyle(QFrame.NoFrame)
+        scroll_area.setMinimumHeight(250)
+        scroll_area.setStyleSheet(SCROLL_BAR_STYLE)
+
+        label_frame = QFrame(scroll_area)
+        label_layout = QVBoxLayout(label_frame)
+        scroll_area.setWidget(label_frame)
+
+        self._layout.addWidget(scroll_area)
+
+        #========================================
+        # sensor select checkboxes
+        #========================================
+        self._params_labels_space: Dict[str, QLabel] = {}
         for name in self._input_names:
-            # The checkbox itself
+            # the checkbox itself
             checkbox = QCheckBox(name, self._parent)
             checkbox.stateChanged.connect(
                 lambda state, name=name: self._toggle_model_parameters(state, name)
             )
+            label_layout.addWidget(checkbox)
 
-            self._sensor_checkboxes.append(checkbox)
-            self._layout.addWidget(checkbox)
-
-            # Checkbox's parameters
-            # Hidden by default, are visible when the checkbox is selected
+            # checkbox's parameters
+            # hidden by default, are visible when the checkbox is selected
             self._params_labels[name] = ModelParametersLabels(
-                random_state=LabelledText(LABEL_RANDOM_STATE, "42",
-                    "integer in the range [0, 4294967295]", self._layout, visible=False),
+                random_state=LabelledText(LABEL_RANDOM_STATE, str(defaults.MODEL_RANDOM_STATE),
+                    "integer in the range [0, 4294967295]", label_layout, visible=False),
 
-                n_components=LabelledText(LABEL_N_COMPONENTS, "2",
-                    "positive integer", self._layout, visible=False),
+                n_components=LabelledText(LABEL_N_COMPONENTS, str(defaults.MODEL_N_COMPONENTS),
+                    "positive integer", label_layout, visible=False),
 
-                threshold=LabelledText(LABEL_THRESHOLD, "-10",
-                    "", self._layout, visible=False),
+                threshold=LabelledText(LABEL_THRESHOLD, str(defaults.MODEL_THRESHOLD),
+                    "", label_layout, visible=False),
 
                 checkbox=checkbox,
             )
+
+            # whitespace under the list before the next checkbox
+            space_label = QLabel("")
+            space_label.setVisible(False)
+            space_label.setFixedHeight(1)
+            label_layout.addWidget(space_label)
+            self._params_labels_space[name] = space_label
+
+        spacedv(label_layout)
 
 
     # Create Cancel / Continue buttons and wire them to actions.
@@ -189,6 +215,7 @@ class Tab1:
         self._params_labels[label].threshold.visibility(visible)
         self._params_labels[label].n_components.visibility(visible)
         self._params_labels[label].random_state.visibility(visible)
+        self._params_labels_space[label].setVisible(visible)
 
 
     # Validate inputs, assemble GestureInput dataclass and submit tab result.

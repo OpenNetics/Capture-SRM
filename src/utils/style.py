@@ -50,3 +50,18 @@ COMBOBOX_STYLE: str = """
     }
 """
 
+SCROLL_BAR_STYLE: str = """
+    QScrollBar:vertical {
+        width: 10px;
+    }
+    QScrollBar::handle:vertical {
+        background: #888;
+        border-radius: 5px;
+    }
+    QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+        background: none; /* hide the arrows */
+    }
+    QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+        background: none; /* hide the page scroll areas */
+    }
+"""
