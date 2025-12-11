@@ -23,7 +23,7 @@ from src.utils.ui import (
 )
 from src.utils.style import (
     APPLICATION_NAME,
-    BACKGROUND_COLOR,
+    BACKGROUND_COLOR, BACKGROUND_HIGHLIGHT_COLOR,
     WINDOW_SIZE, GRAPH_HEIGHT,
     RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE,
 )
@@ -132,6 +132,7 @@ class GestureTracker(QWidget):
     def _init_graph_plot(self) -> None:
         self._plot_widget = pg.PlotWidget()
         self._plot_widget.setBackground(BACKGROUND_COLOR)
+        self._plot_widget.setDefaultPadding(0)
         self._layout.addWidget(self._plot_widget)
         self._plot_widget.setFixedHeight(GRAPH_HEIGHT)
 
@@ -356,7 +357,7 @@ class GestureTracker(QWidget):
             analyse_data.append(source_info)
 
         analyse_method(
-            filename, analyse_data, parameters.values(),
+            filename, analyse_data, tuple(parameters.values()),
             getattr(dialog_inputs, 'data', None) # to make the two analyse methods similar
         )
 
@@ -366,7 +367,7 @@ class GestureTracker(QWidget):
         # create a new timestamp- add start point
         if action == RECORD_ACTION_START:
             self._records_stamps.append([len(self._counter)])
-            self._plot_widget.setBackground("#121212")
+            self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
 
         # add end point for last created timestamp
         elif action == RECORD_ACTION_STOP:
@@ -376,7 +377,7 @@ class GestureTracker(QWidget):
         # delete the last timestamp
         elif action == RECORD_ACTION_DISCARD:
             self._records_stamps.pop()
-            self._plot_widget.setBackground("#1f1212")
+            self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
 
         # reset the start point for the current timestamp to current counter value
         elif action == RECORD_ACTION_RESTART:
