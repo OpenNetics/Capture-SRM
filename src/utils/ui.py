@@ -8,7 +8,7 @@ from typing import Any, Callable, Tuple
 from redwrenlib.utils.debug import alert
 from PySide6.QtWidgets import (
     QLabel, QLineEdit, QMessageBox, QPushButton, QSpacerItem,
-    QBoxLayout, QHBoxLayout, QVBoxLayout,
+    QBoxLayout, QHBoxLayout, QVBoxLayout, QLayout,
     QSizePolicy,
 )
 
@@ -60,6 +60,23 @@ def alert_box(status: str, message: str) -> None:
     msg_box.setWindowTitle(status)
     msg_box.setText(message)
     msg_box.exec_()
+
+def clear_layout(layout: QLayout) -> None:
+    while layout.count():
+        item = layout.takeAt(0)
+        if item is None: continue
+
+        widget = item.widget()
+        if widget:
+            widget.setParent(None)
+            widget.deleteLater()
+            continue
+
+        child_layout = item.layout()
+        if child_layout:
+            clear_layout(child_layout)
+            layout.removeItem(item)
+            child_layout.deleteLater()
 
 
 #- Custom UI Elements ------------------------------------------------------------------------------
