@@ -118,7 +118,7 @@ class GestureTracker(QWidget):
         header_layout.addWidget(zoom_label)
 
         self._zoom_slider = QSlider(Qt.Orientation.Horizontal, self)
-        self._zoom_slider.setRange(0, 10)
+        self._zoom_slider.setRange(0, 20)
         self._zoom_slider.setValue(0)
         self._zoom_slider.setMaximumWidth(ZOOM_SLIDER_WIDTH)
         self._zoom_slider.setToolTip(" [All] ")
@@ -152,7 +152,7 @@ class GestureTracker(QWidget):
         self._plot_widget.setFixedHeight(GRAPH_HEIGHT)
 
         self._plot_widget.showGrid(x=True, y=True)
-        self._plot_widget.setMouseEnabled(True, True)
+        self._plot_widget.setMouseEnabled(False, False)
 
 
     # Create footer area containing legends and connection/baud selectors.
@@ -233,7 +233,7 @@ class GestureTracker(QWidget):
 
     def _zoom_value(self, value: int):
         value *= 5
-        label = " [All] " if value == 0 else f"Latest {value}"
+        label = " [All] " if value == 0 else f" Viewing latest {value} "
         self._zoom_slider.setToolTip(label)
         self._toggle_recent = 0 - value
 
@@ -460,7 +460,7 @@ class GestureTracker(QWidget):
 
         elif event.key() in [Qt.Key_Plus, Qt.Key_Equal]:
             value = self._zoom_slider.value()
-            if value != 10: self._zoom_slider.setValue(value + 1)
+            if value != 20: self._zoom_slider.setValue(value + 1)
 
         elif event.key() in [Qt.Key_Underscore, Qt.Key_Minus]:
             value = self._zoom_slider.value()
