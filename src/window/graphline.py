@@ -5,7 +5,7 @@
 
 from typing import List, Tuple, Optional
 
-from src.utils.ui import EditLabel
+from utils.ui import EditLabel
 
 
 #- GraphLine class ---------------------------------------------------------------------------------

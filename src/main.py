@@ -10,7 +10,7 @@ import numpy as np
 from PySide6.QtWidgets import QApplication
 from PySide6.QtCore import QThread, Signal
 
-from src.window import GestureTracker
+from window import GestureTracker
 
 
 #- Declarations ------------------------------------------------------------------------------------

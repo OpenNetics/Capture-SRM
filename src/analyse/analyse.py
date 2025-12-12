@@ -12,7 +12,7 @@ from sklearn.mixture import GaussianMixture
 from redwrenlib import GestureFile
 from redwrenlib.typing import float3d_t
 
-from src.utils.typing import (
+from utils.typing import (
     model_parameters_t, sensor_values_t
 )
 

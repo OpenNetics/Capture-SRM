@@ -16,17 +16,17 @@ from PySide6.QtWidgets import (
     QSizePolicy,
 )
 
-from src.utils.extra import file_name_path, datestring
-from src.utils.style import (
+from utils.extra import file_name_path, datestring
+from utils.style import (
     SCROLL_HEIGHT,
     LABEL_HEAD_STYLE, SCROLL_BAR_STYLE, TEXT_BOX_STYLE
 )
-from src.utils.typing import (
+from utils.typing import (
     TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
     GestureInput, ModelParameters
 )
-from src.utils.ui import (
+from utils.ui import (
     spacedv, blank_line,
     create_button, LabelledText,
 )

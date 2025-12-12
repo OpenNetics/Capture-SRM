@@ -5,7 +5,7 @@
 
 from typing import Optional, Tuple, TypeVar, Type
 
-from src.utils.ui import alert_box
+from utils.ui import alert_box
 
 
 #- Public Methods ----------------------------------------------------------------------------------

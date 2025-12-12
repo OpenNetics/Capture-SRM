@@ -10,13 +10,14 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from src.utils.style import BACKGROUND_COLOR
-from src.utils.typing import(
+from utils.style import BACKGROUND_COLOR
+from utils.typing import(
     GestureInput,
     TAB1, TAB2,
 )
 from .gesture_dialog_tab1 import Tab1
 from .gesture_dialog_tab2 import Tab2
+from .gesture_dialog_tab3 import Tab3
 
 
 #- Window Class ------------------------------------------------------------------------------------
