@@ -281,7 +281,7 @@ class GestureTracker(QWidget):
         # sensor/source names
         #========================================
         # get all the set names from the graph footer EditLabels
-        source_names: List[str] = [ source.text() for source in self._graphlines ]
+        source_names: Tuple[str, ...] = tuple([source.text() for source in self._graphlines])
 
         # ensure all sensors have unique names
         if not check_sources_name(source_names): return
@@ -300,25 +300,12 @@ class GestureTracker(QWidget):
             return # return if the values were None: happens when invalid values are entered
 
         #========================================
-        # parse retrieved values depending on the window tab it was returned from
+        # parse retrieved values depending on the tab it was returned from
         #========================================
         tab, dialog_inputs = dialog_return
 
-        if tab == TAB1:
-            # dialog_inputs: GestureInput
-            repeats: int = dialog_inputs.repeats
-            filename: str = dialog_inputs.filename
-            parameters: Dict[int, ModelParameters] = dialog_inputs.parameters
-            analyse_method = analyse_create # analyse method to call
-
-        elif tab == TAB2:
-            # dialog_inputs: GestureUpdater
-            repeats: int = dialog_inputs.file.repeats
-            filename: str = dialog_inputs.file.filename
-            parameters: Dict[int, ModelParameters] = dialog_inputs.file.parameters
-            analyse_method = analyse_update # analyse method to call
-
-        else: return # return for invalid tabs
+        analyse_method = analyse_create if tab == TAB1 else analyse_update
+        # .get_inputs() returns None when tab isb't TAB1 or TAB2 anyways
 
         #========================================
         # pop the gesture record window
@@ -328,7 +315,7 @@ class GestureTracker(QWidget):
 
         # repeats = how many readings to read
         # self._record_data = method to handle data record. it accepts RECORD_ACTION_x enums args
-        inputs = RecordInputs(repeats, self._record_data)
+        inputs = RecordInputs(dialog_inputs.repeats, self._record_data)
 
         if inputs.exec() != QDialog.Accepted:
             self._record_data(RECORD_ACTION_TERMINATE) # if a record was created, close & clear it
@@ -349,8 +336,8 @@ class GestureTracker(QWidget):
         # is processed and selected data is stored in a sensor_values_t list.
 
         analyse_data: sensor_values_t = []
-        for source in parameters.keys():
-            source_info: SensorValues = SensorValues(source_names[source])
+        for i, source in enumerate(dialog_inputs.source_ids):
+            source_info: SensorValues = SensorValues(dialog_inputs.file_sources[i])
 
             for start, end in self._records_stamps:
                 source_info.AddValues(
@@ -360,10 +347,7 @@ class GestureTracker(QWidget):
 
             analyse_data.append(source_info)
 
-        analyse_method(
-            filename, analyse_data, tuple(parameters.values()),
-            getattr(dialog_inputs, 'data', None) # to make the two analyse methods similar
-        )
+        analyse_method(dialog_inputs.filename, analyse_data, dialog_inputs.parameters)
 
 
     # Record control callback implementing start/stop/discard/restart semantics.

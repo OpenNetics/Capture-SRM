@@ -10,9 +10,7 @@ import numpy as np
 from numpy.typing import NDArray
 from sklearn.mixture import GaussianMixture
 from redwrenlib import GestureFile
-from redwrenlib.typing import (
-    float3d_t, data_dict_t
-)
+from redwrenlib.typing import float3d_t
 
 from src.utils.typing import (
     model_parameters_t, sensor_values_t
@@ -35,7 +33,7 @@ def _create_model(data: float3d_t, random_state: int, n_components: int ) -> Lis
     return gmm_models
 
 
-def _single_thread_analyse(name: str, readings: sensor_values_t, mp: model_parameters_t) -> None:
+def _single_thread_create(name: str, readings: sensor_values_t, mp: model_parameters_t) -> None:
     gesture_file: GestureFile = GestureFile(name)
 
     if not (gesture_file.create()):
@@ -57,20 +55,20 @@ def _single_thread_analyse(name: str, readings: sensor_values_t, mp: model_param
     print(f"Gesture '{name}' analysis complete.")
 
 
+def _single_thread_update(name: str, readings: sensor_values_t, mp: model_parameters_t) -> None:
+    pass
+
+
 #- Public Methods ----------------------------------------------------------------------------------
 
 # Analyse data and create a new file with it.
-def analyse_create(
-    name: str, readings: sensor_values_t, mp: model_parameters_t, _: None
-) -> None:
-    single_thread = Thread(target=_single_thread_analyse, args=(name, readings, mp,))
+def analyse_create(name: str, readings: sensor_values_t, mp: model_parameters_t) -> None:
+    single_thread = Thread(target=_single_thread_create, args=(name, readings, mp,))
     single_thread.start()
 
 
 # Analyse data and write it to an existing file.
-def analyse_update(
-    name: str, readings: sensor_values_t, mp: model_parameters_t, old_data: data_dict_t
-) -> None:
-    print("update one called")
-    pass
+def analyse_update(name: str, readings: sensor_values_t, mp: model_parameters_t) -> None:
+    single_thread = Thread(target=_single_thread_update, args=(name, readings, mp,))
+    single_thread.start()
 

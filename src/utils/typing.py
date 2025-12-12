@@ -4,7 +4,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 from sklearn.mixture import GaussianMixture
 from redwrenlib.utils import defaults
@@ -56,14 +56,9 @@ class ModelParameters:
 class GestureInput:
     filename: str
     repeats: int
-    parameters: Dict[int, ModelParameters]
-
-
-# Structure used when updating an existing gesture file (filename, new data and original inputs).
-@dataclass(frozen=True)
-class GestureUpdater:
-    file: GestureInput
-    data: dict[str, List[GaussianMixture]]
+    source_ids: Tuple[int, ...]
+    parameters: Tuple[ModelParameters, ...]
+    file_sources: Tuple[str, ...] = ()
 
 
 #- Aliases -----------------------------------------------------------------------------------------

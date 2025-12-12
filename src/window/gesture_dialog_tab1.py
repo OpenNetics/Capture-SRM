@@ -4,7 +4,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 from redwrenlib.utils import defaults
 from PySide6.QtCore import Qt
@@ -37,7 +37,7 @@ from .checks import (
 )
 
 
-#- Local Datatypes ---------------------------------------------------------------------------------
+#- Local Defines -----------------------------------------------------------------------------------
 
 @dataclass
 class ModelParametersLabels:
@@ -58,7 +58,7 @@ class Tab1:
             self,
             parent: QDialog,
             parent_layout: QWidget,
-            input_names: List[str],
+            input_names: Tuple[str, ...],
             submit: Callable[[int], None],
             cancel: Callable[[], None]
         ) -> None:
@@ -67,9 +67,10 @@ class Tab1:
         # class vars with their init values
         #========================================
         self._parent = parent
-        self._submit: Callable[[int], None] = submit
-        self._cancel: Callable[[], None] = cancel
-        self._input_names: List[str] = input_names
+        self._submit = submit
+        self._cancel = cancel
+        self._input_names = input_names
+
         self._params_labels: Dict[str, ModelParametersLabels] = {}
 
         #========================================
@@ -254,7 +255,8 @@ class Tab1:
         #========================================
         # checked checkboxes and their values
         #========================================
-        selected_sensors_models_parameters: Dict[int, ModelParameters] = {}
+        source_ids: List[int] = []
+        params: List[ModelParameters] = []
 
         # Break if any model parameter value isn't valid
         for i, label in enumerate(self._params_labels.keys()):
@@ -282,19 +284,18 @@ class Tab1:
             if n_components is None: return None
 
             # add to the dictionary with the index of the sensor/source as key
-            selected_sensors_models_parameters[i] = ModelParameters(
-                random_state=random_state,
-                threshold=threshold,
-                n_components=n_components
-            )
+            source_ids.append(i)
+            params.append(ModelParameters(threshold, random_state, n_components))
 
         #========================================
         # return type, self._values, generated when all values are valid
         #========================================
         self._values = GestureInput(
-            filename=name,
-            repeats=repeats,
-            parameters=selected_sensors_models_parameters
+            filename = name,
+            repeats  = repeats,
+            parameters = tuple(params),
+            source_ids = tuple(source_ids),
+            file_sources = tuple(self._input_names[i] for i in source_ids)
         )
 
         self._submit(TAB1) # close the window with success return

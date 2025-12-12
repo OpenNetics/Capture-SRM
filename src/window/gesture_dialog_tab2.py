@@ -4,7 +4,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Optional, Tuple
 
 from redwrenlib import GestureFile
 from redwrenlib.utils.debug import alert
@@ -25,20 +25,17 @@ from src.utils.style import (
 from src.utils.typing import(
     TAB2,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
-    GestureInput, GestureUpdater, ModelParameters
+    GestureInput, ModelParameters
 )
 from src.utils.ui import (
     spacedv, blank_line, create_button,
     LabelledText,
 )
 
-from .checks import (
-    check_empty_string,
-    check_string_numeric,
-)
+from .checks import check_string_numeric
 
 
-#- Local Datatypes ---------------------------------------------------------------------------------
+#- Local Defines -----------------------------------------------------------------------------------
 
 @dataclass
 class ReadModelData:
@@ -47,6 +44,8 @@ class ReadModelData:
     n_components: LabelledText
     random_state: LabelledText
     whitespace: QLabel
+
+DROPBOX_UNCHANGED: str = "<UNCHANGED>"
 
 
 #- Tab Class ---------------------------------------------------------------------------------------
@@ -59,7 +58,7 @@ class Tab2:
             self,
             parent: QDialog,
             parent_layout: QWidget,
-            input_names: List[str],
+            input_names: Tuple[str, ...],
             submit: Callable[[int], None],
             cancel: Callable[[], None],
         ) -> None:
@@ -67,10 +66,10 @@ class Tab2:
         #========================================
         # class vars with their init values
         #========================================
-        self._parent: QDialog = parent
-        self._submit: Callable[[int], None] = submit
-        self._cancel: Callable[[], None] = cancel
-        self._input_names: List[str] = input_names
+        self._parent = parent
+        self._submit = submit
+        self._cancel = cancel
+        self._input_names = input_names
 
         #========================================
         # master Layout
@@ -191,7 +190,6 @@ class Tab2:
         #========================================
         # draw file content
         #========================================
-
         blank_line(self._body_layout)
         label = QLabel("Available Sources:")
         label.setStyleSheet(LABEL_HEAD_STYLE)
@@ -212,7 +210,7 @@ class Tab2:
 
             # list of sensors connected to the device
             input_name_list = QComboBox()
-            input_name_list.addItems(["<UNCHANGED>"] + self._input_names)
+            input_name_list.addItems([DROPBOX_UNCHANGED] + list(self._input_names))
             input_name_list.setStyleSheet(COMBOBOX_STYLE)
             input_name_list.currentTextChanged.connect(
                 lambda state, model=model_name: self._source_selected(state, model)
@@ -255,7 +253,7 @@ class Tab2:
     #- Private: actions ----------------------------------------------------------------------------
 
     def _source_selected(self, text: str, label: str) -> None:
-        visible = text != "<UNCHANGED>"
+        visible = text != DROPBOX_UNCHANGED
 
         self._drop_boxes[label].threshold.visibility(visible)
         self._drop_boxes[label].n_components.visibility(visible)
@@ -263,9 +261,69 @@ class Tab2:
         self._drop_boxes[label].whitespace.setVisible(visible)
 
 
-    # Validate inputs, assemble GestureUpdater dataclass and submit tab result.
+    # Validate inputs, assemble GestureInput dataclass and submit tab result.
     def _finish(self) -> None:
-        #TODO generate GestureUpdater
+        #========================================
+        # ensure gesture filename is valid path
+        #========================================
+        if not hasattr(self, '_selected_file'): return None
+
+        #========================================
+        # ensure repeates count is a valid integer
+        #========================================
+        repeats = check_string_numeric(
+            self._repeats.text(), "Repeat Count: Enter valid integer.", int, 1
+        )
+        if not repeats: return None
+
+        #========================================
+        # checked checkboxes and their values
+        #========================================
+        file_sources: List[str] = []
+        source_ids: List[int] = []
+        params: List[ModelParameters] = []
+
+        # Break if any model parameter value isn't valid
+        for label in self._drop_boxes.keys():
+            index: int = self._drop_boxes[label].dropbox.currentIndex()
+
+            # only check values if the checkbox is selected
+            if index == 0: continue # index 0 is DROPBOX_UNCHANGED
+
+            random_state = check_string_numeric(
+                self._drop_boxes[label].random_state.text(),
+                f"[{label}] Random State: Enter integer value in the valid range",
+                int, 0, 4294967295
+            )
+            if random_state is None: return None
+
+            threshold = check_string_numeric(
+                self._drop_boxes[label].threshold.text(),
+                f"[{label}] Threshold: Enter valid integer value.", float
+            )
+            if threshold is None: return None
+
+            n_components = check_string_numeric(
+                self._drop_boxes[label].n_components.text(),
+                f"[{label}] n Component: Enter valid integer value.", int, 1
+            )
+            if n_components is None: return None
+
+            # add to the dictionary with the index of the sensor/source as key
+            file_sources.append(label)
+            source_ids.append(index-1) # -1 because extra DROPBOX_UNCHANGED was added at start
+            params.append(ModelParameters(threshold, random_state, n_components))
+
+        #========================================
+        # return type, self._values, generated when all values are valid
+        #========================================
+        self._values = GestureInput(
+            filename = self._selected_file,
+            repeats  = repeats,
+            source_ids = tuple(source_ids),
+            parameters = tuple(params),
+            file_sources = tuple(file_sources),
+        )
 
         self._submit(TAB2)
 
@@ -273,7 +331,7 @@ class Tab2:
     #- Public Calls --------------------------------------------------------------------------------
 
     # Return assembled GestureUpdater values if finish() previously validated them.
-    def get_inputs(self) -> Optional[GestureUpdater]:
+    def get_inputs(self) -> Optional[GestureInput]:
         return self._values if hasattr(self, '_values') else None
 
 

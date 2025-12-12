@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Tuple
 
 from PySide6.QtWidgets import (
     QDialog, QWidget, QTabWidget,
@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
 
 from src.utils.style import BACKGROUND_COLOR
 from src.utils.typing import(
-    GestureInput, GestureUpdater,
+    GestureInput,
     TAB1, TAB2,
 )
 from .gesture_dialog_tab1 import Tab1
@@ -25,7 +25,7 @@ from .gesture_dialog_tab2 import Tab2
 class GestureDialog(QDialog):
 
     # Build dialog tabs and store inputs; submit() will accept the dialog with chosen tab.
-    def __init__(self, input_names: List[str]) -> None:
+    def __init__(self, input_names: Tuple[str, ...]) -> None:
         super().__init__()
 
         self.setWindowTitle("Record Gestures")
@@ -52,14 +52,14 @@ class GestureDialog(QDialog):
 
 
     # Return inputs from the selected tab, or None if no valid inputs were produced.
-    def get_inputs(self) -> Optional[Tuple[int, Union[GestureInput, GestureUpdater]]]:
+    def get_inputs(self) -> Optional[Tuple[int, GestureInput]]:
         if self.final_tab == TAB1:
             result = self.tab1.get_inputs()
-            return (TAB1, result) if result is not None else None
+            if result is not None: return (TAB1, result)
 
         elif self.final_tab == TAB2:
             result = self.tab2.get_inputs()
-            return (TAB2, result) if result is not None else None
+            if result is not None: return (TAB2, result)
 
         return None
 
