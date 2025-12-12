@@ -1,5 +1,6 @@
 numpy
 pyside6
+pyserial
 pyqtgraph
 redwrenlib
 scikit-learn

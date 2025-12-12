@@ -1,9 +1,12 @@
 
-# serial/available.py
+# talk/available.py
 
 #- Imports -----------------------------------------------------------------------------------------
 
 from typing import List
+
+import serial.tools.list_ports
+
 
 
 #- Declarations ------------------------------------------------------------------------------------
@@ -17,6 +20,6 @@ def baud_rates() -> List[str]:
 
 
 def connected_ports() -> List[str]:
-    Result = [ "/dev/cu.usbmodem54E20", "/dev/cu.usbmodem54E21", "/dev/cu.usbmodem54E22" ]
-    return Result
+    ports = serial.tools.list_ports.comports()
+    return [port.device for port in ports]
 

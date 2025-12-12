@@ -38,7 +38,7 @@ from utils.typing import (
     RECORD_ACTION_TERMINATE,
     TAB1,
 )
-from serial import (
+from talk import (
     select_port, select_baud_rate,
     baud_rates, connected_ports
 )
