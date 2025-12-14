@@ -119,6 +119,7 @@ class GestureTracker(QWidget):
 
         self._zoom_slider = QSlider(Qt.Orientation.Horizontal, self)
         self._zoom_slider.setRange(0, 20)
+        self._zoom_slider.setTickInterval(5)
         self._zoom_slider.setValue(0)
         self._zoom_slider.setMaximumWidth(ZOOM_SLIDER_WIDTH)
         self._zoom_slider.setToolTip(" [All] ")

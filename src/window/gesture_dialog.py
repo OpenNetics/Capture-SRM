@@ -49,6 +49,11 @@ class GestureDialog(QDialog):
         tab_widget.addTab(t2, "Update")
         self.tab2 = Tab2(self, t2, input_names, self._submit, self.reject)
 
+        # Test Tab
+        t3 = QWidget()
+        tab_widget.addTab(t3, "Test")
+        self.tab3 = Tab3(self, t3, input_names, self._submit, self.reject)
+
         self.layout.addWidget(tab_widget)
 
 
