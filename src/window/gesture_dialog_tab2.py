@@ -23,9 +23,8 @@ from utils.style import (
     COMBOBOX_STYLE, TEXT_BOX_STYLE, SCROLL_BAR_STYLE,
 )
 from utils.typing import(
-    TAB2,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
-    GestureInput, ModelParameters
+    GestureInput, ModelParameters, Tab
 )
 from utils.ui import (
     spacedv, blank_line, create_button,
@@ -59,7 +58,7 @@ class Tab2:
             parent: QDialog,
             parent_layout: QWidget,
             input_names: Tuple[str, ...],
-            submit: Callable[[int], None],
+            submit: Callable[[Tab], None],
             cancel: Callable[[], None],
         ) -> None:
 
@@ -324,7 +323,7 @@ class Tab2:
             file_sources = tuple(file_sources),
         )
 
-        self._submit(TAB2)
+        self._submit(Tab.UPDATE)
 
 
     #- Public Calls --------------------------------------------------------------------------------

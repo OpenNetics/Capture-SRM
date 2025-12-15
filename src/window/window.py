@@ -29,14 +29,8 @@ from utils.style import (
     RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE, LABEL_BODY_STYLE,
 )
 from utils.typing import (
-    SensorValues,
+    SensorValues, RecordAction, Tab,
     sensor_values_t,
-    RECORD_ACTION_STOP,
-    RECORD_ACTION_START,
-    RECORD_ACTION_DISCARD,
-    RECORD_ACTION_RESTART,
-    RECORD_ACTION_TERMINATE,
-    TAB1,
 )
 from talk import (
     select_port, select_baud_rate,
@@ -305,8 +299,8 @@ class GestureTracker(QWidget):
         #========================================
         tab, dialog_inputs = dialog_return
 
-        analyse_method = analyse_create if tab == TAB1 else analyse_update
-        # .get_inputs() returns None when tab isb't TAB1 or TAB2 anyways
+        analyse_method = analyse_create if tab == Tab.CREATE else analyse_update
+        # .get_inputs() returns None when tab isnt Tab.CREATE or Tab.UPDATE anyways
 
         #========================================
         # pop the gesture record window
@@ -315,11 +309,11 @@ class GestureTracker(QWidget):
         self._records_stamps: int2d_t = []
 
         # repeats = how many readings to read
-        # self._record_data = method to handle data record. it accepts RECORD_ACTION_x enums args
+        # self._record_data = method to handle data record. it accepts RecordAction.x enums args
         inputs = RecordInputs(dialog_inputs.repeats, self._record_data)
 
         if inputs.exec() != QDialog.Accepted:
-            self._record_data(RECORD_ACTION_TERMINATE) # if a record was created, close & clear it
+            self._record_data(RecordAction.TERMINATE) # if a record was created, close & clear it
             return # exit if pressed cancel on the record prompt
 
         #========================================
@@ -352,28 +346,28 @@ class GestureTracker(QWidget):
 
 
     # Record control callback implementing start/stop/discard/restart semantics.
-    def _record_data(self, action: int) -> None:
+    def _record_data(self, action: RecordAction) -> None:
         # create a new timestamp- add start point
-        if action == RECORD_ACTION_START:
+        if action == RecordAction.START:
             self._records_stamps.append([len(self._counter)])
             self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
 
         # add end point for last created timestamp
-        elif action == RECORD_ACTION_STOP:
+        elif action == RecordAction.STOP:
             self._records_stamps[-1].append(len(self._counter))
             self._plot_widget.setBackground(BACKGROUND_COLOR)
 
         # delete the last timestamp
-        elif action == RECORD_ACTION_DISCARD:
+        elif action == RecordAction.DISCARD:
             self._records_stamps.pop()
             self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
 
         # reset the start point for the current timestamp to current counter value
-        elif action == RECORD_ACTION_RESTART:
+        elif action == RecordAction.RESTART:
             self._records_stamps[-1][0] = len(self._counter)
 
         # empty the record, clear all timestamps
-        else: # == RECORD_ACTION_TERMINATE
+        else: # == RecordAction.TERMINATE
             self._records_stamps = []
             self._plot_widget.setBackground(BACKGROUND_COLOR)
 

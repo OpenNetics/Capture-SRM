@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 from PySide6.QtWidgets import (
     QDialog, QWidget, QTabWidget,
@@ -11,10 +11,8 @@ from PySide6.QtWidgets import (
 )
 
 from utils.style import BACKGROUND_COLOR
-from utils.typing import(
-    GestureInput,
-    TAB1, TAB2,
-)
+from utils.typing import GestureInput, Tab
+
 from .gesture_dialog_tab1 import Tab1
 from .gesture_dialog_tab2 import Tab2
 from .gesture_dialog_tab3 import Tab3
@@ -37,7 +35,7 @@ class GestureDialog(QDialog):
         tab_widget = QTabWidget(self)
         tab_widget.setStyleSheet("QTabWidget::pane { border: none; }")
 
-        self.final_tab: int = 0
+        self.final_tab: Tab = Tab.NONE
 
         # Record Tab
         t1 = QWidget()
@@ -58,20 +56,20 @@ class GestureDialog(QDialog):
 
 
     # Return inputs from the selected tab, or None if no valid inputs were produced.
-    def get_inputs(self) -> Optional[Tuple[int, GestureInput]]:
-        if self.final_tab == TAB1:
+    def get_inputs(self) -> Optional[Tuple[Tab, GestureInput]]:
+        if self.final_tab == Tab.CREATE:
             result = self.tab1.get_inputs()
-            if result is not None: return (TAB1, result)
+            if result is not None: return (Tab.CREATE, result)
 
-        elif self.final_tab == TAB2:
+        elif self.final_tab == Tab.UPDATE:
             result = self.tab2.get_inputs()
-            if result is not None: return (TAB2, result)
+            if result is not None: return (Tab.UPDATE, result)
 
         return None
 
 
     # Record which tab produced the inputs and accept the dialog to close it.
-    def _submit(self, tab: int) -> None:
+    def _submit(self, tab: Tab) -> None:
         self.final_tab = tab
         self.accept()
 

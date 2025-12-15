@@ -22,9 +22,8 @@ from utils.style import (
     LABEL_HEAD_STYLE, SCROLL_BAR_STYLE, TEXT_BOX_STYLE
 )
 from utils.typing import (
-    TAB1,
     LABEL_RANDOM_STATE, LABEL_N_COMPONENTS, LABEL_THRESHOLD,
-    GestureInput, ModelParameters
+    GestureInput, ModelParameters, Tab
 )
 from utils.ui import (
     spacedv, blank_line,
@@ -59,7 +58,7 @@ class Tab1:
             parent: QDialog,
             parent_layout: QWidget,
             input_names: Tuple[str, ...],
-            submit: Callable[[int], None],
+            submit: Callable[[Tab], None],
             cancel: Callable[[], None]
         ) -> None:
 
@@ -298,7 +297,7 @@ class Tab1:
             file_sources = tuple(self._input_names[i] for i in source_ids)
         )
 
-        self._submit(TAB1) # close the window with success return
+        self._submit(Tab.CREATE) # close the window with success return
 
 
     #- Public Calls --------------------------------------------------------------------------------

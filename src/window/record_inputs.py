@@ -17,13 +17,7 @@ from utils.ui import create_button
 from utils.style import (
     BACKGROUND_COLOR, FONT_COLOR,
 )
-from utils.typing import (
-    RECORD_ACTION_STOP,
-    RECORD_ACTION_START,
-    RECORD_ACTION_DISCARD,
-    RECORD_ACTION_RESTART,
-    RECORD_ACTION_TERMINATE
-)
+from utils.typing import RecordAction
 
 
 #- Window Class ------------------------------------------------------------------------------------
@@ -32,7 +26,11 @@ from utils.typing import (
 class RecordInputs(QDialog):
 
     # Initialise dialog UI and recording state, pass callbacks to record controller.
-    def __init__(self, total_recordings: int, record_function: Callable[[int], None]) -> None:
+    def __init__(
+        self,
+        total_recordings: int,
+        record_function: Callable[[RecordAction], None]
+    ) -> None:
         super().__init__()
         self.setWindowTitle("Record Gestures")
         self.setFixedSize(300, 150)
@@ -71,13 +69,13 @@ class RecordInputs(QDialog):
                 f"Deleted recording {self._recording_counter-1} of {self._total_recordings}"
             )
             self._recording_counter -= 1
-            self._call(RECORD_ACTION_DISCARD)
+            self._call(RecordAction.DISCARD)
 
         elif button_title == "Restart":
-            self._call(RECORD_ACTION_RESTART)
+            self._call(RecordAction.RESTART)
 
         else:
-            self._call(RECORD_ACTION_TERMINATE)
+            self._call(RecordAction.TERMINATE)
             self.reject()
 
 
@@ -100,7 +98,7 @@ class RecordInputs(QDialog):
                 self._start_stop_button.setText("Continue")
                 self._text_label.setText(f"Recorded {self._total_recordings} readings")
 
-            self._call(RECORD_ACTION_STOP)
+            self._call(RecordAction.STOP)
 
         else:
             self._recording = True
@@ -108,7 +106,7 @@ class RecordInputs(QDialog):
             self._start_stop_button.setText("Stop")
             self._text_label.setText(
                 f"Recording: {self._recording_counter} of {self._total_recordings}")
-            self._call(RECORD_ACTION_START)
+            self._call(RecordAction.START)
 
     #- Keyboard Shortcut Override ------------------------------------------------------------------
 

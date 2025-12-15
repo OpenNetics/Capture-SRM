@@ -3,10 +3,10 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
+from enum import Enum
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
-from sklearn.mixture import GaussianMixture
 from redwrenlib.utils import defaults
 from redwrenlib.typing import (
     float2d_t, float3d_t
@@ -15,15 +15,18 @@ from redwrenlib.typing import (
 
 #- Constants ---------------------------------------------------------------------------------------
 
-RECORD_ACTION_STOP: int = 0
-RECORD_ACTION_START: int = 1
-RECORD_ACTION_DISCARD: int = 2
-RECORD_ACTION_RESTART: int = 3
-RECORD_ACTION_TERMINATE: int = 4
+class RecordAction(Enum):
+    STOP = 0
+    START = 1
+    DISCARD = 2
+    RESTART = 3
+    TERMINATE = 4
 
-TAB1: int = 1
-TAB2: int = 2
-TAB3: int = 3
+class Tab(Enum):
+    NONE = 0
+    CREATE = 1
+    UPDATE = 2
+    TEST = 3
 
 LABEL_RANDOM_STATE: str = "Random State"
 LABEL_N_COMPONENTS: str = "n Components"
