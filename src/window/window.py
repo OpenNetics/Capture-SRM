@@ -156,21 +156,29 @@ class GestureTracker(QWidget):
         self._layout.addLayout(self._legend_layout)
 
         #========================================
-        # port refresh button
-        #========================================
-        connection_refresh_button = create_button(
-            "Refresh", "Reflesh port list", self._button_refresh_connections)
-        self._legend_layout.addWidget(connection_refresh_button)
-
-        #========================================
         # port list
         #========================================
         self._connection_list = QComboBox()
-        self._connection_list.addItems(["<SELECT>"] + connected_ports())
+        self._connection_list.addItems(["<SELECT>"])
         self._connection_list.setToolTip("Select Connection Port")
         self._connection_list.setStyleSheet(COMBOBOX_STYLE)
-        self._connection_list.currentTextChanged.connect(select_port)
         self._legend_layout.addWidget(self._connection_list)
+
+        # refresh port list everytime the list is clicked
+        def _dynamic_port_list(event):
+            self._connection_list.clear() # remove old values
+            self._connection_list.addItems(["<SELECT>"] + connected_ports())
+            QComboBox.mousePressEvent(self._connection_list, event)
+
+        self._connection_list.mousePressEvent = lambda event: _dynamic_port_list(event)
+
+        # resize component to fit text size
+        def _dynamic_port_select(option: str):
+            width = 150 + len(option) * 1.5
+            self._connection_list.setStyleSheet(COMBOBOX_STYLE + f"QComboBox {{width: {width}px;}}")
+            select_port(option)
+
+        self._connection_list.currentTextChanged.connect(_dynamic_port_select)
 
         #========================================
         # baud rate list
@@ -370,12 +378,6 @@ class GestureTracker(QWidget):
         else: # == RecordAction.TERMINATE
             self._records_stamps = []
             self._plot_widget.setBackground(BACKGROUND_COLOR)
-
-
-    # Refresh the list of available serial connection ports in the combobox.
-    def _button_refresh_connections(self) -> None:
-        self._connection_list.clear() # remove old values
-        self._connection_list.addItems(["<SELECT>"] + connected_ports())
 
 
     #- Public Calls --------------------------------------------------------------------------------
