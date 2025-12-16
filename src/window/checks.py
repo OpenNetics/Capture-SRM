@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Optional, Tuple, TypeVar, Type
+from typing import Optional, TypeVar, Type
 
 from utils.ui import alert_box
 
@@ -43,7 +43,7 @@ def check_string_numeric(
 
 
 # Ensure that the provided list of source names are unique; pop up an alert on failure.
-def check_sources_name(sources: Tuple[str, ...]) -> bool:
+def check_sources_name(sources: tuple[str, ...]) -> bool:
     result: bool = len(sources) == len(set(sources))
     if not result:
         alert_box("Error", "Make sure all sources have unique names")

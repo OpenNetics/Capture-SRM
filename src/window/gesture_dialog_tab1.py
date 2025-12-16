@@ -4,7 +4,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Optional
 
 from redwrenlib.utils import defaults
 from PySide6.QtCore import Qt
@@ -57,7 +57,7 @@ class Tab1:
             self,
             parent: QDialog,
             parent_layout: QWidget,
-            input_names: Tuple[str, ...],
+            input_names: tuple[str, ...],
             submit: Callable[[Tab], None],
             cancel: Callable[[], None]
         ) -> None:
@@ -70,7 +70,7 @@ class Tab1:
         self._cancel = cancel
         self._input_names = input_names
 
-        self._params_labels: Dict[str, ModelParametersLabels] = {}
+        self._params_labels: dict[str, ModelParametersLabels] = {}
 
         #========================================
         # master Layout
@@ -254,8 +254,8 @@ class Tab1:
         #========================================
         # checked checkboxes and their values
         #========================================
-        source_ids: List[int] = []
-        params: List[ModelParameters] = []
+        source_ids: list[int] = []
+        params: list[ModelParameters] = []
 
         # Break if any model parameter value isn't valid
         for i, label in enumerate(self._params_labels.keys()):

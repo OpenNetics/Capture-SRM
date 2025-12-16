@@ -3,7 +3,6 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List
 from threading import Thread
 
 import numpy as np
@@ -19,12 +18,12 @@ from utils.typing import (
 
 #- Private Methods ---------------------------------------------------------------------------------
 
-def _create_model(data: float3d_t, random_state: int, n_components: int ) -> List[GaussianMixture]:
+def _create_model(data: float3d_t, random_state: int, n_components: int ) -> list[GaussianMixture]:
     # creates a numpy list of arrays from the data iterable of only non-empty arrays
-    train_traces: List[NDArray[np.float64]] = [np.array(t) for t in data if len(t) > 0]
+    train_traces: list[NDArray[np.float64]] = [np.array(t) for t in data if len(t) > 0]
 
     # create models
-    gmm_models: List[GaussianMixture] = []
+    gmm_models: list[GaussianMixture] = []
     for trace in train_traces:
         gmm = GaussianMixture(n_components=n_components, random_state=random_state)
         gmm.fit(trace)

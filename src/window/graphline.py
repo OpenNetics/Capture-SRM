@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List, Tuple, Optional
+from typing import Optional
 
 from utils.ui import EditLabel
 
@@ -15,20 +15,20 @@ class GraphLine:
 
     # Initialise a GraphLine with initial readings, color tuple and an editable title widget.
     def __init__(
-        self, reading: List[float], color: Tuple[int, int, int], title: EditLabel
+        self, reading: list[float], color: tuple[int, int, int], title: EditLabel
     ) -> None:
-        self.__reading: List[float] = reading
-        self.__color: Tuple[int, int, int] = color
+        self.__reading: list[float] = reading
+        self.__color: tuple[int, int, int] = color
         self.__title: EditLabel = title
 
 
     # Return a slice of the stored readings between start_idx and end_idx.
-    def reading(self, start_idx: int = 0, end_idx: Optional[int] = None) -> List[float]:
+    def reading(self, start_idx: int = 0, end_idx: Optional[int] = None) -> list[float]:
         return self.__reading[start_idx:end_idx]
 
 
     # Return the color tuple used to render this graph line.
-    def color(self) -> Tuple[int, int, int]:
+    def color(self) -> tuple[int, int, int]:
         return self.__color
 
 

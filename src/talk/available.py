@@ -3,15 +3,13 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import List
-
 import serial.tools.list_ports
 
 
 
 #- Declarations ------------------------------------------------------------------------------------
 
-def baud_rates() -> List[str]:
+def baud_rates() -> list[str]:
     return [
         "1200", "2400", "4800", "9600",
         "14400", "19200", "38400", "57600",
@@ -19,7 +17,7 @@ def baud_rates() -> List[str]:
     ]
 
 
-def connected_ports() -> List[str]:
+def connected_ports() -> list[str]:
     ports = serial.tools.list_ports.comports()
     return [port.device for port in ports]
 

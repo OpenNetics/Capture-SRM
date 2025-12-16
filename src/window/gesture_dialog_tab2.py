@@ -4,7 +4,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Optional
 
 from redwrenlib import GestureFile
 from redwrenlib.utils.debug import alert
@@ -57,7 +57,7 @@ class Tab2:
             self,
             parent: QDialog,
             parent_layout: QWidget,
-            input_names: Tuple[str, ...],
+            input_names: tuple[str, ...],
             submit: Callable[[Tab], None],
             cancel: Callable[[], None],
         ) -> None:
@@ -193,7 +193,7 @@ class Tab2:
         label.setStyleSheet(LABEL_HEAD_STYLE)
         self._body_layout.addWidget(label)
 
-        self._drop_boxes: Dict[str, ReadModelData] = {}
+        self._drop_boxes: dict[str, ReadModelData] = {}
         read_data = self._gesture_data.get_gesture_data()
 
         for model_name in read_data.keys():
@@ -277,9 +277,9 @@ class Tab2:
         #========================================
         # checked checkboxes and their values
         #========================================
-        file_sources: List[str] = []
-        source_ids: List[int] = []
-        params: List[ModelParameters] = []
+        file_sources: list[str] = []
+        source_ids: list[int] = []
+        params: list[ModelParameters] = []
 
         # Break if any model parameter value isn't valid
         for label in self._drop_boxes.keys():

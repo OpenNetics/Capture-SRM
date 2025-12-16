@@ -5,7 +5,6 @@
 
 from enum import Enum
 from dataclasses import dataclass, field
-from typing import List, Tuple
 
 from redwrenlib.utils import defaults
 from redwrenlib.typing import (
@@ -41,7 +40,7 @@ class SensorValues:
     label: str
     values: float3d_t = field(default_factory=list)
 
-    def AddValues(self, counter: List[float], readings: List[float]) -> None:
+    def AddValues(self, counter: list[float], readings: list[float]) -> None:
         read_values: float2d_t = [[x, y] for x, y in zip(counter, readings)]
         self.values.append(read_values)
 
@@ -59,13 +58,13 @@ class ModelParameters:
 class GestureInput:
     filename: str
     repeats: int
-    source_ids: Tuple[int, ...]
-    parameters: Tuple[ModelParameters, ...]
-    file_sources: Tuple[str, ...] = ()
+    source_ids: tuple[int, ...]
+    parameters: tuple[ModelParameters, ...]
+    file_sources: tuple[str, ...] = ()
 
 
 #- Aliases -----------------------------------------------------------------------------------------
 
-sensor_values_t = List[SensorValues]
-model_parameters_t = Tuple[ModelParameters, ...]
+sensor_values_t = list[SensorValues]
+model_parameters_t = tuple[ModelParameters, ...]
 

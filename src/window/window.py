@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
@@ -68,8 +68,8 @@ class GestureTracker(QWidget):
         #========================================
         # class vars with their init values
         #========================================
-        self._graphlines: List[GraphLine] = []
-        self._counter: List[float] = [0]
+        self._graphlines: list[GraphLine] = []
+        self._counter: list[float] = [0]
         self._toggle_recent: int = 0
         self._freeze: bool = False
 
@@ -276,7 +276,7 @@ class GestureTracker(QWidget):
         # sensor/source names
         #========================================
         # get all the set names from the graph footer EditLabels
-        source_names: Tuple[str, ...] = tuple([source.text() for source in self._graphlines])
+        source_names: tuple[str, ...] = tuple([source.text() for source in self._graphlines])
 
         # ensure all sensors have unique names
         if not check_sources_name(source_names): return
@@ -381,7 +381,7 @@ class GestureTracker(QWidget):
     #- Public Calls --------------------------------------------------------------------------------
 
     # Append new sensor values to internal buffers and create graph lines as needed.
-    def add_data(self, values: List[Any]) -> None:
+    def add_data(self, values: list[Any]) -> None:
         # add data to the raw data area
         self._data_display.append(str(values))
         self._counter.append(self._counter[-1] + 1)
@@ -398,7 +398,7 @@ class GestureTracker(QWidget):
                 #========================================
                 # draw the line
                 #========================================
-                colors: Tuple[int, int, int] = new_color()
+                colors: tuple[int, int, int] = new_color()
                 text_label = EditLabel(f"source{i+1}", colors)
 
                 new_line: GraphLine = GraphLine(

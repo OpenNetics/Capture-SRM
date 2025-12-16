@@ -3,7 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-from typing import Any, Callable, Tuple
+from typing import Any, Callable
 
 from redwrenlib.utils.debug import alert
 from PySide6.QtWidgets import (
@@ -85,7 +85,7 @@ def clear_layout(layout: QLayout) -> None:
 class EditLabel():
 
     # Initialise EditLabel with given text and set up auto-resize behaviour.
-    def __init__(self, label: str, colors: Tuple[int, int, int]) -> None:
+    def __init__(self, label: str, colors: tuple[int, int, int]) -> None:
         self._text_input = QLineEdit()
         self._text_input.setStyleSheet(
             TEXT_BOX_STYLE + f"color: rgb({colors[0]}, {colors[1]}, {colors[2]});"

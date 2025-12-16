@@ -4,7 +4,7 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Optional
 
 from redwrenlib import GestureFile
 from redwrenlib.utils.debug import alert
@@ -43,7 +43,7 @@ class Tab3(Tab2):
             self,
             parent: QDialog,
             parent_layout: QWidget,
-            input_names: Tuple[str, ...],
+            input_names: tuple[str, ...],
             submit: Callable[[Tab], None],
             cancel: Callable[[], None],
         ) -> None:
