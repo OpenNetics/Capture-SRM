@@ -4,13 +4,14 @@
 #- Imports -----------------------------------------------------------------------------------------
 
 from typing import Any
+from datetime import datetime
 
 import pyqtgraph as pg
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QKeyEvent
+from PySide6.QtGui import QKeyEvent, QFont
 from PySide6.QtWidgets import (
     QDialog, QWidget, QFrame,
-    QComboBox, QFileDialog, QLabel, QMessageBox, QTextEdit, QSlider,
+    QComboBox, QFileDialog, QLabel, QMessageBox, QTextEdit, QSlider, QLineEdit,
     QHBoxLayout, QVBoxLayout, QScrollArea,
 )
 from redwrenlib.typing import int2d_t
@@ -24,9 +25,9 @@ from utils.ui import (
 )
 from utils.style import (
     APPLICATION_NAME,
-    BACKGROUND_COLOR, BACKGROUND_HIGHLIGHT_COLOR,
+    BACKGROUND_COLOR, BACKGROUND_HIGHLIGHT_COLOR, ACCENT_COLOR,
     WINDOW_SIZE, GRAPH_HEIGHT, ZOOM_SLIDER_WIDTH,
-    RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE, LABEL_BODY_STYLE,
+    RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE, LABEL_BODY_STYLE, TEXT_BOX_STYLE,
 )
 from utils.typing import (
     SensorValues, RecordAction, Tab,
@@ -80,6 +81,7 @@ class GestureTracker(QWidget):
         self._init_graph_plot()
         self._init_graph_footer()
         self._init_raw_data()
+        self._init_serial_writer()
 
 
     #- Private: Initialise Components --------------------------------------------------------------
@@ -208,13 +210,33 @@ class GestureTracker(QWidget):
         self._data_display.setStyleSheet(RAW_VALUE_BOX_STYLE)
         self._data_display.setReadOnly(True)
 
+        monospaced_font = QFont("Courier New", 15)
+        self._data_display.setFont(monospaced_font)
+
         self._scroll_area_layout.addWidget(self._data_display)
         self._scroll_area.setWidget(self._scroll_area_content)
 
         self._layout.addWidget(self._scroll_area)
 
 
-    #- Private: Sensor Data ------------------------------------------------------------------------
+    # Text box to write serial data
+    def _init_serial_writer(self) -> None:
+        serial_write = QLineEdit()
+        serial_write.setPlaceholderText("Serial Write")
+        serial_write.setToolTip("Enable/Disable different components based on return commands")
+        serial_write.setStyleSheet(TEXT_BOX_STYLE + "margin: 0 12%;")
+        self._layout.addWidget(serial_write)
+
+        def handle_return_pressed():
+            self._append_data(
+                f'<span style="color: {ACCENT_COLOR};">{serial_write.text()}</span>'
+            )
+            serial_write.clear() # clear the QLineEdit
+
+        serial_write.returnPressed.connect(handle_return_pressed)
+
+
+    #- Private Methods -----------------------------------------------------------------------------
 
     # Update the plot from graphlines unless the UI is frozen.
     def _update_plot(self) -> None:
@@ -230,6 +252,42 @@ class GestureTracker(QWidget):
             )
 
             self._plot_widget.addItem(sliced_line)
+
+
+    # Add data to the raw data box with current time
+    def _append_data(self, data: Any) -> None:
+        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]  # slice to get milliseconds
+
+        self._data_display.append(
+            f'<span style="color: {ACCENT_COLOR};">{timestamp}</span>  {data}'
+        )
+
+
+    # Record control callback implementing start/stop/discard/restart semantics.
+    def _record_data(self, action: RecordAction) -> None:
+        # create a new timestamp- add start point
+        if action == RecordAction.START:
+            self._records_stamps.append([len(self._counter)])
+            self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
+
+        # add end point for last created timestamp
+        elif action == RecordAction.STOP:
+            self._records_stamps[-1].append(len(self._counter))
+            self._plot_widget.setBackground(BACKGROUND_COLOR)
+
+        # delete the last timestamp
+        elif action == RecordAction.DISCARD:
+            self._records_stamps.pop()
+            self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
+
+        # reset the start point for the current timestamp to current counter value
+        elif action == RecordAction.RESTART:
+            self._records_stamps[-1][0] = len(self._counter)
+
+        # empty the record, clear all timestamps
+        else: # == RecordAction.TERMINATE
+            self._records_stamps = []
+            self._plot_widget.setBackground(BACKGROUND_COLOR)
 
 
     #- Private: Button Actions ---------------------------------------------------------------------
@@ -353,39 +411,12 @@ class GestureTracker(QWidget):
         analyse_method(dialog_inputs.filename, analyse_data, dialog_inputs.parameters)
 
 
-    # Record control callback implementing start/stop/discard/restart semantics.
-    def _record_data(self, action: RecordAction) -> None:
-        # create a new timestamp- add start point
-        if action == RecordAction.START:
-            self._records_stamps.append([len(self._counter)])
-            self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
-
-        # add end point for last created timestamp
-        elif action == RecordAction.STOP:
-            self._records_stamps[-1].append(len(self._counter))
-            self._plot_widget.setBackground(BACKGROUND_COLOR)
-
-        # delete the last timestamp
-        elif action == RecordAction.DISCARD:
-            self._records_stamps.pop()
-            self._plot_widget.setBackground(BACKGROUND_HIGHLIGHT_COLOR)
-
-        # reset the start point for the current timestamp to current counter value
-        elif action == RecordAction.RESTART:
-            self._records_stamps[-1][0] = len(self._counter)
-
-        # empty the record, clear all timestamps
-        else: # == RecordAction.TERMINATE
-            self._records_stamps = []
-            self._plot_widget.setBackground(BACKGROUND_COLOR)
-
-
     #- Public Calls --------------------------------------------------------------------------------
 
     # Append new sensor values to internal buffers and create graph lines as needed.
     def add_data(self, values: list[Any]) -> None:
         # add data to the raw data area
-        self._data_display.append(str(values))
+        self._append_data(values)
         self._counter.append(self._counter[-1] + 1)
 
         # clear old data and add new lines
