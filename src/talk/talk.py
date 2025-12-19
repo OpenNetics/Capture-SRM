@@ -21,7 +21,7 @@ class Talk:
         self.signals = TalkSignals()
 
         self._port: str = ""
-        self._baudrate: int = 9600  # default rate
+        self._baudrate: int = 115200  # default rate
 
         self._serial_connection: Optional[serial.Serial] = None
         self._thread: Optional[threading.Thread] = None
