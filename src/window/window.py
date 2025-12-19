@@ -20,21 +20,15 @@ from redwrenlib.utils.debug import alert
 
 from analyse import analyse_create, analyse_update
 from talk import Talk, all_ports, BAUDRATES
-from utils.extra import new_color, datestring, parse_string_list
-from utils.ui import (
-    EditLabel,
-    spacedh, create_button,
-)
+from utils.extra import datestring, parse_string_list
+from utils.ui import spacedh, create_button
 from utils.style import (
     APPLICATION_NAME,
     BACKGROUND_COLOR, BACKGROUND_HIGHLIGHT_COLOR, ACCENT_COLOR,
     WINDOW_SIZE, GRAPH_HEIGHT, ZOOM_SLIDER_WIDTH,
     RAW_VALUE_BOX_STYLE, COMBOBOX_STYLE, SCROLL_BAR_STYLE, LABEL_BODY_STYLE, TEXT_BOX_STYLE,
 )
-from utils.typing import (
-    SensorValues, RecordAction, Tab,
-    sensor_values_t,
-)
+from utils.typing import SensorValues, RecordAction, Tab, sensor_values_t
 
 from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs
@@ -356,7 +350,7 @@ class GestureTracker(QWidget):
         # sensor/source names
         #========================================
         # get all the set names from the graph footer EditLabels
-        source_names: tuple[str, ...] = tuple([source.text() for source in self._graphlines])
+        source_names: tuple[str, ...] = tuple([source.text for source in self._graphlines])
 
         # ensure all sensors have unique names
         if not check_sources_name(source_names): return
@@ -446,13 +440,9 @@ class GestureTracker(QWidget):
                 #========================================
                 # draw the line
                 #========================================
-                colors: tuple[int, int, int] = new_color()
-                text_label = EditLabel(f"source{i+1}", colors)
-
                 new_line: GraphLine = GraphLine(
-                    reading=[value] * len(self._counter),
-                    color=colors,
-                    title=text_label
+                    reading = [value] * len(self._counter),
+                    title   = f"source{i+1}"
                 )
 
                 self._graphlines.append(new_line)
@@ -460,15 +450,9 @@ class GestureTracker(QWidget):
                 #========================================
                 # draw legend
                 #========================================
-                square = QLabel()
-                square.setFixedSize(QSize(5, 20))
-                square.setStyleSheet(
-                    f"background-color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
-                )
-
                 h_layout = QHBoxLayout()
-                h_layout.addWidget(square)
-                h_layout.addWidget(text_label.obj())
+                h_layout.addWidget(new_line.legend)
+                h_layout.addWidget(new_line.title)
 
                 self._legend_layout.addLayout(h_layout)
 
