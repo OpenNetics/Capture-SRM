@@ -7,7 +7,7 @@ from typing import Any
 from datetime import datetime
 
 import pyqtgraph as pg
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtCore import Qt, QSize, Slot
 from PySide6.QtGui import QKeyEvent, QFont
 from PySide6.QtWidgets import (
     QDialog, QWidget, QFrame,
@@ -18,7 +18,8 @@ from redwrenlib.typing import int2d_t
 from redwrenlib.utils.debug import alert
 
 from analyse import analyse_create, analyse_update
-from utils.extra import new_color, datestring
+from talk import Talk, all_ports, BAUDRATES
+from utils.extra import new_color, datestring, parse_string_list
 from utils.ui import (
     EditLabel,
     spacedh, create_button,
@@ -33,10 +34,6 @@ from utils.typing import (
     SensorValues, RecordAction, Tab,
     sensor_values_t,
 )
-from talk import (
-    select_port, select_baud_rate,
-    baud_rates, connected_ports
-)
 
 from .gesture_dialog import GestureDialog
 from .record_inputs import RecordInputs
@@ -50,7 +47,7 @@ from .checks import check_sources_name
 class GestureTracker(QWidget):
 
     # Initialise the main window, state variables and build UI components.
-    def __init__(self) -> None:
+    def __init__(self, talk: Talk) -> None:
         super().__init__()
 
         #========================================
@@ -73,6 +70,14 @@ class GestureTracker(QWidget):
         self._counter: list[float] = [0]
         self._toggle_recent: int = 0
         self._freeze: bool = False
+        self._print_time = True
+
+        #========================================
+        # class vars with their init values
+        #========================================
+        self._talk = talk
+        self._talk.signals.line_received.connect(self._add_data)
+        self._talk.signals.single_received.connect(self._add_to_raw)
 
         #========================================
         # initialise the system
@@ -169,7 +174,7 @@ class GestureTracker(QWidget):
         # refresh port list everytime the list is clicked
         def _dynamic_port_list(event):
             self._connection_list.clear() # remove old values
-            self._connection_list.addItems(["<SELECT>"] + connected_ports())
+            self._connection_list.addItems(["<SELECT>"] + all_ports())
             QComboBox.mousePressEvent(self._connection_list, event)
 
         self._connection_list.mousePressEvent = lambda event: _dynamic_port_list(event)
@@ -178,7 +183,9 @@ class GestureTracker(QWidget):
         def _dynamic_port_select(option: str):
             width = 150 + len(option) * 1.5
             self._connection_list.setStyleSheet(COMBOBOX_STYLE + f"QComboBox {{width: {width}px;}}")
-            select_port(option)
+            if option not in  ["", "<SELECT>", self._talk.port]:
+                self._clear_button.click() # clear existing data when switching source
+                self._talk.port = option
 
         self._connection_list.currentTextChanged.connect(_dynamic_port_select)
 
@@ -186,12 +193,16 @@ class GestureTracker(QWidget):
         # baud rate list
         #========================================
         self._baud_rate_list = QComboBox()
-        self._baud_rate_list.addItems(baud_rates())
+        self._baud_rate_list.addItems(BAUDRATES)
         self._baud_rate_list.setToolTip("Select Baud Rate")
         self._baud_rate_list.setCurrentText("115200")
         self._baud_rate_list.setStyleSheet(COMBOBOX_STYLE)
-        self._baud_rate_list.currentTextChanged.connect(select_baud_rate)
         self._legend_layout.addWidget(self._baud_rate_list)
+
+        def _set_baudrate(value: str):
+            self._talk.baudrate = value
+
+        self._baud_rate_list.currentTextChanged.connect(_set_baudrate)
 
         spacedh(self._legend_layout)
 
@@ -228,7 +239,7 @@ class GestureTracker(QWidget):
         self._layout.addWidget(serial_write)
 
         def handle_return_pressed():
-            self._append_data(
+            self._append_timed_data(
                 f'<span style="color: {ACCENT_COLOR};">{serial_write.text()}</span>'
             )
             serial_write.clear() # clear the QLineEdit
@@ -255,7 +266,7 @@ class GestureTracker(QWidget):
 
 
     # Add data to the raw data box with current time
-    def _append_data(self, data: Any) -> None:
+    def _append_timed_data(self, data: Any = "") -> None:
         timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]  # slice to get milliseconds
 
         self._data_display.append(
@@ -290,7 +301,7 @@ class GestureTracker(QWidget):
             self._plot_widget.setBackground(BACKGROUND_COLOR)
 
 
-    #- Private: Button Actions ---------------------------------------------------------------------
+    #- Button Actions ------------------------------------------------------------------------------
 
     def _zoom_value(self, value: int):
         value *= 5
@@ -411,13 +422,14 @@ class GestureTracker(QWidget):
         analyse_method(dialog_inputs.filename, analyse_data, dialog_inputs.parameters)
 
 
-    #- Public Calls --------------------------------------------------------------------------------
+    #- Add data ------------------------------------------------------------------------------------
 
     # Append new sensor values to internal buffers and create graph lines as needed.
-    def add_data(self, values: list[Any]) -> None:
-        # add data to the raw data area
-        self._append_data(values)
+    @Slot(str)
+    def _add_data(self, values_str: str) -> None:
         self._counter.append(self._counter[-1] + 1)
+
+        values = parse_string_list(values_str)
 
         # clear old data and add new lines
         for i, value in enumerate(values):
@@ -465,6 +477,17 @@ class GestureTracker(QWidget):
                 graphline.add_reading(value)
 
         self._update_plot()
+
+
+    @Slot(str)
+    def _add_to_raw(self, data: str):
+        if self._print_time: self._append_timed_data()
+
+        if data == "\r":
+            self._print_time = True
+        else:
+            self._print_time = False
+            self._data_display.insertPlainText(data)
 
 
     #- Keyboard Shortcut Override ------------------------------------------------------------------

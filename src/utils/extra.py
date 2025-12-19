@@ -1,6 +1,11 @@
 
 # utils/extra.py
 
+#- Imports -----------------------------------------------------------------------------------------
+
+from typing import Any
+
+
 #- Lib ---------------------------------------------------------------------------------------------
 
 # Return a random RGB color tuple used for new graph lines.
@@ -22,4 +27,19 @@ def datestring() -> str:
     from datetime import datetime
     now = datetime.now()
     return now.strftime(f"%m-%d-%H%M")
+
+
+# Return a list for "12,324,34,foo,11,bar" string
+def parse_string_list(string: str) -> list[Any]:
+    result: list[Any] = []
+
+    for element in string.split(','): # split the string by commas
+        try:
+            num = float(element) # convert to float first, will handle integers as well
+            result.append(num)
+
+        except ValueError:
+            result.append(element.strip('"'))
+
+    return result
 
