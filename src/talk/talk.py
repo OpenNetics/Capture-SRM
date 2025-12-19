@@ -17,6 +17,7 @@ from .talk_signal import TalkSignals
 
 class Talk:
 
+    # Initialises the Talk class, setting up signals and default serial parameters.
     def __init__(self):
         self.signals = TalkSignals()
 
@@ -30,9 +31,12 @@ class Talk:
 
     #- Getter/Setter -------------------------------------------------------------------------------
 
+    # Returns the current serial port.
     @property
     def port(self) -> str: return self._port
 
+
+    # Sets the serial port and restarts the connection if valid.
     @port.setter
     def port(self, port: str) -> None:
         self._cleanup() # safely close the existing connection
@@ -44,9 +48,13 @@ class Talk:
 
         alert(f"Invalid port selected: {port}")
 
+
+    # Returns the current baudrate.
     @property
     def baudrate(self) -> int: return self._baudrate
 
+
+    # Sets the baudrate and restarts the connection if valid.
     @baudrate.setter
     def baudrate(self, rate: str) -> None:
         self._cleanup()
@@ -61,6 +69,7 @@ class Talk:
 
     #- Private Methods -----------------------------------------------------------------------------
 
+    # Continuously reads data from the serial connection and emits signals for received data.
     def _read_loop(self):
         data_buffer = bytearray()
 
@@ -87,16 +96,15 @@ class Talk:
 
                 # ignore the error: otherwise prints logs for if invalid baudrate is selected among
                 # other errors
-                pass 
-
+                pass
 
         self._cleanup()
 
 
-
+    # Safely closes the serial connection and cleans up resources.
     def _cleanup(self):
         if self._serial_connection:
-            try: 
+            try:
                 if self._serial_connection.is_open: self._serial_connection.close()
 
             except Exception: pass
@@ -104,6 +112,7 @@ class Talk:
             self._serial_connection = None
 
 
+    # Stops the current read loop and restarts the connection with updated settings.
     def _restart_connection(self):
         # stop read loop and wait
         self._running = False
@@ -115,6 +124,7 @@ class Talk:
 
     #- Public Methods ------------------------------------------------------------------------------
 
+    # Initialises the serial connection and starts the reading thread.
     def start(self) -> None:
         if not self._port: return
 
@@ -134,6 +144,7 @@ class Talk:
         self._thread.start()
 
 
+    # Sends data through the serial connection if it is open.
     def write(self, data: bytes) -> None:
         if not self._serial_connection or not self._serial_connection.is_open:
             raise RuntimeError("Serial port is not open")
@@ -141,40 +152,10 @@ class Talk:
         self._serial_connection.write(data)
 
 
+    # Stops the reading loop and cleans up resources.
     def stop(self) -> None:
         self._running = False
         if self._thread: self._thread.join(timeout=2.0)
 
         self._cleanup()
 
-
-#===================================================================================================
-#===================================================================================================
-#===================================================================================================
-
-
-if __name__ == "__main__":
-    import time
-    def handle_single(single_byte: bytes): print(single_byte, end="")
-    def handle_line(byte_array: bytes): alert(byte_array)
-
-    reader = Talk(handle_line, handle_single)
-    try:
-        reader.start()
-        #reader.port = "/dev/cu.notvalid"
-        #time.sleep(2)
-
-        #reader.port = "/dev/cu.againnotvalid"
-        #time.sleep(2)
-
-        reader.port = "/dev/cu.usbmodem11201" # valid
-        #time.sleep(5)
-
-        #reader.port = "/dev/cu.usbem11201"
-        while True: time.sleep(10)
-
-    except KeyboardInterrupt:
-        print("Stopping...")
-
-    finally:
-        reader.stop()
