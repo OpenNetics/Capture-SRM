@@ -28,9 +28,9 @@ from utils.typing import(
 )
 from utils.ui import (
     spacedv, blank_line, create_button,
-    LabelledText,
 )
 
+from .labelled_text import LabelledText
 from .checks import check_string_numeric
 
 

@@ -9,7 +9,7 @@ from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QLabel, QLineEdit
 
 from utils.extra import new_color
-from utils.ui import EditLabel
+from .edit_label import EditLabel
 
 
 #- GraphLine class ---------------------------------------------------------------------------------
@@ -39,12 +39,12 @@ class GraphLine:
 
     # Return the QLineEdit object for the current line.
     @property
-    def title(self) -> QLineEdit: return self.__title.obj()
+    def title(self) -> QLineEdit: return self.__title.object
 
 
     # Return the text of the title widget for this line.
     @property
-    def text(self) -> str: return self.__title.obj().text()
+    def text(self) -> str: return self.__title.object.text()
 
 
     #- Public Methods ------------------------------------------------------------------------------

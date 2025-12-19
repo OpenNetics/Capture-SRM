@@ -28,9 +28,9 @@ from utils.typing import(
 )
 from utils.ui import (
     spacedv, blank_line, create_button,
-    LabelledText,
 )
 
+from .labelled_text import LabelledText
 from .gesture_dialog_tab2 import Tab2
 
 #- Tab Class ---------------------------------------------------------------------------------------

@@ -7,14 +7,12 @@ from typing import Any, Callable
 
 from redwrenlib.utils.debug import alert
 from PySide6.QtWidgets import (
-    QLabel, QLineEdit, QMessageBox, QPushButton, QSpacerItem,
-    QBoxLayout, QHBoxLayout, QVBoxLayout, QLayout,
+    QLabel, QMessageBox, QPushButton, QSpacerItem,
+    QHBoxLayout, QVBoxLayout, QLayout,
     QSizePolicy,
 )
 
-from .style import (
-    BUTTON_STYLE, TEXT_BOX_STYLE, LABEL_BODY_STYLE,
-)
+from .style import BUTTON_STYLE
 
 
 #- Lib ---------------------------------------------------------------------------------------------
@@ -61,6 +59,8 @@ def alert_box(status: str, message: str) -> None:
     msg_box.setText(message)
     msg_box.exec_()
 
+
+# Delete all elemets in recursive from a layout.
 def clear_layout(layout: QLayout) -> None:
     while layout.count():
         item = layout.takeAt(0)
@@ -77,66 +77,4 @@ def clear_layout(layout: QLayout) -> None:
             clear_layout(child_layout)
             layout.removeItem(item)
             child_layout.deleteLater()
-
-
-#- Custom UI Elements ------------------------------------------------------------------------------
-
-# Simple editable label that auto-resizes to fit its text.
-class EditLabel():
-
-    # Initialise EditLabel with given text and set up auto-resize behaviour.
-    def __init__(self, label: str, colors: tuple[int, int, int]) -> None:
-        self._text_input = QLineEdit()
-        self._text_input.setStyleSheet(
-            TEXT_BOX_STYLE + f"color: rgb({colors[0]}, {colors[1]}, {colors[2]});"
-        )
-        self._text_input.textChanged.connect(self.adjust_width)
-        self._text_input.setText(label)
-
-
-    # Adjust the widget width to match the current text content (capped).
-    def adjust_width(self) -> None:
-        metrics = self._text_input.fontMetrics()
-        text_width = metrics.horizontalAdvance(self._text_input.text())
-        self._text_input.setFixedWidth(min(text_width + 25, 100))
-
-    def obj(self) -> QLineEdit:
-        return self._text_input
-
-
-# Textfield with label next to it.
-class LabelledText:
-
-    # Initialise LabelledText with a label and a textbox.
-    def __init__(
-        self, title: str, value: str, tip: str, parent_layout: QBoxLayout,
-        visible: bool = True
-    ) -> None:
-        layout = QHBoxLayout()
-
-        # label
-        self._text_label = QLabel(title)
-        self._text_label.setVisible(visible)
-        self._text_label.setStyleSheet(LABEL_BODY_STYLE)
-        layout.addWidget(self._text_label)
-
-        # text box
-        self._text_input = QLineEdit()
-        self._text_input.setVisible(visible)
-        self._text_input.setPlaceholderText(value)
-        self._text_input.setToolTip(tip)
-        self._text_input.setText(value)
-        self._text_input.setStyleSheet(TEXT_BOX_STYLE)
-        layout.addWidget(self._text_input)
-
-        parent_layout.addLayout(layout)
-
-    # Toggle visibility of the two components.
-    def visibility(self, visible: bool) -> None:
-        self._text_label.setVisible(visible)
-        self._text_input.setVisible(visible)
-
-    # Retrieve value of the text box.
-    def text(self) -> str:
-        return self._text_input.text()
 

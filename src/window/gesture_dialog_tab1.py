@@ -26,10 +26,10 @@ from utils.typing import (
     GestureInput, ModelParameters, Tab
 )
 from utils.ui import (
-    spacedv, blank_line,
-    create_button, LabelledText,
+    spacedv, blank_line, create_button
 )
 
+from .labelled_text import LabelledText
 from .checks import (
     check_empty_string,
     check_string_numeric,
