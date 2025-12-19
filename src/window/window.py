@@ -3,6 +3,7 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
+import time
 from typing import Any
 from datetime import datetime
 
@@ -71,6 +72,7 @@ class GestureTracker(QWidget):
         self._toggle_recent: int = 0
         self._freeze: bool = False
         self._print_time = True
+        self._start_time = time.time()
 
         #========================================
         # class vars with their init values
@@ -313,6 +315,7 @@ class GestureTracker(QWidget):
     # Clear all recorded data and reset view state.
     def _button_clear_data(self) -> None:
         self._counter = [0]
+        self._start_time = time.time()
         self._toggle_recent = 0
 
         for line in self._graphlines: line.reset_reading()
@@ -427,7 +430,7 @@ class GestureTracker(QWidget):
     # Append new sensor values to internal buffers and create graph lines as needed.
     @Slot(str)
     def _add_data(self, values_str: str) -> None:
-        self._counter.append(self._counter[-1] + 1)
+        self._counter.append(time.time() - self._start_time)
 
         values = parse_string_list(values_str)
 
