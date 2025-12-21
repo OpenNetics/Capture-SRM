@@ -8,7 +8,7 @@ from typing import Any
 from datetime import datetime
 
 import pyqtgraph as pg
-from PySide6.QtCore import Qt, QSize, Slot
+from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QKeyEvent, QFont
 from PySide6.QtWidgets import (
     QDialog, QWidget, QFrame,
@@ -252,6 +252,8 @@ class GestureTracker(QWidget):
         self._plot_widget.clear()   # clear old plots
 
         for line in self._graphlines:
+            if line.hidden: continue
+
             sliced_line = pg.PlotDataItem(
                 x = self._counter[self._toggle_recent:],
                 y = line.reading(self._toggle_recent),

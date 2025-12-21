@@ -9,9 +9,14 @@ from typing import Any
 #- Lib ---------------------------------------------------------------------------------------------
 
 # Return a random RGB color tuple used for new graph lines.
-def new_color() -> tuple[int, int, int]:
+def new_color() -> str:
     from random import randint
-    return (randint(0, 255), randint(60, 255), randint(0, 200))
+
+    r = randint(0, 255)
+    g = randint(60, 255)
+    b = randint(0, 200)
+
+    return f"#{r:02X}{g:02X}{b:02X}"
 
 
 # Return filepath for filename
