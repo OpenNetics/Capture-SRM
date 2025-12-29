@@ -6,8 +6,6 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from redwrenlib import GestureFile
-from redwrenlib.utils.debug import alert
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (

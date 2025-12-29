@@ -5,7 +5,7 @@
 
 from typing import Any, Callable
 
-from redwrenlib.utils.debug import alert
+from opennetics.utils.debug import alert
 from PySide6.QtWidgets import (
     QLabel, QMessageBox, QPushButton, QSpacerItem,
     QHBoxLayout, QVBoxLayout, QLayout,

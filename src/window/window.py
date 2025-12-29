@@ -15,8 +15,8 @@ from PySide6.QtWidgets import (
     QComboBox, QFileDialog, QLabel, QMessageBox, QTextEdit, QSlider, QLineEdit,
     QHBoxLayout, QVBoxLayout, QScrollArea,
 )
-from redwrenlib.typing import int2d_t
-from redwrenlib.utils.debug import alert
+from opennetics.typing import int2d_t
+from opennetics.utils.debug import alert
 
 from analyse import analyse_create, analyse_update
 from talk import Talk, all_ports, BAUDRATES

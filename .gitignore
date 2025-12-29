@@ -5,6 +5,6 @@
 **/todo
 **/*.ges
 
-.pyenv/
+.venv/
 __pycache__/
 

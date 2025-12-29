@@ -8,8 +8,8 @@ from threading import Thread
 import numpy as np
 from numpy.typing import NDArray
 from sklearn.mixture import GaussianMixture
-from redwrenlib import GestureFile
-from redwrenlib.typing import float3d_t
+from opennetics.file import GestureFile
+from opennetics.typing import float3d_t
 
 from utils.typing import (
     model_parameters_t, sensor_values_t

@@ -7,7 +7,7 @@ import threading
 from typing import Optional
 
 import serial
-from redwrenlib.utils.debug import alert
+from opennetics.utils.debug import alert
 
 from .utils import all_ports, BAUDRATES
 from .talk_signal import TalkSignals

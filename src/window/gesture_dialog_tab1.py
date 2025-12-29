@@ -6,7 +6,7 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from redwrenlib.utils import defaults
+from opennetics.utils import defaults
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (

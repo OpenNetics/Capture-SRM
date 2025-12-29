@@ -6,8 +6,8 @@
 from enum import Enum
 from dataclasses import dataclass, field
 
-from redwrenlib.utils import defaults
-from redwrenlib.typing import (
+from opennetics.utils import defaults
+from opennetics.typing import (
     float2d_t, float3d_t
 )
 

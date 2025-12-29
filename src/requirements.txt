@@ -2,5 +2,5 @@ numpy
 pyside6
 pyserial
 pyqtgraph
-redwrenlib
+opennetics
 scikit-learn

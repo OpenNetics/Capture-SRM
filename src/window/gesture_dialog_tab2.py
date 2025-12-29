@@ -6,8 +6,8 @@
 from dataclasses import dataclass
 from typing import Callable, Optional
 
-from redwrenlib import GestureFile
-from redwrenlib.utils.debug import alert
+from opennetics.file import GestureFile
+from opennetics.utils.debug import alert
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeyEvent
 from PySide6.QtWidgets import (
@@ -194,7 +194,7 @@ class Tab2:
         self._body_layout.addWidget(label)
 
         self._drop_boxes: dict[str, ReadModelData] = {}
-        read_data = self._gesture_data.get_gesture_data()
+        read_data = self._gesture_data.gesture_data
 
         for model_name in read_data.keys():
             label_holder: QHBoxLayout = QHBoxLayout()
