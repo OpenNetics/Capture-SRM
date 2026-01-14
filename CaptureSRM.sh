@@ -77,7 +77,7 @@ if [ -z "$1" ]; then
     fi
     source ./.venv/bin/activate 2>/dev/null
 
-    echo -e "\033[1;33m[Running GestureTracker]\033[0m"
+    echo -e "\033[1;33m[Running CaptureSRM]\033[0m"
     python3 ./src/main.py
 fi
 

@@ -1,6 +1,6 @@
 @echo off
 rem ------------------------------------------------------------
-rem  GestureTracker helper script for Windows
+rem   CaptureSRM helper script for Windows
 rem ------------------------------------------------------------
 
 rem ---------- Helper: print help ----------
@@ -73,6 +73,6 @@ exit /b 1
 
 rem ---------- Run the main script ----------
 :run_main
-echo [Running GestureTracker]
+echo [Running CaptureSRM]
 python .\src\main.py
 

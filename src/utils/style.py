@@ -3,18 +3,18 @@
 
 #- Imports -----------------------------------------------------------------------------------------
 
-APPLICATION_NAME: str = "Gesture Creator v1.0.0"
+APPLICATION_NAME: str = "CaptureSRM v1.0"
 
 
 #- Dimensions --------------------------------------------------------------------------------------
 
-WINDOW_SIZE: dict[str,int] = {
+WINDOW_SIZE: dict[str, int] = {
     "width": 1200,
     "height": 800
 }
 
 GRAPH_HEIGHT: int = 250
-SCROLL_HEIGHT:int = 450
+SCROLL_HEIGHT: int = 450
 ZOOM_SLIDER_WIDTH: int = 200
 
 
