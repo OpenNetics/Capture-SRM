@@ -8,8 +8,36 @@ from typing import Any
 
 #- Lib ---------------------------------------------------------------------------------------------
 
+global_color_counter = -1
+COLORS_LUT: list[str] = [
+    "#fa2077",
+    "#7463f3",
+    "#ff69b4",
+    "#c61b2a",
+    "#fdfd20",
+    "#5d8aa8",
+    "#ff2800",
+    "#98ff98",
+    "#007aa5",
+    "#870606",
+    "#f8f8ff",
+    "#ff00ff",
+    "#f8ba8b",
+    "#7F2169",
+    "#0069d1",
+    "#78f0f0",
+    "#a56423",
+    "#3f00ff",
+]
+
+
 # Return a random RGB color tuple used for new graph lines.
 def new_color() -> str:
+    global global_color_counter
+    if global_color_counter < len(COLORS_LUT) - 1:
+        global_color_counter += 1
+        return COLORS_LUT[global_color_counter]
+
     from random import randint
 
     r = randint(0, 255)
