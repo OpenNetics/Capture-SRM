@@ -128,7 +128,7 @@ class Tab1:
     def _init_input_filepath(self) -> None:
         # placeholder filename would be datestring()
         file_path, _ = QFileDialog.getSaveFileName(
-            self._parent, "Save Gesture", datestring(), "Gesture Files (*.ges);;All Files (*)",
+            self._parent, "Save Gesture", datestring(), "Gesture Files (*.srm);;All Files (*)",
             options = QFileDialog.Options()
         )
 

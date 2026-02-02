@@ -135,7 +135,7 @@ class Tab2:
     # Browse button action: open file dialog to choose target gesture file.
     def _init_input_filepath(self) -> None:
         file_path, _ = QFileDialog.getOpenFileName(
-            self._parent, "Open Gesture File", "", "Gesture Files (*.ges);;All Files (*)",
+            self._parent, "Open Gesture File", "", "Gesture Files (*.srm);;All Files (*)",
             options=QFileDialog.Options()
         )
         if not file_path: return
