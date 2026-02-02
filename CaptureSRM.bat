@@ -1,78 +1,78 @@
 @echo off
+setlocal enabledelayedexpansion
+
 rem ------------------------------------------------------------
 rem   CaptureSRM helper script for Windows
 rem ------------------------------------------------------------
 
-rem ---------- Helper: print help ----------
-:print_help
-echo USAGE:
-echo   %~nx0 {OPTIONS}
-echo.
-echo OPTIONS:
-echo   --install    Install all dependencies.
-echo   --reinstall  Remove existing environment and reinstall dependencies.
-echo   --update     Ensure packages are installed and update them.
-echo   --help       Display this help message.
-goto :eof
+rem ------------------------
+rem   Script Arguments
+rem ------------------------
 
-rem ---------- Parse first argument ----------
 if "%~1"=="" (
-    call :print_help
-    exit /b 1
-)
+    if not exist ".\.venv\" (
+        call :run_install
+    )
+    call :run_main
 
-if "%~1"=="--install" (
-    echo [Activating virtual environment]
-    call .\.venv\Scripts\activate.bat >nul 2>&1
-    goto :run_main
-)
+) else if "%~1"=="install" (
+    call :run_install
 
-if "%~1"=="--reinstall" (
+) else if "%~1"=="reinstall" (
     echo [Removing existing virtual environment]
     rmdir /s /q .\.venv
 
+    call :run_install
+
+) else if "%~1"=="update" (
+    echo update
+    call :run_install
+
+) else if "%~1"=="help" (
+    call :print_help
+
+) else (
+    call :print_help
+)
+
+
+rem ------------------------
+rem   Functions
+rem ------------------------
+
+goto :eof
+
+:run_main
+    echo [Activating virtual environment]
+    call .\.venv\Scripts\activate.bat >nul 2>&1
+
+    echo [Running CaptureSRM]
+    python .\src\main.py
+
+    goto :eof
+
+
+:run_install
     echo [Creating a new virtual environment]
     python -m venv .\.venv
+    attrib +h .\.venv
 
     echo [Installing requirements]
     call .\.venv\Scripts\activate.bat
     python -m pip install -r .\src\requirements.txt
-    goto :run_main
-)
 
-if "%~1"=="--update" (
-    if not exist ".\.venv\" (
-        echo [Virtual environment not found. Creating it]
-        python -m venv .\.venv
+    goto :eof
 
-        echo [Installing requirements]
-        call .\.venv\Scripts\activate.bat
-        python -m pip install -r .\src\requirements.txt
-    ) else (
-        echo [Activating existing virtual environment]
-        call .\.venv\Scripts\activate.bat
-    )
 
-    echo [Pulling updated git release]
-    git pull
+:print_help
+    echo USAGE:
+    echo   %~nx0 {OPTIONS}
+    echo.
+    echo OPTIONS:
+    echo   install    Install all dependencies.
+    echo   reinstall  Remove existing environment and reinstall dependencies.
+    echo   update     Ensure packages are installed and update them.
+    echo   help       Display this help message.
 
-    echo [Updating installed packages]
-    python -m pip install --upgrade -r .\src\requirements.txt
-    goto :run_main
-)
-
-if "%~1"=="--help" (
-    call :print_help
-    exit /b 0
-)
-
-rem ---------- Fallback: unknown option ----------
-echo Unknown option: %~1
-call :print_help
-exit /b 1
-
-rem ---------- Run the main script ----------
-:run_main
-echo [Running CaptureSRM]
-python .\src\main.py
+    goto :eof
 
