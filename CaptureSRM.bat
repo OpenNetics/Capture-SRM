@@ -47,7 +47,9 @@ goto :eof
     call .\.venv\Scripts\activate.bat >nul 2>&1
 
     echo [Running CaptureSRM]
-    python .\src\main.py
+    start "" "$~dp0.venv\Scripts\pythonw.exe" "%~dp0src\main.py"
+    timeout /t 2>nul
+    exit /b
 
     goto :eof
 
